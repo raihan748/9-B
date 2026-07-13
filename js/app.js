@@ -83,9 +83,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initApp() {
-  if (typeof Gun !== 'undefined') {
-    // Inisialisasi Gun.js
-    appDatabase = Gun(window.gunPeers);
+  if (window.gunDB) {
+    // Gunakan singleton gunDB — dibuat di config.js sebelum semua modul lain
+    appDatabase = window.gunDB;
     statusRef = appDatabase.get('9b_class_status_v1');
     sessionsRef = appDatabase.get('9b_class_admin_sessions_v1');
     logsRef = appDatabase.get('9b_class_activity_logs_v1');

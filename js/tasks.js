@@ -1,18 +1,14 @@
-// Modul Pengecekan Tugas (Task Tracker) terintegrasi dengan Gun.js (Global Realtime Tracker)
-let gunTasksInstance = null;
+// Modul Papan Tugas (Task Tracker) — menggunakan singleton window.gunDB dari config.js
 let tasksNodeRef = null;
-let localTasksFallback = []; // Fallback local storage jika database gagal/offline
+let localTasksFallback = [];
 
 window.initTasks = function() {
-  if (typeof Gun !== 'undefined') {
-    if (!gunTasksInstance) {
-      gunTasksInstance = Gun(window.gunPeers);
-    }
-    tasksNodeRef = gunTasksInstance.get('9b_class_tasks_global_v3'); // Namespace baru untuk global tracker stabil
-    
+  if (window.gunDB) {
+    // Gunakan singleton gunDB — JANGAN buat instance Gun baru
+    tasksNodeRef = window.gunDB.get('9b_class_tasks_global_v3');
     setupTasksRealtimeListener();
   } else {
-    console.warn("Gun.js tidak terdeteksi, beralih ke penyimpanan lokal browser.");
+    console.warn("Gun.js singleton belum siap, beralih ke localStorage.");
     loadTasksFromLocalStorage();
     window.renderTasksList();
   }
@@ -20,19 +16,24 @@ window.initTasks = function() {
 
 function setupTasksRealtimeListener() {
   tasksNodeRef.map().on((task, taskId) => {
-    if (!task) {
-      // Jika tugas dihapus secara global, hapus dari list lokal
+    // Abaikan node metadata Gun.js dan tugas yang sudah ditandai hapus
+    if (!task || taskId === '_' || task._deleted === true) {
       localTasksFallback = localTasksFallback.filter(t => t.id !== taskId);
-    } else {
-      // Perbarui atau tambahkan tugas ke list lokal secara global
-      const index = localTasksFallback.findIndex(t => t.id === taskId);
-      const updatedTask = { id: taskId, ...task };
-      if (index > -1) {
-        localTasksFallback[index] = updatedTask;
-      } else {
-        localTasksFallback.push(updatedTask);
-      }
+      window.renderTasksList();
+      return;
     }
+
+    // Abaikan nilai primitif yang bukan objek tugas
+    if (typeof task !== 'object') return;
+
+    const index = localTasksFallback.findIndex(t => t.id === taskId);
+    // Gabungkan dengan data yang sudah ada agar perubahan parsial (misal: hanya status) ikut terupdate
+    if (index > -1) {
+      localTasksFallback[index] = { ...localTasksFallback[index], ...task, id: taskId };
+    } else {
+      localTasksFallback.push({ ...task, id: taskId });
+    }
+
     window.renderTasksList();
     saveTasksToLocalStorage();
   });
@@ -163,11 +164,17 @@ window.addNewTask = function(subject, desc, deadline, priority) {
   }
 };
 
-// Ubah Status Pengerjaan Tugas secara Global (Admin Only)
+// Ubah Status Tugas secara Global (Admin Only)
+// KRITIS: Gunakan .get(taskId).get('status').put() bukan .get(taskId).put({status})
+// agar Gun.js P2P mengirim notifikasi perubahan ke SEMUA peer yang mendengarkan
 window.moveTask = function(taskId, newStatus) {
+  const taskName = localTasksFallback.find(t => t.id === taskId)?.subject || 'tugas';
+
   if (tasksNodeRef && !taskId.startsWith('local_')) {
-    tasksNodeRef.get(taskId).put({ status: newStatus });
+    // Tulis langsung ke sub-key 'status' — ini cara benar di Gun.js
+    tasksNodeRef.get(taskId).get('status').put(newStatus);
   } else {
+    // Fallback: update lokal saja
     const task = localTasksFallback.find(t => t.id === taskId);
     if (task) {
       task.status = newStatus;
@@ -177,12 +184,12 @@ window.moveTask = function(taskId, newStatus) {
   }
 
   if (window.logAdminActivity) {
-    const taskName = localTasksFallback.find(t => t.id === taskId)?.subject || 'tugas';
     window.logAdminActivity(`Mengubah status tugas global "${taskName}" menjadi [${newStatus.toUpperCase()}]`);
   }
 };
 
 // Hapus Tugas secara Global (Admin Only)
+// Gun.js tidak bisa benar-benar menghapus node, jadi kita tandai sebagai _deleted=true
 window.deleteTask = function(taskId) {
   if (!confirm("Apakah Anda yakin ingin menghapus tugas ini secara permanen dari database global? Tugas akan hilang dari layar seluruh siswa.")) return;
 
@@ -190,12 +197,14 @@ window.deleteTask = function(taskId) {
   const taskSubject = taskToDelete ? taskToDelete.subject : 'Tugas';
 
   if (tasksNodeRef && !taskId.startsWith('local_')) {
-    tasksNodeRef.get(taskId).put(null);
-  } else {
-    localTasksFallback = localTasksFallback.filter(t => t.id !== taskId);
-    saveTasksToLocalStorage();
-    window.renderTasksList();
+    // Tandai sebagai dihapus — lebih andal dari put(null) di Gun.js P2P
+    tasksNodeRef.get(taskId).get('_deleted').put(true);
   }
+
+  // Hapus dari list lokal langsung tanpa menunggu callback
+  localTasksFallback = localTasksFallback.filter(t => t.id !== taskId);
+  saveTasksToLocalStorage();
+  window.renderTasksList();
 
   if (window.logAdminActivity) {
     window.logAdminActivity(`Menghapus tugas secara permanen: "${taskSubject}"`);

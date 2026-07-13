@@ -1,4 +1,4 @@
-// Modul Chat Realtime menggunakan Gun.js (Realtime Peer-to-Peer Database)
+// Modul Chat Realtime — menggunakan singleton window.gunDB dari config.js
 let gunInstance = null;
 let chatNodeRef = null;
 let chatListenerRef = null;
@@ -8,16 +8,13 @@ let currentUserAvatar = localStorage.getItem('chat_avatar') || '🦖';
 const emojis = ['🦖', '👾', '🦊', '🐱', '🐼', '🐨', '🐸', '🦁', '🐯', '🐙', '🥑', '🍕', '⚽', '🎸', '🚀'];
 
 window.initChat = function(onUserReady) {
-  if (typeof Gun === 'undefined') {
-    console.error("SDK Gun.js belum dimuat di index.html");
+  if (!window.gunDB) {
+    console.error("Gun.js singleton belum siap di initChat");
     return;
   }
 
-  // Inisialisasi Gun.js jika belum ada
-  if (!gunInstance) {
-    gunInstance = Gun(window.gunPeers);
-  }
-  
+  // Gunakan singleton gunDB — JANGAN buat instance Gun baru
+  gunInstance = window.gunDB;
   chatNodeRef = gunInstance.get('9b_class_chat_v1');
 
   // Periksa apakah pengguna sudah mengatur nama panggilan
