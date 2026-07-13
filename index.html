@@ -4,15 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Website Resmi Kelas 9B — SMPIT Al-Fityan</title>
-  <meta name="description" content="Portal Kelas 9B - Dark Neo-Brutalism Edition. Tempat ngobrol, cek tugas, belajar bareng, dan mengunci kapsul waktu kenangan.">
+  <meta name="description" content="Portal Kelas 9B. Wadah komunikasi, pemantauan tugas, pembelajaran bersama, dan penyimpanan kapsul waktu kenangan.">
   
   <!-- Styling & Icons -->
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   
-  <!-- Firebase SDK Legacy (Compatible with browser ES Modules CDN) -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+  <!-- Gun.js SDK (Realtime Decentralized Database) -->
+  <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
 </head>
 <body>
 
@@ -27,13 +26,13 @@
     </a>
     <ul class="nav-links">
       <li><a class="nav-tab-btn active" data-tab="lobby">Lobby</a></li>
-      <li><a class="nav-tab-btn" data-tab="chat">Chamber Chat</a></li>
-      <li><a class="nav-tab-btn" data-tab="tasks">Task Board</a></li>
-      <li><a class="nav-tab-btn" data-tab="capsule">Time Capsule</a></li>
+      <li><a class="nav-tab-btn" data-tab="chat">Ruang Komunikasi</a></li>
+      <li><a class="nav-tab-btn" data-tab="tasks">Papan Tugas</a></li>
+      <li><a class="nav-tab-btn" data-tab="capsule">Kapsul Waktu</a></li>
     </ul>
     <div class="nav-right">
       <button id="adminLoginBtn" class="admin-login-btn">
-        <i class="fa-solid fa-lock"></i> ADMIN LOGIN
+        <i class="fa-solid fa-lock"></i> LOGIN ADMIN
       </button>
       <button id="mobileMenuBtn">
         <i class="fa-solid fa-bars"></i>
@@ -44,18 +43,18 @@
   <!-- MOBILE NAVIGATION MENU -->
   <div id="mobileMenu">
     <a class="nav-tab-btn active" data-tab="lobby">Lobby</a>
-    <a class="nav-tab-btn" data-tab="chat">Chamber Chat</a>
-    <a class="nav-tab-btn" data-tab="tasks">Task Board</a>
-    <a class="nav-tab-btn" data-tab="capsule">Time Capsule</a>
+    <a class="nav-tab-btn" data-tab="chat">Ruang Komunikasi</a>
+    <a class="nav-tab-btn" data-tab="tasks">Papan Tugas</a>
+    <a class="nav-tab-btn" data-tab="capsule">Kapsul Waktu</a>
   </div>
 
   <!-- LIVE BROADCAST BANNER -->
   <div class="live-broadcast" id="liveBroadcastBanner">
     <div class="live-badge">
-      <span class="live-dot"></span> LIVE BROADCAST
+      <span class="live-dot"></span> SIARAN LANGSUNG
     </div>
     <div class="broadcast-ticker">
-      <span class="broadcast-text" id="broadcastText">Selamat datang di website resmi kelas 9B! Tugas Matematika Bab 3 dikumpulkan hari Kamis. Piket kelas hari ini harap bersiap sepulang sekolah.</span>
+      <span class="broadcast-text" id="broadcastText">Selamat datang di website resmi Kelas 9B. Tugas sekolah dapat Anda pantau di menu Papan Tugas.</span>
     </div>
   </div>
 
@@ -71,10 +70,10 @@
       <div id="examPrepCenter" class="exam-prep-banner" style="display: none;">
         <div class="exam-header">
           <div class="exam-title">
-            <i class="fa-solid fa-graduation-cap"></i> EXAM PREPARATION CENTER (MODE BELAJAR UJIAN)
+            <i class="fa-solid fa-graduation-cap"></i> PUSAT PERSIAPAN UJIAN (MODE BELAJAR)
           </div>
           <p style="margin-top: 6px; font-size: 0.95rem; color: var(--text-muted);">
-            Owner telah mengaktifkan mode belajar. Tonton video materi di bawah ini untuk persiapan ujian kelas 9B!
+            Administrator telah mengaktifkan mode belajar. Silakan pelajari materi video di bawah ini untuk persiapan ujian Kelas 9B.
           </p>
         </div>
         <div class="exam-grid-videos" id="examVideoGrid">
@@ -88,22 +87,22 @@
           <div class="hero-brutal">
             <div class="hero-subtitle">Masa Depan Dimulai dari Sini</div>
             <h1 class="hero-title">Welcome to the<br><span class="accent">9B CLASSROOM</span></h1>
-            <p class="hero-desc">Wadah digital resmi anak-anak kelas 9B. Pantau tugas menumpuk, ngobrol santai real-time di Chamber Chat, dengerin lo-fi, dan taruh pesan rahasia di Kapsul Waktu kita.</p>
+            <p class="hero-desc">Wadah digital resmi Kelas 9B. Pantau daftar tugas akademik, berkomunikasi secara real-time di Ruang Komunikasi, dan simpan pesan rahasia Anda di Kapsul Waktu.</p>
           </div>
 
           <!-- Stats Grid -->
           <div class="grid-stats">
             <div class="stat-item">
-              <div class="stat-value">32</div>
-              <div class="stat-label">Pasukan Siswa</div>
+              <div class="stat-value">32 Siswa</div>
+              <div class="stat-label">Jumlah Anggota Kelas</div>
             </div>
             <div class="stat-item">
-              <div class="stat-value" id="statsClassStatus">Aktif</div>
-              <div class="stat-label">Status Kelas</div>
+              <div class="stat-value">1 Wali Kelas</div>
+              <div class="stat-label">Pendamping Kelas</div>
             </div>
             <div class="stat-item">
-              <div class="stat-value">99%</div>
-              <div class="stat-label">Tingkat Kebisingan</div>
+              <div class="stat-value school-title">SMPIT AL-FITYAN SCHOOL GOWA</div>
+              <div class="stat-label">Asal Sekolah</div>
             </div>
           </div>
 
@@ -113,11 +112,11 @@
             <div class="mading-grid" id="madingLobbyGrid">
               <div class="mading-item important">
                 <div class="mading-date">DIPOSTING OLEH WALI KELAS • 13 JULI 2026</div>
-                <div class="mading-content">Siapkan diri kalian buat Ujian Akhir Semester! Jangan lupa jaga kesehatan dan manfaatkan video persiapan ujian di tab belajar kalau diaktifkan.</div>
+                <div class="mading-content">Harap persiapkan diri Anda untuk menghadapi Penilaian Akhir Semester. Tetap jaga kesehatan dan manfaatkan video persiapan ujian di menu belajar apabila diaktifkan.</div>
               </div>
               <div class="mading-item">
                 <div class="mading-date">DIPOSTING OLEH KETUA KELAS • 12 JULI 2026</div>
-                <div class="mading-content">Jadwal piket kelas diperketat mulai minggu ini. Yang melanggar bakal kena sanksi traktir es sirup kantin!</div>
+                <div class="mading-content">Jadwal piket kelas harap dijalankan secara disiplin demi kenyamanan belajar bersama di ruang kelas.</div>
               </div>
             </div>
           </div>
@@ -138,48 +137,35 @@
             </div>
           </div>
 
-          <!-- BGM Widget -->
-          <div class="widget-bgm">
-            <h4 class="widget-title"><i class="fa-solid fa-music" style="color: var(--purple);"></i> BGM CHILL PLAYER</h4>
-            <div class="bgm-player">
-              <button class="bgm-btn" id="bgmPlayBtn"><i class="fa-solid fa-play"></i></button>
-              <div class="bgm-info">
-                <div class="bgm-title">Lofi Chill Study Beats</div>
-                <div class="bgm-subtitle">Audio background instrumental</div>
-              </div>
-            </div>
-            <!-- Audio streaming source lo-fi gratis -->
-            <audio id="bgmAudio" loop src="https://commercial.ambitionlofi.com/stream/ambition.mp3"></audio>
-          </div>
         </div>
       </div>
     </section>
 
     <!-- ==========================================
-         TAB CONTENT: CHAMBER CHAT
+         TAB CONTENT: RUANG KOMUNIKASI (CHAMBER CHAT)
          ========================================== -->
     <section id="chatTab" class="tab-content">
       <div class="chat-layout">
         <!-- Sidebar Chat -->
         <div class="chat-sidebar">
           <div>
-            <h3 style="font-family: 'Archivo Black', sans-serif; font-size: 1.1rem; margin-bottom: 20px;">CHAMBER 9B</h3>
+            <h3 style="font-family: 'Archivo Black', sans-serif; font-size: 1.1rem; margin-bottom: 20px;">RUANG DISKUSI</h3>
             <div class="user-profile-box">
-              <div class="profile-title">Profil Lo</div>
+              <div class="profile-title">Profil Anda</div>
               <div class="profile-display">
                 <div class="user-avatar" id="myChatAvatar">🦖</div>
-                <div class="user-name" id="myChatName">Siswa 9B</div>
+                <div class="user-name" id="myChatName">Anggota Kelas 9B</div>
               </div>
-              <button id="editUsernameBtn" class="task-action-btn" style="width: 100%; margin-top: 10px; font-size: 0.75rem;">GANTI PROFIL</button>
+              <button id="editUsernameBtn" class="task-action-btn" style="width: 100%; margin-top: 10px; font-size: 0.75rem;">UBAH PROFIL</button>
             </div>
             
             <div class="chat-room-info">
-              <h4>Aturan Ngobrol</h4>
-              <p>1. Bebas bahas apa aja asal sopan.<br>2. Jangan spam chat.<br>3. Admin/Owner bisa hapus chat lo kalau melanggar aturan.</p>
+              <h4>Aturan Diskusi</h4>
+              <p>1. Berdiskusi secara sopan dan santun.<br>2. Dilarang mengirimkan pesan berulang (spam).<br>3. Admin dapat menghapus pesan yang dinilai kurang pantas.</p>
             </div>
           </div>
           
-          <button id="clearChatBtn" class="brut-btn btn-pink" style="width: 100%; display: none; font-size: 0.8rem; padding: 10px;">KOSONGKAN CHAT</button>
+          <button id="clearChatBtn" class="brut-btn btn-pink" style="width: 100%; display: none; font-size: 0.8rem; padding: 10px;">BERSIHKAN RIWAYAT DISKUSI</button>
         </div>
 
         <!-- Chat Container -->
@@ -187,21 +173,21 @@
           <div class="chat-header">
             <div class="chat-title-info">
               <span class="online-indicator"></span>
-              <span style="font-family: 'Archivo Black', sans-serif; font-size: 1.1rem;">#chat-utama-9b</span>
+              <span style="font-family: 'Archivo Black', sans-serif; font-size: 1.1rem;">#komunikasi-utama-9b</span>
             </div>
-            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700;">Realtime Database</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700;">Jaringan Real-time</span>
           </div>
 
           <!-- Message History -->
           <div class="chat-messages" id="chatMessages">
             <div class="message system">
-              <div class="message-text">Menghubungkan ke ruang obrolan...</div>
+              <div class="message-text">Menghubungkan ke ruang komunikasi...</div>
             </div>
           </div>
 
           <!-- Chat Input -->
           <div class="chat-input-area">
-            <input type="text" id="chatInputField" class="chat-input" placeholder="Tulis pesan lo di sini, pencet Enter buat kirim..." maxlength="200">
+            <input type="text" id="chatInputField" class="chat-input" placeholder="Tulis pesan Anda di sini, tekan Enter untuk mengirim..." maxlength="200">
             <button id="sendChatBtn" class="brut-btn btn-purple" style="box-shadow: 3px 3px 0px #000; padding: 12px 20px;"><i class="fa-solid fa-paper-plane"></i></button>
           </div>
         </div>
@@ -209,12 +195,12 @@
     </section>
 
     <!-- ==========================================
-         TAB CONTENT: TASK BOARD
+         TAB CONTENT: PAPAN TUGAS (TASK BOARD)
          ========================================== -->
     <section id="tasksTab" class="tab-content">
       <div class="tasks-control-bar">
         <h2 style="font-family: 'Archivo Black', sans-serif; font-size: 1.8rem; display: flex; align-items: center; gap: 8px;">
-          <i class="fa-solid fa-list-check" style="color: var(--yellow-light);"></i> TUGAS KELAS 9B
+          <i class="fa-solid fa-list-check" style="color: var(--yellow-light);"></i> PAPAN TUGAS KELAS 9B
         </h2>
         <button id="openAddTaskModalBtn" class="brut-btn btn-mint" style="display: none; padding: 10px 20px;">+ TAMBAH TUGAS</button>
       </div>
@@ -224,7 +210,7 @@
         <!-- Column To Do -->
         <div class="kanban-col col-todo">
           <div class="kanban-header">
-            <span>BELUM DIKERJAKAN</span>
+            <span>BELUM DIMULAI</span>
             <span class="col-count" id="todoCount">0</span>
           </div>
           <div class="kanban-cards" id="todoCards">
@@ -235,7 +221,7 @@
         <!-- Column In Progress -->
         <div class="kanban-col col-progress">
           <div class="kanban-header">
-            <span>SEDANG DIKERJAKAN</span>
+            <span>SEDANG DIPROSES</span>
             <span class="col-count" id="progressCount">0</span>
           </div>
           <div class="kanban-cards" id="progressCards">
@@ -257,7 +243,7 @@
     </section>
 
     <!-- ==========================================
-         TAB CONTENT: TIME CAPSULE
+         TAB CONTENT: KAPSUL WAKTU (TIME CAPSULE)
          ========================================== -->
     <section id="capsuleTab" class="tab-content">
       <div class="time-capsule-layout">
@@ -268,7 +254,7 @@
             <i class="fa-solid fa-user-lock"></i>
           </div>
           <h2 style="font-family: 'Archivo Black', sans-serif; font-size: 1.8rem;">KAPSUL WAKTU KELAS 9B</h2>
-          <p style="color: var(--text-muted); margin-top: 8px;">Kapsul waktu ini berisi pesan rahasia, cita-cita, dan kenangan anak-anak 9B yang dikunci rapat. Tanggal pembukaan diatur langsung oleh Head Admin.</p>
+          <p style="color: var(--text-muted); margin-top: 8px;">Kapsul waktu ini menyimpan pesan tertulis, cita-cita, dan kenangan Kelas 9B yang dikunci rapat. Tanggal pembukaan diatur oleh Administrator Utama.</p>
           
           <div class="countdown-box">
             <div class="countdown-segment">
@@ -295,24 +281,24 @@
 
           <!-- Submit message area -->
           <div class="capsule-submit-box">
-            <h3 style="font-family: 'Archivo Black', sans-serif; font-size: 1.1rem; margin-bottom: 16px; border-bottom: 2px dashed rgba(255,255,255,0.05); padding-bottom: 8px;">SEMPILKAN PESAN RAHASIA LO</h3>
+            <h3 style="font-family: 'Archivo Black', sans-serif; font-size: 1.1rem; margin-bottom: 16px; border-bottom: 2px dashed rgba(255,255,255,0.05); padding-bottom: 8px;">SIMPAN PESAN RAHASIA ANDA</h3>
             <div class="form-group" style="text-align: left;">
               <label for="capsuleSenderName">Nama Pengirim (Wajib)</label>
-              <input type="text" id="capsuleSenderName" class="form-input" placeholder="Masukkan nama lo..." maxlength="20">
+              <input type="text" id="capsuleSenderName" class="form-input" placeholder="Masukkan nama lengkap/panggilan Anda..." maxlength="20">
             </div>
             <div class="form-group" style="text-align: left;">
               <label for="capsuleMessageInput">Pesan / Cita-cita / Kenangan Rahasia</label>
-              <textarea id="capsuleMessageInput" class="form-input" rows="4" style="resize: none;" placeholder="Tulis harapan lo untuk diri lo sendiri, kelas, atau temen-temen 9B 10 tahun mendatang..." maxlength="400"></textarea>
+              <textarea id="capsuleMessageInput" class="form-input" rows="4" style="resize: none;" placeholder="Tuliskan harapan, cita-cita, atau pesan untuk diri Anda sendiri serta teman-teman Kelas 9B di masa depan..." maxlength="400"></textarea>
             </div>
-            <button id="submitToCapsuleBtn" class="brut-btn btn-purple" style="width: 100%; box-shadow: 4px 4px 0px #000;">KUNCI PESAN KE DALAM KAPSUL</button>
+            <button id="submitToCapsuleBtn" class="brut-btn btn-purple" style="width: 100%; box-shadow: 4px 4px 0px #000;">KUNCI PESAN KE KAPSUL WAKTU</button>
           </div>
         </div>
 
         <!-- View saat Kapsul Terbuka (Semua kenangan dimunculkan) -->
         <div id="capsuleUnlockedView" class="capsule-unlocked-view" style="display: none;">
           <div class="unlocked-header">
-            <h2>🔓 KAPSUL WAKTU RESMI DIBUKA!</h2>
-            <p>Pesan dan cita-cita anak-anak kelas 9B yang dikunci dulu sekarang bisa dibaca. Semoga sukses buat kita semua!</p>
+            <h2>🔓 KAPSUL WAKTU RESMI DIBUKA</h2>
+            <p>Seluruh pesan dan kenangan Kelas 9B yang tersimpan kini dapat dibaca bersama. Semoga kesuksesan menyertai langkah kita semua.</p>
           </div>
           <div class="capsule-messages-grid" id="capsuleMessagesGrid">
             <!-- Dynamic memories cards -->
@@ -327,7 +313,7 @@
          ========================================== -->
     <section id="adminDashboardPanel" class="admin-panel" style="display: none;">
       <div class="panel-header">
-        <h3><i class="fa-solid fa-solar-panel"></i> DASHBOARD KONTROL ADMIN <span id="adminPanelLevel" class="tag-label" style="margin: 0 0 0 10px; background: var(--pink);">ADMIN</span></h3>
+        <h3><i class="fa-solid fa-solar-panel"></i> DASHBOARD UTAMA ADMINISTRASI <span id="adminPanelLevel" class="tag-label" style="margin: 0 0 0 10px; background: var(--pink);">ADMIN</span></h3>
         <button id="adminLogoutBtn" class="brut-btn btn-pink" style="padding: 6px 12px; font-size: 0.8rem; box-shadow: 2px 2px 0px #000;">LOGOUT</button>
       </div>
 
@@ -426,7 +412,7 @@
   <div id="loginAdminModal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
       <h3 style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-lock" style="color: var(--pink);"></i> Login Akses Admin</h3>
-      <p>Masukkan password admin lo untuk mengelola tugas, live broadcast, atau panel kontrol kelas.</p>
+      <p>Silakan masukkan kata sandi akses untuk mengelola tugas kelas, siaran langsung, dan panel kontrol.</p>
       <div class="form-group">
         <label for="adminPasswordInput">Password Admin</label>
         <input type="password" id="adminPasswordInput" class="form-input" placeholder="Ketik password...">
@@ -442,7 +428,7 @@
   <div id="addTaskModal" class="modal-overlay" style="display: none;">
     <div class="modal-content" style="width: 480px;">
       <h3 style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-list-check" style="color: var(--mint);"></i> Tambah Tugas Baru</h3>
-      <p>Catat tugas baru untuk kelas 9B. Tugas akan otomatis tersinkronisasi ke dashboard semua siswa.</p>
+      <p>Catat tugas baru untuk Kelas 9B. Tugas akan otomatis tersinkronisasi ke seluruh layar siswa.</p>
       
       <div class="form-group">
         <label for="taskSubjectInput">Mata Pelajaran</label>
@@ -496,7 +482,7 @@
   <div id="addVideoModal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
       <h3>Tambah Video Materi</h3>
-      <p>Tambahkan video pembelajaran (YouTube) ke Exam Prep Center.</p>
+      <p>Tambahkan video pembelajaran (YouTube) ke Pusat Persiapan Ujian.</p>
       <div class="form-group">
         <label for="videoTitleInput">Judul Video</label>
         <input type="text" id="videoTitleInput" class="form-input" placeholder="Contoh: Belajar Limit Fungsi Aljabar">

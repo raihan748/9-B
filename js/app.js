@@ -1,7 +1,6 @@
-// Jantung Utama Logika Aplikasi (Non-Module Global Scope)
+// Jantung Utama Logika Aplikasi terintegrasi dengan Gun.js (Non-Module Global Scope)
 
 // State Management
-// BUG FIX: Rename 'database' -> 'appDatabase' agar tidak conflict dengan chat.js dan tasks.js
 let appDatabase = null;
 let statusRef = null;
 let sessionsRef = null;
@@ -22,10 +21,6 @@ const adminLoginBtn = document.getElementById('adminLoginBtn');
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 const mobileMenu = document.getElementById('mobileMenu');
 
-// Audio BGM
-const bgmAudio = document.getElementById('bgmAudio');
-const bgmPlayBtn = document.getElementById('bgmPlayBtn');
-
 // Modals
 const loginAdminModal = document.getElementById('loginAdminModal');
 const addTaskModal = document.getElementById('addTaskModal');
@@ -40,17 +35,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initApp() {
-  // Inisialisasi Firebase jika ada
-  if (typeof firebase !== 'undefined') {
-    if (!firebase.apps.length) {
-      firebase.initializeApp(window.firebaseConfig);
-    }
-    appDatabase = firebase.database();
-    statusRef = appDatabase.ref('9b_status');
-    sessionsRef = appDatabase.ref('9b_admin_sessions');
-    logsRef = appDatabase.ref('9b_activity_logs');
-    capsuleRef = appDatabase.ref('9b_time_capsule');
-    videosRef = appDatabase.ref('9b_exam_videos');
+  if (typeof Gun !== 'undefined') {
+    // Inisialisasi Gun.js
+    appDatabase = Gun(window.gunPeers);
+    statusRef = appDatabase.get('9b_class_status_v1');
+    sessionsRef = appDatabase.get('9b_class_admin_sessions_v1');
+    logsRef = appDatabase.get('9b_class_activity_logs_v1');
+    capsuleRef = appDatabase.get('9b_class_time_capsule_v1');
+    videosRef = appDatabase.get('9b_class_exam_videos_v1');
 
     setupGlobalStatusListener();
   }
@@ -73,11 +65,8 @@ function initApp() {
   // Event Listeners untuk UI & Tombol
   setupUIEventListeners();
   
-  // Kembalikan sesi admin jika sebelumnya sudah login (cek localStorage)
+  // Kembalikan sesi admin jika sebelumnya sudah login
   restoreAdminSession();
-
-  // Setup Lo-fi BGM Player
-  initBgmPlayer();
 }
 
 /* ==========================================================================
@@ -94,7 +83,6 @@ function initTabRouter() {
 }
 
 function switchTab(tabId) {
-  // Update tombol aktif
   tabButtons.forEach(b => {
     if (b.dataset.tab === tabId) {
       b.classList.add('active');
@@ -103,7 +91,6 @@ function switchTab(tabId) {
     }
   });
 
-  // Update konten tab aktif
   tabContents.forEach(content => {
     if (content.id === `${tabId}Tab`) {
       content.classList.add('active');
@@ -112,12 +99,9 @@ function switchTab(tabId) {
     }
   });
 
-  // Tutup mobile menu jika terbuka
   mobileMenu.style.display = 'none';
 
-  // Trigger khusus saat pindah tab
   if (tabId === 'chat') {
-    // Auto scroll chat ke bawah
     const chatMessages = document.getElementById('chatMessages');
     if (chatMessages) {
       setTimeout(() => {
@@ -132,13 +116,13 @@ function switchTab(tabId) {
 }
 
 /* ==========================================================================
-   GLOBAL REALTIME STATUS LISTENER (FIREBASE SYNC)
+   GLOBAL REALTIME STATUS LISTENER (GUN.JS SYNC)
    ========================================================================== */
 function setupGlobalStatusListener() {
   if (!statusRef) return;
 
-  statusRef.on('value', (snapshot) => {
-    const status = snapshot.val() || {};
+  statusRef.on((status) => {
+    if (!status) return;
 
     // 1. Deadline Alert Mode
     const isDeadlineMode = status.deadline_mode || false;
@@ -167,12 +151,10 @@ function setupGlobalStatusListener() {
     document.getElementById('switchTimeCapsuleMode').checked = isTimeCapsule;
     targetCapsuleDate = status.time_capsule_unlock_date || '';
     
-    // BUG FIX: Tab capsule selalu tampil di nav, isinya yang berubah berdasarkan mode
-    // Jika Time Capsule mode tidak aktif, tampilkan pesan info saja
+    // Tab capsule selalu aktif untuk pengisian pesan rahasia
     if (isTimeCapsule) {
       initTimeCapsuleView(status.time_capsule_forced_open || false);
     } else {
-      // Tampilkan locked view default agar tab tetap accessible
       const lockedView = document.getElementById('capsuleLockedView');
       const unlockedView = document.getElementById('capsuleUnlockedView');
       if (lockedView) lockedView.style.display = 'block';
@@ -180,7 +162,7 @@ function setupGlobalStatusListener() {
     }
 
     // 4. Live Broadcast Text
-    const bcastText = status.broadcast_text || 'Selamat datang di website resmi kelas 9B!';
+    const bcastText = status.broadcast_text || 'Selamat datang di website resmi Kelas 9B.';
     document.getElementById('broadcastText').innerText = bcastText;
     document.getElementById('broadcastTextEditor').value = bcastText;
   });
@@ -202,10 +184,9 @@ function initTimeCapsuleView(forcedOpen) {
       day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
     })} WIB`;
   } else {
-    targetText.innerText = 'Rencana dibuka pada: Waktu belum ditentukan admin';
+    targetText.innerText = 'Rencana dibuka pada: Waktu pembukaan belum ditentukan administrator';
   }
 
-  // Mulai hitung mundur jika tidak dipaksa buka
   if (forcedOpen) {
     lockedView.style.display = 'none';
     unlockedView.style.display = 'block';
@@ -216,7 +197,6 @@ function initTimeCapsuleView(forcedOpen) {
     
     if (targetCapsuleDate) {
       startCountdown(targetCapsuleDate, () => {
-        // Callback saat hitung mundur habis
         lockedView.style.display = 'none';
         unlockedView.style.display = 'block';
         loadCapsuleMemories();
@@ -261,29 +241,47 @@ function loadCapsuleMemories() {
   if (!capsuleRef) return;
   
   const grid = document.getElementById('capsuleMessagesGrid');
-  grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center;">Memuat kenangan kelas 9B...</div>';
+  grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center;">Memuat kenangan Kelas 9B...</div>';
 
-  capsuleRef.once('value', (snapshot) => {
-    grid.innerHTML = '';
-    const data = snapshot.val();
-    if (data) {
-      Object.keys(data).forEach(key => {
-        const item = data[key];
-        const card = document.createElement('div');
-        card.className = 'capsule-message-card';
-        // Berikan rotasi asimetris acak untuk gaya brutalist
-        const rotation = (Math.random() * 4 - 2).toFixed(1);
-        card.style.setProperty('--rotation', `${rotation}deg`);
-
-        card.innerHTML = `
-          <div class="capsule-msg-sender">DARI: ${escapeHTML(item.sender)}</div>
-          <div class="capsule-msg-body">"${escapeHTML(item.message)}"</div>
-        `;
-        grid.appendChild(card);
-      });
+  const memoriesList = [];
+  capsuleRef.map().once((item, key) => {
+    if (!item) return;
+    
+    // Cek apakah item sudah ada di array untuk menghindari duplikasi
+    const index = memoriesList.findIndex(m => m.id === key);
+    if (index > -1) {
+      memoriesList[index] = { id: key, ...item };
     } else {
-      grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Belum ada pesan yang disumbangkan di kapsul waktu kelas.</div>';
+      memoriesList.push({ id: key, ...item });
     }
+    
+    renderMemoriesGrid(memoriesList);
+  });
+
+  // Handle jika database kosong
+  setTimeout(() => {
+    if (grid.innerHTML.includes('Memuat kenangan')) {
+      grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Belum ada pesan yang disumbangkan di dalam kapsul waktu.</div>';
+    }
+  }, 2000);
+}
+
+function renderMemoriesGrid(list) {
+  const grid = document.getElementById('capsuleMessagesGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  
+  list.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'capsule-message-card';
+    const rotation = (Math.random() * 4 - 2).toFixed(1);
+    card.style.setProperty('--rotation', `${rotation}deg`);
+
+    card.innerHTML = `
+      <div class="capsule-msg-sender">DARI: ${escapeHTML(item.sender)}</div>
+      <div class="capsule-msg-body">"${escapeHTML(item.message)}"</div>
+    `;
+    grid.appendChild(card);
   });
 }
 
@@ -292,20 +290,19 @@ function submitToCapsule(sender, message) {
   const cleanMsg = message.trim();
 
   if (!cleanSender || !cleanMsg) {
-    alert("Nama dan pesan wajib diisi!");
+    alert("Nama dan isi pesan wajib diisi!");
     return;
   }
 
   if (capsuleRef) {
-    capsuleRef.push({
+    capsuleRef.set({
       sender: cleanSender,
       message: cleanMsg,
       timestamp: Date.now()
-    }).then(() => {
-      alert("🔒 Pesan lo berhasil dikunci ke dalam Kapsul Waktu! Ga ada yang bisa baca sampai waktunya dibuka.");
-      document.getElementById('capsuleSenderName').value = '';
-      document.getElementById('capsuleMessageInput').value = '';
     });
+    alert("🔒 Pesan Anda berhasil dikunci ke dalam Kapsul Waktu. Pesan tidak akan dapat dibaca oleh siapa pun sampai waktu pembukaan tiba.");
+    document.getElementById('capsuleSenderName').value = '';
+    document.getElementById('capsuleMessageInput').value = '';
   } else {
     alert("Koneksi database terputus. Gagal menyimpan pesan.");
   }
@@ -319,45 +316,72 @@ function loadExamVideos() {
   const grid = document.getElementById('examVideoGrid');
   grid.innerHTML = '<div style="grid-column:1/-1; text-align:center;">Memuat materi video...</div>';
 
-  videosRef.on('value', (snapshot) => {
-    grid.innerHTML = '';
-    const data = snapshot.val();
-    if (data) {
-      Object.keys(data).forEach(key => {
-        const video = data[key];
-        const ytId = extractYoutubeId(video.url);
-        if (!ytId) return;
-
-        const card = document.createElement('div');
-        card.className = 'video-card';
-        
-        // Tampilkan tombol delete jika login sebagai Head Admin
-        const isHeadAdmin = localStorage.getItem('admin_level') === 'HEAD_ADMIN';
-        const deleteBtn = isHeadAdmin 
-          ? `<button class="task-action-btn btn-delete" style="width:100%; border:none; border-top:2px solid var(--border-color); font-size:0.75rem; padding:8px;" onclick="deleteExamVideo('${key}')">HAPUS VIDEO</button>`
-          : '';
-
-        card.innerHTML = `
-          <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/${ytId}" allowfullscreen></iframe>
-          </div>
-          <div class="video-info">
-            <div class="video-title">${escapeHTML(video.title)}</div>
-          </div>
-          ${deleteBtn}
-        `;
-        grid.appendChild(card);
-      });
+  const videoList = [];
+  
+  videosRef.map().on((video, key) => {
+    if (!video) {
+      // Hapus video dari list jika di-put null
+      const idx = videoList.findIndex(v => v.id === key);
+      if (idx > -1) videoList.splice(idx, 1);
     } else {
-      grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Belum ada video materi belajar yang ditambahkan.</div>';
+      const idx = videoList.findIndex(v => v.id === key);
+      if (idx > -1) {
+        videoList[idx] = { id: key, ...video };
+      } else {
+        videoList.push({ id: key, ...video });
+      }
     }
+    
+    renderVideosGrid(videoList);
+  });
+
+  // Handle jika kosong
+  setTimeout(() => {
+    if (grid.innerHTML.includes('Memuat materi')) {
+      grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Belum ada materi pembelajaran video yang ditambahkan.</div>';
+    }
+  }, 2000);
+}
+
+function renderVideosGrid(list) {
+  const grid = document.getElementById('examVideoGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  if (list.length === 0) {
+    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Belum ada materi pembelajaran video yang ditambahkan.</div>';
+    return;
+  }
+
+  list.forEach(video => {
+    const ytId = extractYoutubeId(video.url);
+    if (!ytId) return;
+
+    const card = document.createElement('div');
+    card.className = 'video-card';
+    
+    const isHeadAdmin = localStorage.getItem('admin_level') === 'HEAD_ADMIN';
+    const deleteBtn = isHeadAdmin 
+      ? `<button class="task-action-btn btn-delete" style="width:100%; border:none; border-top:2px solid var(--border-color); font-size:0.75rem; padding:8px;" onclick="deleteExamVideo('${video.id}')">HAPUS VIDEO</button>`
+      : '';
+
+    card.innerHTML = `
+      <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/${ytId}" allowfullscreen></iframe>
+      </div>
+      <div class="video-info">
+        <div class="video-title">${escapeHTML(video.title)}</div>
+      </div>
+      ${deleteBtn}
+    `;
+    grid.appendChild(card);
   });
 }
 
 window.deleteExamVideo = function(videoId) {
   if (!confirm("Hapus video materi ini dari daftar belajar siswa?")) return;
   if (videosRef) {
-    videosRef.child(videoId).remove();
+    videosRef.get(videoId).put(null);
     if (window.logAdminActivity) {
       window.logAdminActivity("Menghapus video pembelajaran");
     }
@@ -391,46 +415,46 @@ function attemptAdminLogin(password) {
     adminLevel = 'REGULAR_ADMIN';
     adminName = 'Admin Teman';
   } else {
-    alert("❌ Password Salah, Bro!");
+    alert("❌ Kata sandi yang Anda masukkan salah.");
     return;
   }
 
-  // Set Local Storage
   localStorage.setItem('admin_logged', 'true');
   localStorage.setItem('admin_level', adminLevel);
   localStorage.setItem('admin_name', adminName);
 
-  // Buat sesi di database Firebase
   createAdminSession(adminLevel, adminName);
 }
 
 function createAdminSession(level, name) {
   if (sessionsRef) {
-    const newSession = sessionsRef.push();
-    mySessionKey = newSession.key;
+    const sessionKey = 'session_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+    mySessionKey = sessionKey;
     localStorage.setItem('admin_session_key', mySessionKey);
 
-    newSession.set({
+    sessionsRef.get(sessionKey).put({
       name: name,
       level: level,
       timestamp: Date.now()
-    }).then(() => {
-      // Catat log aktivitas login
-      window.logAdminActivity("Berhasil login ke panel admin");
+    }, (err) => {
+      if (err) {
+        console.warn("Gagal sinkronisasi sesi ke database, menggunakan penyimpanan lokal.");
+      }
+      if (window.logAdminActivity) {
+        window.logAdminActivity("Berhasil masuk ke panel administrator");
+      }
       applyAdminUI(level, name);
       loginAdminModal.style.display = 'none';
       document.getElementById('adminPasswordInput').value = '';
     });
     
-    // Dengarkan jika Head Admin memutuskan sesi kita secara paksa (force logout)
-    sessionsRef.child(mySessionKey).on('value', (snapshot) => {
-      if (!snapshot.exists()) {
-        // Jika node dihapus dari database, paksa logout lokal!
+    // Dengarkan jika sesi diputus paksa
+    sessionsRef.get(mySessionKey).on((session) => {
+      if (session === null) {
         handleLogout(true);
       }
     });
   } else {
-    // offline fallback
     applyAdminUI(level, name);
     loginAdminModal.style.display = 'none';
   }
@@ -446,10 +470,9 @@ function restoreAdminSession() {
     mySessionKey = sessionKey || '';
     applyAdminUI(level, name);
     
-    // Dengarkan kembali status sesi di database
     if (sessionsRef && mySessionKey) {
-      sessionsRef.child(mySessionKey).on('value', (snapshot) => {
-        if (!snapshot.exists()) {
+      sessionsRef.get(mySessionKey).on((session) => {
+        if (session === null) {
           handleLogout(true);
         }
       });
@@ -458,11 +481,9 @@ function restoreAdminSession() {
 }
 
 function applyAdminUI(level, name) {
-  // Update tombol navbar
   adminLoginBtn.innerHTML = `<i class="fa-solid fa-user-gear"></i> ${name.toUpperCase()}`;
   adminLoginBtn.classList.add('logged-in');
 
-  // Tampilkan panel kontrol
   const dashboard = document.getElementById('adminDashboardPanel');
   dashboard.style.display = 'block';
 
@@ -476,27 +497,22 @@ function applyAdminUI(level, name) {
     labelLevel.style.color = '#000';
   }
 
-  // Tampilkan tombol penambah tugas
   document.getElementById('openAddTaskModalBtn').style.display = 'inline-flex';
 
-  // Hak Akses Khusus Head Admin (Rehan)
   if (level === 'HEAD_ADMIN') {
     document.getElementById('ctrlExamPrep').style.display = 'flex';
     document.getElementById('ctrlTimeCapsule').style.display = 'flex';
     document.getElementById('headAdminManagementBox').style.display = 'block';
     document.getElementById('clearChatBtn').style.display = 'block';
     
-    // Load log aktivitas & manajemen sesi admin
     setupHeadAdminDashboard();
   } else {
-    // Sembunyikan hak akses eksklusif Head Admin
     document.getElementById('ctrlExamPrep').style.display = 'none';
     document.getElementById('ctrlTimeCapsule').style.display = 'none';
     document.getElementById('headAdminManagementBox').style.display = 'none';
     document.getElementById('clearChatBtn').style.display = 'none';
   }
 
-  // Render ulang list tugas agar tombol-tombol pindah status admin muncul
   if (window.renderTasksList) {
     window.renderTasksList();
   }
@@ -504,25 +520,22 @@ function applyAdminUI(level, name) {
 
 function handleLogout(forced = false) {
   if (sessionsRef && mySessionKey) {
-    sessionsRef.child(mySessionKey).off(); // matikan semua listener pada node sesi ini
+    sessionsRef.get(mySessionKey).off();
     if (!forced) {
-      // Jika logout manual, hapus sesi di database
-      sessionsRef.child(mySessionKey).remove();
+      sessionsRef.get(mySessionKey).put(null);
       if (window.logAdminActivity) {
-        window.logAdminActivity("Berhasil logout dari panel admin");
+        window.logAdminActivity("Berhasil keluar dari panel administrator");
       }
     }
   }
 
-  // Bersihkan data lokal
   localStorage.removeItem('admin_logged');
   localStorage.removeItem('admin_level');
   localStorage.removeItem('admin_name');
   localStorage.removeItem('admin_session_key');
   mySessionKey = '';
 
-  // Reset UI
-  adminLoginBtn.innerHTML = `<i class="fa-solid fa-lock"></i> ADMIN LOGIN`;
+  adminLoginBtn.innerHTML = `<i class="fa-solid fa-lock"></i> LOGIN ADMIN`;
   adminLoginBtn.classList.remove('logged-in');
   document.getElementById('adminDashboardPanel').style.display = 'none';
   document.getElementById('openAddTaskModalBtn').style.display = 'none';
@@ -533,80 +546,98 @@ function handleLogout(forced = false) {
   }
 
   if (forced) {
-    alert("⚠️ Sesi Admin lo telah diputus secara paksa oleh Head Admin!");
+    alert("⚠️ Sesi akses administrator Anda telah diputus secara paksa oleh Administrator Utama.");
     switchTab('lobby');
   }
 }
 
-// Catat histori aktivitas admin reguler ke database Firebase
-// BUG FIX: Tambah guard agar tidak crash saat Firebase belum siap
 window.logAdminActivity = function(actionText) {
   if (!logsRef) {
     console.log(`[Activity Log - Offline]: ${actionText}`);
     return;
   }
   const adminName = localStorage.getItem('admin_name') || 'Admin';
-  logsRef.push({
+  logsRef.set({
     admin: adminName,
     action: actionText,
     timestamp: Date.now()
-  }).catch(err => console.warn('Gagal menulis log aktivitas:', err));
+  });
 };
 
 /* ==========================================================================
    HEAD ADMIN EXCLUSIVE FUNCTIONS
    ========================================================================== */
 function setupHeadAdminDashboard() {
-  if (!database) return;
+  if (!appDatabase) return;
 
-  // 1. Listen Histori Log Aktivitas Admin (Batas 30 log terakhir)
-  logsRef.limitToLast(30).on('value', (snapshot) => {
+  // 1. Aktivitas Logs Listener
+  const logsList = [];
+  logsRef.map().on((log, key) => {
+    if (!log) {
+      const idx = logsList.findIndex(l => l.id === key);
+      if (idx > -1) logsList.splice(idx, 1);
+    } else {
+      const idx = logsList.findIndex(l => l.id === key);
+      if (idx > -1) {
+        logsList[idx] = { id: key, ...log };
+      } else {
+        logsList.push({ id: key, ...log });
+      }
+    }
+
+    // Urutkan berdasarkan waktu terbaru
+    const sortedLogs = [...logsList].sort((a, b) => b.timestamp - a.timestamp).slice(0, 30);
     const logBox = document.getElementById('activityLogBox');
     logBox.innerHTML = '';
-    const data = snapshot.val();
-    if (data) {
-      // Urutkan terbalik agar log terbaru ada di atas
-      const keys = Object.keys(data).reverse();
-      keys.forEach(key => {
-        const log = data[key];
-        const time = new Date(log.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-        const entry = document.createElement('div');
-        entry.className = 'log-entry';
-        
-        let isCritical = log.action.includes('HAPUS') || log.action.includes('darurat') || log.action.includes('kapsul');
-        if (isCritical) entry.classList.add('important');
+    
+    sortedLogs.forEach(item => {
+      const time = new Date(item.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      
+      let isCritical = item.action.includes('HAPUS') || item.action.includes('darurat') || item.action.includes('kapsul');
+      if (isCritical) entry.classList.add('important');
 
-        entry.innerHTML = `[${time}] <strong>${log.admin}</strong>: ${log.action}`;
-        logBox.appendChild(entry);
-      });
-    } else {
+      entry.innerHTML = `[${time}] <strong>${item.admin}</strong>: ${item.action}`;
+      logBox.appendChild(entry);
+    });
+
+    if (sortedLogs.length === 0) {
       logBox.innerHTML = '<div class="log-entry">Belum ada catatan aktivitas admin.</div>';
     }
   });
 
-  // 2. Listen Sesi Admin Reguler yang Sedang Aktif
-  sessionsRef.on('value', (snapshot) => {
+  // 2. Active Sessions Listener
+  const activeAdmins = [];
+  sessionsRef.map().on((session, key) => {
+    if (!session) {
+      const idx = activeAdmins.findIndex(a => a.id === key);
+      if (idx > -1) activeAdmins.splice(idx, 1);
+    } else {
+      const idx = activeAdmins.findIndex(a => a.id === key);
+      if (idx > -1) {
+        activeAdmins[idx] = { id: key, ...session };
+      } else {
+        activeAdmins.push({ id: key, ...session });
+      }
+    }
+
     const list = document.getElementById('activeAdminsList');
     list.innerHTML = '';
-    const data = snapshot.val();
     let countActive = 0;
 
-    if (data) {
-      Object.keys(data).forEach(key => {
-        const session = data[key];
-        // Jangan tampilkan sesi Head Admin sendiri untuk diterminasi
-        if (key === mySessionKey) return;
+    activeAdmins.forEach(item => {
+      if (item.id === mySessionKey) return; // jangan terminasi diri sendiri
 
-        countActive++;
-        const item = document.createElement('div');
-        item.className = 'admin-session-item';
-        item.innerHTML = `
-          <span>👤 ${session.name} (${session.level})</span>
-          <button class="task-action-btn btn-delete" style="padding:4px 8px; font-size:0.7rem; font-weight:700;" onclick="terminateAdminSession('${key}', '${session.name}')">TERMINASI</button>
-        `;
-        list.appendChild(item);
-      });
-    }
+      countActive++;
+      const div = document.createElement('div');
+      div.className = 'admin-session-item';
+      div.innerHTML = `
+        <span>👤 ${item.name} (${item.level})</span>
+        <button class="task-action-btn btn-delete" style="padding:4px 8px; font-size:0.7rem; font-weight:700;" onclick="terminateAdminSession('${item.id}', '${item.name}')">TERMINASI</button>
+      `;
+      list.appendChild(div);
+    });
 
     if (countActive === 0) {
       list.innerHTML = '<div class="admin-session-item">Tidak ada admin reguler yang sedang online.</div>';
@@ -614,12 +645,11 @@ function setupHeadAdminDashboard() {
   });
 }
 
-// Terminasi Sesi Admin Reguler (Hanya Head Admin)
 window.terminateAdminSession = function(sessionKey, name) {
-  if (!confirm(`Apakah lo yakin mau mengeluarkan paksa admin "${name}" dari sesi aktif mereka?`)) return;
+  if (!confirm(`Apakah Anda yakin ingin memutuskan sesi akses administrator "${name}" secara paksa?`)) return;
   if (sessionsRef) {
-    sessionsRef.child(sessionKey).remove(); // hapus sesi di Firebase
-    window.logAdminActivity(`Memutus sesi admin reguler: "${name}"`);
+    sessionsRef.get(sessionKey).put(null);
+    window.logAdminActivity(`Memutus sesi administrator reguler: "${name}"`);
   }
 };
 
@@ -627,55 +657,46 @@ window.terminateAdminSession = function(sessionKey, name) {
    UI EVENT LISTENERS & WIDGET CONTROL
    ========================================================================== */
 function setupUIEventListeners() {
-  // Mobile menu toggle
   mobileMenuBtn.onclick = () => {
     const isVisible = mobileMenu.style.display === 'flex';
     mobileMenu.style.display = isVisible ? 'none' : 'flex';
   };
 
-  // Navigasi logo klik kembali ke home
   document.getElementById('navLogoHome').onclick = (e) => {
     e.preventDefault();
     switchTab('lobby');
   };
 
-  // Event handler tombol login di navbar
   adminLoginBtn.onclick = () => {
     const isLogged = localStorage.getItem('admin_logged') === 'true';
     if (isLogged) {
-      // Jika sudah login, klik tombol navbar akan membawa ke tab admin dashboard (scroll ke bawah)
       document.getElementById('adminDashboardPanel').scrollIntoView({ behavior: 'smooth' });
     } else {
       loginAdminModal.style.display = 'flex';
     }
   };
 
-  // Close Login Modal
   document.getElementById('closeLoginModalBtn').onclick = () => {
     loginAdminModal.style.display = 'none';
   };
   
-  // Submit Login
   document.getElementById('submitLoginBtn').onclick = () => {
     const val = document.getElementById('adminPasswordInput').value;
     attemptAdminLogin(val);
   };
   
-  // Submit Login via Enter key
   document.getElementById('adminPasswordInput').onkeydown = (e) => {
     if (e.key === 'Enter') {
       attemptAdminLogin(e.target.value);
     }
   };
 
-  // Logout Admin
   document.getElementById('adminLogoutBtn').onclick = () => {
-    if (confirm("Keluar dari panel admin?")) {
+    if (confirm("Apakah Anda yakin ingin keluar dari panel administrator?")) {
       handleLogout();
     }
   };
 
-  // Event handler modal tambah tugas
   document.getElementById('openAddTaskModalBtn').onclick = () => {
     addTaskModal.style.display = 'flex';
   };
@@ -691,7 +712,7 @@ function setupUIEventListeners() {
     const priority = document.getElementById('taskPrioritySelect').value;
 
     if (!subject.trim() || !desc.trim()) {
-      alert("Mata Pelajaran dan Detail Tugas wajib diisi!");
+      alert("Kolom Mata Pelajaran dan Keterangan Tugas wajib diisi!");
       return;
     }
 
@@ -700,21 +721,17 @@ function setupUIEventListeners() {
     }
     addTaskModal.style.display = 'none';
 
-    // Reset input
     document.getElementById('taskSubjectInput').value = '';
     document.getElementById('taskDescInput').value = '';
     document.getElementById('taskDeadlineInput').value = '';
   };
 
-  // Kapsul Waktu submit message
   document.getElementById('submitToCapsuleBtn').onclick = () => {
     const sender = document.getElementById('capsuleSenderName').value;
     const message = document.getElementById('capsuleMessageInput').value;
     submitToCapsule(sender, message);
   };
 
-  // EDIT USERNAME & AVATAR CHAT
-  // BUG FIX: Hapus JUGA avatar dari localStorage agar fresh saat re-init
   document.getElementById('editUsernameBtn').onclick = () => {
     localStorage.removeItem('chat_username');
     localStorage.removeItem('chat_avatar');
@@ -726,7 +743,6 @@ function setupUIEventListeners() {
     }
   };
 
-  // TOMBOL SEND CHAT
   document.getElementById('sendChatBtn').onclick = () => {
     const input = document.getElementById('chatInputField');
     if (window.sendMessage) {
@@ -744,45 +760,38 @@ function setupUIEventListeners() {
     }
   };
 
-  // CLEAR CHAT HISTORY (Head Admin Only)
   document.getElementById('clearChatBtn').onclick = () => {
     if (window.clearChatHistory) {
       window.clearChatHistory();
     }
   };
 
-  /* ==========================================================================
-     ADMIN PANEL SWITCH CONTROLS (FIREBASE EVENT WRITE)
-     ========================================================================== */
-  
-  // 1. Switch Deadline Mode (Admin & Head Admin)
+  // 1. Switch Deadline Mode
   document.getElementById('switchDeadlineMode').onchange = (e) => {
     if (statusRef) {
-      statusRef.update({ deadline_mode: e.target.checked });
-      window.logAdminActivity(`Mengubah Deadline Alert Mode ke: [${e.target.checked ? 'AKTIF' : 'NONAKTIF'}]`);
+      statusRef.put({ deadline_mode: e.target.checked });
+      window.logAdminActivity(`Mengubah status Deadline Alert Mode menjadi: [${e.target.checked ? 'AKTIF' : 'NONAKTIF'}]`);
     }
   };
 
-  // 2. Switch Exam Prep Mode (Head Admin Only)
+  // 2. Switch Exam Prep Mode
   document.getElementById('switchExamPrepMode').onchange = (e) => {
     if (statusRef) {
-      statusRef.update({ exam_prep_mode: e.target.checked });
-      window.logAdminActivity(`Mengubah Exam Prep Mode ke: [${e.target.checked ? 'AKTIF' : 'NONAKTIF'}]`);
+      statusRef.put({ exam_prep_mode: e.target.checked });
+      window.logAdminActivity(`Mengubah status Exam Prep Mode menjadi: [${e.target.checked ? 'AKTIF' : 'NONAKTIF'}]`);
       
-      // Jika diaktifkan, tawarkan untuk memuat video baru
-      if (e.target.checked && confirm("Exam Prep Mode aktif. Mau nambahin video materi baru sekarang?")) {
+      if (e.target.checked && confirm("Exam Prep Mode telah diaktifkan. Ingin menambahkan materi video pembelajaran baru sekarang?")) {
         addVideoModal.style.display = 'flex';
       }
     }
   };
 
-  // 3. Switch Time Capsule (Head Admin Only)
+  // 3. Switch Time Capsule Mode
   document.getElementById('switchTimeCapsuleMode').onchange = (e) => {
     if (statusRef) {
-      statusRef.update({ time_capsule_mode: e.target.checked });
-      window.logAdminActivity(`Mengubah visibilitas Time Capsule Mode ke: [${e.target.checked ? 'AKTIF' : 'NONAKTIF'}]`);
+      statusRef.put({ time_capsule_mode: e.target.checked });
+      window.logAdminActivity(`Mengubah status Kapsul Waktu menjadi: [${e.target.checked ? 'AKTIF' : 'NONAKTIF'}]`);
       
-      // Jika diaktifkan, tawarkan untuk set waktu pembukaan
       if (e.target.checked) {
         setCapsuleDateModal.style.display = 'flex';
       }
@@ -793,19 +802,18 @@ function setupUIEventListeners() {
   document.getElementById('submitCapsuleDateBtn').onclick = () => {
     const inputVal = document.getElementById('capsuleTargetDateInput').value;
     if (!inputVal) {
-      alert("Harap pilih tanggal & waktu pembukaan!");
+      alert("Harap tentukan tanggal dan waktu pembukaan!");
       return;
     }
     
     if (statusRef) {
-      statusRef.update({
+      statusRef.put({
         time_capsule_unlock_date: inputVal,
-        time_capsule_forced_open: false // reset bypass status
-      }).then(() => {
-        setCapsuleDateModal.style.display = 'none';
-        window.logAdminActivity(`Mengatur waktu pembukaan Kapsul Waktu pada: ${inputVal}`);
-        alert("Waktu pembukaan kapsul waktu sukses di-set!");
+        time_capsule_forced_open: false
       });
+      setCapsuleDateModal.style.display = 'none';
+      window.logAdminActivity(`Mengatur waktu pembukaan Kapsul Waktu pada tanggal: ${inputVal}`);
+      alert("Pengaturan waktu pembukaan Kapsul Waktu berhasil disimpan!");
     }
   };
 
@@ -819,18 +827,17 @@ function setupUIEventListeners() {
     const url = document.getElementById('videoUrlInput').value.trim();
 
     if (!title || !url) {
-      alert("Judul dan Link URL wajib diisi!");
+      alert("Judul dan alamat tautan video wajib diisi!");
       return;
     }
 
     if (videosRef) {
-      videosRef.push({ title, url }).then(() => {
-        addVideoModal.style.display = 'none';
-        document.getElementById('videoTitleInput').value = '';
-        document.getElementById('videoUrlInput').value = '';
-        window.logAdminActivity(`Menambahkan video materi: "${title}"`);
-        alert("Video berhasil ditambahkan!");
-      });
+      videosRef.set({ title, url });
+      addVideoModal.style.display = 'none';
+      document.getElementById('videoTitleInput').value = '';
+      document.getElementById('videoUrlInput').value = '';
+      window.logAdminActivity(`Menambahkan materi video pembelajaran baru: "${title}"`);
+      alert("Video pembelajaran berhasil ditambahkan!");
     }
   };
 
@@ -838,49 +845,22 @@ function setupUIEventListeners() {
     addVideoModal.style.display = 'none';
   };
 
-  // 6. Save Live Broadcast Text (Head Admin & Wali Kelas)
+  // 6. Save Live Broadcast Text
   document.getElementById('saveBroadcastBtn').onclick = () => {
     const text = document.getElementById('broadcastTextEditor').value.trim();
     if (!text) {
-      alert("Teks pengumuman tidak boleh kosong!");
+      alert("Teks pengumuman siaran tidak boleh kosong!");
       return;
     }
     if (statusRef) {
-      statusRef.update({ broadcast_text: text }).then(() => {
-        window.logAdminActivity(`Mengubah pengumuman Live Broadcast menjadi: "${text}"`);
-        alert("Live Broadcast diperbarui!");
-      });
-    }
-  };
-}
-
-/* ==========================================================================
-   BGM LO-FI PLAYER WIDGET
-   ========================================================================== */
-function initBgmPlayer() {
-  if (!bgmPlayBtn || !bgmAudio) return;
-
-  bgmPlayBtn.onclick = () => {
-    if (bgmAudio.paused) {
-      // Mainkan Audio
-      bgmAudio.play().then(() => {
-        bgmPlayBtn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
-        bgmPlayBtn.style.background = 'var(--mint)';
-      }).catch(err => {
-        console.error("Gagal memutar audio: ", err);
-        alert("Gagal memutar musik lo-fi, harap cek koneksi internet lo.");
-      });
-    } else {
-      // Pause Audio
-      bgmAudio.pause();
-      bgmPlayBtn.innerHTML = `<i class="fa-solid fa-play"></i>`;
-      bgmPlayBtn.style.background = 'var(--purple)';
+      statusRef.put({ broadcast_text: text });
+      window.logAdminActivity(`Mengubah teks Siaran Langsung menjadi: "${text}"`);
+      alert("Siaran Langsung berhasil diperbarui!");
     }
   };
 }
 
 // Helpers
-// BUG FIX: Tambah null check dan String() cast agar tidak crash jika input undefined/null
 function escapeHTML(str) {
   if (!str) return '';
   return String(str).replace(/[&<>'"]/g, 
