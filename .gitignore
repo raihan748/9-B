@@ -1,0 +1,7 @@
+# Git ignore file for Class 9B Website
+.DS_Store
+Thumbs.db
+*.log
+node_modules/
+.env
+.vercel/

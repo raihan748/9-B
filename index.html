@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Website Resmi Kelas 9B — SMPIT Al-Fityan</title>
+  <meta name="description" content="Portal Kelas 9B - Dark Neo-Brutalism Edition. Tempat ngobrol, cek tugas, belajar bareng, dan mengunci kapsul waktu kenangan.">
+  
+  <!-- Styling & Icons -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- Firebase SDK Legacy (Compatible with browser ES Modules CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+  <!-- NAVIGATION BAR -->
+  <nav>
+    <a href="#" class="nav-brand" id="navLogoHome">
+      <div class="nav-logo">9B</div>
+      <div class="nav-title">
+        <span>Sembilan B</span>
+        <span>SMPIT AL-FITYAN</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a class="nav-tab-btn active" data-tab="lobby">Lobby</a></li>
+      <li><a class="nav-tab-btn" data-tab="chat">Chamber Chat</a></li>
+      <li><a class="nav-tab-btn" data-tab="tasks">Task Board</a></li>
+      <li><a class="nav-tab-btn" data-tab="capsule">Time Capsule</a></li>
+    </ul>
+    <div class="nav-right">
+      <button id="adminLoginBtn" class="admin-login-btn">
+        <i class="fa-solid fa-lock"></i> ADMIN LOGIN
+      </button>
+      <button id="mobileMenuBtn">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MOBILE NAVIGATION MENU -->
+  <div id="mobileMenu">
+    <a class="nav-tab-btn active" data-tab="lobby">Lobby</a>
+    <a class="nav-tab-btn" data-tab="chat">Chamber Chat</a>
+    <a class="nav-tab-btn" data-tab="tasks">Task Board</a>
+    <a class="nav-tab-btn" data-tab="capsule">Time Capsule</a>
+  </div>
+
+  <!-- LIVE BROADCAST BANNER -->
+  <div class="live-broadcast" id="liveBroadcastBanner">
+    <div class="live-badge">
+      <span class="live-dot"></span> LIVE BROADCAST
+    </div>
+    <div class="broadcast-ticker">
+      <span class="broadcast-text" id="broadcastText">Selamat datang di website resmi kelas 9B! Tugas Matematika Bab 3 dikumpulkan hari Kamis. Piket kelas hari ini harap bersiap sepulang sekolah.</span>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <main>
+    
+    <!-- ==========================================
+         TAB CONTENT: LOBBY
+         ========================================== -->
+    <section id="lobbyTab" class="tab-content active">
+      
+      <!-- Exam Prep Banner (Muncul secara dinamis jika di-trigger oleh Head Admin) -->
+      <div id="examPrepCenter" class="exam-prep-banner" style="display: none;">
+        <div class="exam-header">
+          <div class="exam-title">
+            <i class="fa-solid fa-graduation-cap"></i> EXAM PREPARATION CENTER (MODE BELAJAR UJIAN)
+          </div>
+          <p style="margin-top: 6px; font-size: 0.95rem; color: var(--text-muted);">
+            Owner telah mengaktifkan mode belajar. Tonton video materi di bawah ini untuk persiapan ujian kelas 9B!
+          </p>
+        </div>
+        <div class="exam-grid-videos" id="examVideoGrid">
+          <!-- Video cards akan dimuat secara dinamis dari database -->
+        </div>
+      </div>
+
+      <div class="lobby-layout">
+        <!-- Main Column -->
+        <div class="lobby-main">
+          <div class="hero-brutal">
+            <div class="hero-subtitle">Masa Depan Dimulai dari Sini</div>
+            <h1 class="hero-title">Welcome to the<br><span class="accent">9B CLASSROOM</span></h1>
+            <p class="hero-desc">Wadah digital resmi anak-anak kelas 9B. Pantau tugas menumpuk, ngobrol santai real-time di Chamber Chat, dengerin lo-fi, dan taruh pesan rahasia di Kapsul Waktu kita.</p>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="grid-stats">
+            <div class="stat-item">
+              <div class="stat-value">32</div>
+              <div class="stat-label">Pasukan Siswa</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="statsClassStatus">Aktif</div>
+              <div class="stat-label">Status Kelas</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">99%</div>
+              <div class="stat-label">Tingkat Kebisingan</div>
+            </div>
+          </div>
+
+          <!-- Mading Kelas -->
+          <div class="mading-lobby">
+            <h3 class="mading-title"><i class="fa-solid fa-bullhorn" style="color: var(--yellow);"></i> PAPAN PENGUMUMAN KELAS</h3>
+            <div class="mading-grid" id="madingLobbyGrid">
+              <div class="mading-item important">
+                <div class="mading-date">DIPOSTING OLEH WALI KELAS • 13 JULI 2026</div>
+                <div class="mading-content">Siapkan diri kalian buat Ujian Akhir Semester! Jangan lupa jaga kesehatan dan manfaatkan video persiapan ujian di tab belajar kalau diaktifkan.</div>
+              </div>
+              <div class="mading-item">
+                <div class="mading-date">DIPOSTING OLEH KETUA KELAS • 12 JULI 2026</div>
+                <div class="mading-content">Jadwal piket kelas diperketat mulai minggu ini. Yang melanggar bakal kena sanksi traktir es sirup kantin!</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar Column -->
+        <div class="lobby-sidebar">
+          
+          <!-- Piket Hari Ini -->
+          <div class="widget-piket">
+            <h4 class="widget-title"><i class="fa-solid fa-broom" style="color: var(--pink);"></i> PIKET HARI INI</h4>
+            <div class="piket-day-active" id="piketDayName">Senin</div>
+            <div class="piket-list" id="piketMemberList">
+              <div class="piket-member"><i class="fa-solid fa-circle-check"></i> Rehan</div>
+              <div class="piket-member"><i class="fa-solid fa-circle-check"></i> Bagas</div>
+              <div class="piket-member"><i class="fa-solid fa-circle-check"></i> Clara</div>
+              <div class="piket-member"><i class="fa-solid fa-circle-check"></i> Dino</div>
+            </div>
+          </div>
+
+          <!-- BGM Widget -->
+          <div class="widget-bgm">
+            <h4 class="widget-title"><i class="fa-solid fa-music" style="color: var(--purple);"></i> BGM CHILL PLAYER</h4>
+            <div class="bgm-player">
+              <button class="bgm-btn" id="bgmPlayBtn"><i class="fa-solid fa-play"></i></button>
+              <div class="bgm-info">
+                <div class="bgm-title">Lofi Chill Study Beats</div>
+                <div class="bgm-subtitle">Audio background instrumental</div>
+              </div>
+            </div>
+            <!-- Audio streaming source lo-fi gratis -->
+            <audio id="bgmAudio" loop src="https://commercial.ambitionlofi.com/stream/ambition.mp3"></audio>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB CONTENT: CHAMBER CHAT
+         ========================================== -->
+    <section id="chatTab" class="tab-content">
+      <div class="chat-layout">
+        <!-- Sidebar Chat -->
+        <div class="chat-sidebar">
+          <div>
+            <h3 style="font-family: 'Archivo Black', sans-serif; font-size: 1.1rem; margin-bottom: 20px;">CHAMBER 9B</h3>
+            <div class="user-profile-box">
+              <div class="profile-title">Profil Lo</div>
+              <div class="profile-display">
+                <div class="user-avatar" id="myChatAvatar">🦖</div>
+                <div class="user-name" id="myChatName">Siswa 9B</div>
+              </div>
+              <button id="editUsernameBtn" class="task-action-btn" style="width: 100%; margin-top: 10px; font-size: 0.75rem;">GANTI PROFIL</button>
+            </div>
+            
+            <div class="chat-room-info">
+              <h4>Aturan Ngobrol</h4>
+              <p>1. Bebas bahas apa aja asal sopan.<br>2. Jangan spam chat.<br>3. Admin/Owner bisa hapus chat lo kalau melanggar aturan.</p>
+            </div>
+          </div>
+          
+          <button id="clearChatBtn" class="brut-btn btn-pink" style="width: 100%; display: none; font-size: 0.8rem; padding: 10px;">KOSONGKAN CHAT</button>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="chat-main">
+          <div class="chat-header">
+            <div class="chat-title-info">
+              <span class="online-indicator"></span>
+              <span style="font-family: 'Archivo Black', sans-serif; font-size: 1.1rem;">#chat-utama-9b</span>
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700;">Realtime Database</span>
+          </div>
+
+          <!-- Message History -->
+          <div class="chat-messages" id="chatMessages">
+            <div class="message system">
+              <div class="message-text">Menghubungkan ke ruang obrolan...</div>
+            </div>
+          </div>
+
+          <!-- Chat Input -->
+          <div class="chat-input-area">
+            <input type="text" id="chatInputField" class="chat-input" placeholder="Tulis pesan lo di sini, pencet Enter buat kirim..." maxlength="200">
+            <button id="sendChatBtn" class="brut-btn btn-purple" style="box-shadow: 3px 3px 0px #000; padding: 12px 20px;"><i class="fa-solid fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB CONTENT: TASK BOARD
+         ========================================== -->
+    <section id="tasksTab" class="tab-content">
+      <div class="tasks-control-bar">
+        <h2 style="font-family: 'Archivo Black', sans-serif; font-size: 1.8rem; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-list-check" style="color: var(--yellow-light);"></i> TUGAS KELAS 9B
+        </h2>
+        <button id="openAddTaskModalBtn" class="brut-btn btn-mint" style="display: none; padding: 10px 20px;">+ TAMBAH TUGAS</button>
+      </div>
+
+      <!-- Kanban Board -->
+      <div class="kanban-board">
+        <!-- Column To Do -->
+        <div class="kanban-col col-todo">
+          <div class="kanban-header">
+            <span>BELUM DIKERJAKAN</span>
+            <span class="col-count" id="todoCount">0</span>
+          </div>
+          <div class="kanban-cards" id="todoCards">
+            <!-- Dynamic task cards -->
+          </div>
+        </div>
+
+        <!-- Column In Progress -->
+        <div class="kanban-col col-progress">
+          <div class="kanban-header">
+            <span>SEDANG DIKERJAKAN</span>
+            <span class="col-count" id="progressCount">0</span>
+          </div>
+          <div class="kanban-cards" id="progressCards">
+            <!-- Dynamic task cards -->
+          </div>
+        </div>
+
+        <!-- Column Done -->
+        <div class="kanban-col col-done">
+          <div class="kanban-header">
+            <span>SELESAI</span>
+            <span class="col-count" id="doneCount">0</span>
+          </div>
+          <div class="kanban-cards" id="doneCards">
+            <!-- Dynamic task cards -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB CONTENT: TIME CAPSULE
+         ========================================== -->
+    <section id="capsuleTab" class="tab-content">
+      <div class="time-capsule-layout">
+        
+        <!-- View saat Kapsul Terkunci (Countdown & Submit Form) -->
+        <div id="capsuleLockedView" class="capsule-locked-view">
+          <div class="capsule-icon">
+            <i class="fa-solid fa-user-lock"></i>
+          </div>
+          <h2 style="font-family: 'Archivo Black', sans-serif; font-size: 1.8rem;">KAPSUL WAKTU KELAS 9B</h2>
+          <p style="color: var(--text-muted); margin-top: 8px;">Kapsul waktu ini berisi pesan rahasia, cita-cita, dan kenangan anak-anak 9B yang dikunci rapat. Tanggal pembukaan diatur langsung oleh Head Admin.</p>
+          
+          <div class="countdown-box">
+            <div class="countdown-segment">
+              <div class="countdown-val" id="cdDays">00</div>
+              <div class="countdown-unit">Hari</div>
+            </div>
+            <div class="countdown-segment">
+              <div class="countdown-val" id="cdHours">00</div>
+              <div class="countdown-unit">Jam</div>
+            </div>
+            <div class="countdown-segment">
+              <div class="countdown-val" id="cdMins">00</div>
+              <div class="countdown-unit">Menit</div>
+            </div>
+            <div class="countdown-segment">
+              <div class="countdown-val" id="cdSecs">00</div>
+              <div class="countdown-unit">Detik</div>
+            </div>
+          </div>
+          
+          <div id="capsuleTargetDateText" style="font-weight: 700; color: var(--purple); font-size: 0.95rem;">
+            Rencana dibuka pada: -- / -- / ----
+          </div>
+
+          <!-- Submit message area -->
+          <div class="capsule-submit-box">
+            <h3 style="font-family: 'Archivo Black', sans-serif; font-size: 1.1rem; margin-bottom: 16px; border-bottom: 2px dashed rgba(255,255,255,0.05); padding-bottom: 8px;">SEMPILKAN PESAN RAHASIA LO</h3>
+            <div class="form-group" style="text-align: left;">
+              <label for="capsuleSenderName">Nama Pengirim (Wajib)</label>
+              <input type="text" id="capsuleSenderName" class="form-input" placeholder="Masukkan nama lo..." maxlength="20">
+            </div>
+            <div class="form-group" style="text-align: left;">
+              <label for="capsuleMessageInput">Pesan / Cita-cita / Kenangan Rahasia</label>
+              <textarea id="capsuleMessageInput" class="form-input" rows="4" style="resize: none;" placeholder="Tulis harapan lo untuk diri lo sendiri, kelas, atau temen-temen 9B 10 tahun mendatang..." maxlength="400"></textarea>
+            </div>
+            <button id="submitToCapsuleBtn" class="brut-btn btn-purple" style="width: 100%; box-shadow: 4px 4px 0px #000;">KUNCI PESAN KE DALAM KAPSUL</button>
+          </div>
+        </div>
+
+        <!-- View saat Kapsul Terbuka (Semua kenangan dimunculkan) -->
+        <div id="capsuleUnlockedView" class="capsule-unlocked-view" style="display: none;">
+          <div class="unlocked-header">
+            <h2>🔓 KAPSUL WAKTU RESMI DIBUKA!</h2>
+            <p>Pesan dan cita-cita anak-anak kelas 9B yang dikunci dulu sekarang bisa dibaca. Semoga sukses buat kita semua!</p>
+          </div>
+          <div class="capsule-messages-grid" id="capsuleMessagesGrid">
+            <!-- Dynamic memories cards -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================
+         PANEL ADMIN (HEAD ADMIN/OWNER & ADMIN REGULER)
+         ========================================== -->
+    <section id="adminDashboardPanel" class="admin-panel" style="display: none;">
+      <div class="panel-header">
+        <h3><i class="fa-solid fa-solar-panel"></i> DASHBOARD KONTROL ADMIN <span id="adminPanelLevel" class="tag-label" style="margin: 0 0 0 10px; background: var(--pink);">ADMIN</span></h3>
+        <button id="adminLogoutBtn" class="brut-btn btn-pink" style="padding: 6px 12px; font-size: 0.8rem; box-shadow: 2px 2px 0px #000;">LOGOUT</button>
+      </div>
+
+      <div class="admin-grid">
+        <!-- Column Kiri: Kontrol & Switch -->
+        <div class="panel-section">
+          <h4>Skenario Khusus & Mode</h4>
+          
+          <!-- Deadline Mode Switch -->
+          <div class="switch-control">
+            <span class="switch-label"><i class="fa-solid fa-triangle-exclamation" style="color: var(--pink);"></i> Skenario A: Deadline Alert Mode (Tugas Mendadak)</span>
+            <label class="brut-switch">
+              <input type="checkbox" id="switchDeadlineMode">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <!-- Exam Prep Mode (Only Head Admin/Owner) -->
+          <div class="switch-control" id="ctrlExamPrep" style="display: none;">
+            <span class="switch-label"><i class="fa-solid fa-graduation-cap" style="color: var(--cyan);"></i> Skenario B: Exam Preparation Mode (Video Belajar Ujian)</span>
+            <label class="brut-switch">
+              <input type="checkbox" id="switchExamPrepMode">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <!-- Time Capsule Mode (Only Head Admin/Owner) -->
+          <div class="switch-control" id="ctrlTimeCapsule" style="display: none;">
+            <span class="switch-label"><i class="fa-solid fa-key" style="color: var(--purple);"></i> Skenario C: Time Capsule Lock/Unlock Switch</span>
+            <label class="brut-switch">
+              <input type="checkbox" id="switchTimeCapsuleMode">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <!-- Live Broadcast Text Editor (Head Admin & Wali Kelas) -->
+          <div class="form-group" style="margin-top: 20px;" id="broadcastEditorBox">
+            <label for="broadcastTextEditor"><i class="fa-solid fa-edit"></i> Edit Teks Live Broadcast</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="broadcastTextEditor" class="form-input" style="flex: 1;" placeholder="Ketik pengumuman baru...">
+              <button id="saveBroadcastBtn" class="brut-btn btn-yellow" style="box-shadow: 3px 3px 0px #000; padding: 10px 16px;">TAYANGKAN</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column Kanan: Aktivitas & Manajemen Sesi (Head Admin Only) -->
+        <div class="panel-section" id="headAdminManagementBox" style="display: none;">
+          <h4>Manajemen Admin & Pemantau Aktivitas</h4>
+          
+          <div class="form-group">
+            <label><i class="fa-solid fa-history"></i> Pemantau Aktivitas Admin (Activity Log)</label>
+            <div class="activity-log-box" id="activityLogBox">
+              <!-- Logs will be loaded dynamically -->
+              <div class="log-entry">Menunggu log aktivitas...</div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 20px;">
+            <label><i class="fa-solid fa-users-gear"></i> Admin Reguler yang Sedang Aktif</label>
+            <div class="active-admins-list" id="activeAdminsList">
+              <!-- Active sessions list -->
+              <div class="admin-session-item">Tidak ada admin reguler aktif</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================
+       CREDIT FOOTER (SIGNATURE)
+       ========================================== -->
+  <footer>
+    <div class="footer-inner">
+      <div class="credit-box">
+        <p>MADE WITH DETERMINATION BY REHAN & 9B TEAM</p>
+      </div>
+      <div class="footer-links">
+        <a href="#" class="nav-tab-btn" data-tab="lobby">Lobby</a>
+        <a href="#" class="nav-tab-btn" data-tab="chat">Chat</a>
+        <a href="#" class="nav-tab-btn" data-tab="tasks">Tasks</a>
+        <a href="#" class="nav-tab-btn" data-tab="capsule">Time Capsule</a>
+      </div>
+      <p style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin-top: 10px;">
+        &copy; 2026 KELAS 9B - SMPIT AL-FITYAN. ALL RIGHTS RESERVED.
+      </p>
+    </div>
+  </footer>
+
+  <!-- ==========================================
+       POPUP MODALS (LOGIN ADMIN, TAMBAH TUGAS)
+       ========================================== -->
+  
+  <!-- Modal Login Admin -->
+  <div id="loginAdminModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <h3 style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-lock" style="color: var(--pink);"></i> Login Akses Admin</h3>
+      <p>Masukkan password admin lo untuk mengelola tugas, live broadcast, atau panel kontrol kelas.</p>
+      <div class="form-group">
+        <label for="adminPasswordInput">Password Admin</label>
+        <input type="password" id="adminPasswordInput" class="form-input" placeholder="Ketik password...">
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button id="closeLoginModalBtn" class="brut-btn btn-pink" style="flex: 1; box-shadow: 3px 3px 0px #000;">BATAL</button>
+        <button id="submitLoginBtn" class="brut-btn btn-purple" style="flex: 1; box-shadow: 3px 3px 0px #000;">LOGIN</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Tambah Tugas -->
+  <div id="addTaskModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="width: 480px;">
+      <h3 style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-list-check" style="color: var(--mint);"></i> Tambah Tugas Baru</h3>
+      <p>Catat tugas baru untuk kelas 9B. Tugas akan otomatis tersinkronisasi ke dashboard semua siswa.</p>
+      
+      <div class="form-group">
+        <label for="taskSubjectInput">Mata Pelajaran</label>
+        <input type="text" id="taskSubjectInput" class="form-input" placeholder="Contoh: Matematika, Fisika, B. Inggris..." maxlength="20">
+      </div>
+      
+      <div class="form-group">
+        <label for="taskDescInput">Detail Tugas</label>
+        <textarea id="taskDescInput" class="form-input" rows="3" style="resize: none;" placeholder="Ketik keterangan pengerjaan..." maxlength="150"></textarea>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="form-group">
+          <label for="taskDeadlineInput">Deadline</label>
+          <input type="date" id="taskDeadlineInput" class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="taskPrioritySelect">Skala Prioritas</label>
+          <select id="taskPrioritySelect" class="form-input" style="background-color: var(--bg-dark);">
+            <option value="low">Rendah (Hijau)</option>
+            <option value="medium" selected>Sedang (Kuning)</option>
+            <option value="high">Tinggi (Merah)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button id="closeAddTaskModalBtn" class="brut-btn btn-pink" style="flex: 1; box-shadow: 3px 3px 0px #000;">BATAL</button>
+        <button id="submitAddTaskBtn" class="brut-btn btn-mint" style="flex: 1; box-shadow: 3px 3px 0px #000;">SIMPAN TUGAS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Set Tanggal Kapsul Waktu (Head Admin Only) -->
+  <div id="setCapsuleDateModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <h3>Set Waktu Kapsul</h3>
+      <p>Atur tanggal dan waktu pembukaan kapsul waktu 9B.</p>
+      <div class="form-group">
+        <label for="capsuleTargetDateInput">Pilih Tanggal & Waktu Buka</label>
+        <input type="datetime-local" id="capsuleTargetDateInput" class="form-input">
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button id="closeCapsuleDateModalBtn" class="brut-btn btn-pink" style="flex: 1; box-shadow: 3px 3px 0px #000;">BATAL</button>
+        <button id="submitCapsuleDateBtn" class="brut-btn btn-purple" style="flex: 1; box-shadow: 3px 3px 0px #000;">SET WAKTU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Add Video Ujian (Head Admin Only) -->
+  <div id="addVideoModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <h3>Tambah Video Materi</h3>
+      <p>Tambahkan video pembelajaran (YouTube) ke Exam Prep Center.</p>
+      <div class="form-group">
+        <label for="videoTitleInput">Judul Video</label>
+        <input type="text" id="videoTitleInput" class="form-input" placeholder="Contoh: Belajar Limit Fungsi Aljabar">
+      </div>
+      <div class="form-group">
+        <label for="videoUrlInput">Link URL YouTube</label>
+        <input type="text" id="videoUrlInput" class="form-input" placeholder="Contoh: https://www.youtube.com/watch?v=xxxxxx">
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button id="closeVideoModalBtn" class="brut-btn btn-pink" style="flex: 1; box-shadow: 3px 3px 0px #000;">BATAL</button>
+        <button id="submitAddVideoBtn" class="brut-btn btn-cyan" style="flex: 1; box-shadow: 3px 3px 0px #000;">TAMBAH</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logika Aplikasi (ES Module Entry) -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
