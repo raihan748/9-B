@@ -1,6 +1,4 @@
-// Modul Chat Realtime menggunakan Firebase Realtime Database
-import { firebaseConfig } from './config.js';
-
+// Modul Chat Realtime menggunakan Firebase Realtime Database (Non-Module)
 let database = null;
 let chatRef = null;
 let currentUsername = localStorage.getItem('chat_username') || '';
@@ -8,7 +6,7 @@ let currentUserAvatar = localStorage.getItem('chat_avatar') || '🦖';
 
 const emojis = ['🦖', '👾', '🦊', '🐱', '🐼', '🐨', '🐸', '🦁', '🐯', '🐙', '🥑', '🍕', '⚽', '🎸', '🚀'];
 
-export function initChat(onUserReady) {
+window.initChat = function(onUserReady) {
   // Pastikan Firebase dimuat
   if (typeof firebase === 'undefined') {
     console.error("Firebase SDK belum dimuat di index.html");
@@ -17,7 +15,7 @@ export function initChat(onUserReady) {
 
   // Inisialisasi Firebase App jika belum diinisialisasi
   if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(window.firebaseConfig);
   }
   
   database = firebase.database();
@@ -30,7 +28,7 @@ export function initChat(onUserReady) {
     setupChatListeners();
     if (onUserReady) onUserReady(currentUsername, currentUserAvatar);
   }
-}
+};
 
 function showUsernameModal(callback) {
   // Buat modal overlay secara dinamis jika belum ada
@@ -75,7 +73,7 @@ function showUsernameModal(callback) {
     };
   });
 
-  const saveBtn = modal.getElementById('saveUsernameBtn');
+  const saveBtn = modal.querySelector('#saveUsernameBtn');
   const input = modal.querySelector('#usernameInput');
 
   saveBtn.onclick = () => {
@@ -173,7 +171,7 @@ function renderMessage(message, messageId) {
   chatMessages.appendChild(msgDiv);
 }
 
-export function sendMessage(text) {
+window.sendMessage = function(text) {
   if (!chatRef) return;
   const cleanText = text.trim();
   if (!cleanText) return;
@@ -185,7 +183,7 @@ export function sendMessage(text) {
     timestamp: firebase.database.ServerValue.TIMESTAMP,
     type: 'user'
   });
-}
+};
 
 function sendSystemMessage(text) {
   if (!chatRef) return;
@@ -201,18 +199,18 @@ function deleteMessage(messageId) {
   database.ref(`9b_chat/${messageId}`).remove();
   
   // Log ke aktivitas admin
-  import('./app.js').then(module => {
-    module.logAdminActivity("Menghapus pesan obrolan");
-  });
+  if (window.logAdminActivity) {
+    window.logAdminActivity("Menghapus pesan obrolan");
+  }
 }
 
-export function clearChatHistory() {
+window.clearChatHistory = function() {
   if (!confirm("⚠️ PERINGATAN: Apakah lo yakin mau mengosongkan semua riwayat chat di database? Tindakan ini permanen!")) return;
   if (database) {
     database.ref('9b_chat').remove();
     sendSystemMessage("🔄 Riwayat obrolan dikosongkan oleh Head Admin.");
   }
-}
+};
 
 // Helpers
 function formatTime(timestamp) {

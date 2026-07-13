@@ -1,25 +1,23 @@
-// Modul Pengecekan Tugas (Task Tracker) terintegrasi dengan Firebase Realtime Database
-import { firebaseConfig } from './config.js';
-
-let database = null;
+// Modul Pengecekan Tugas (Task Tracker) terintegrasi dengan Firebase Realtime Database (Non-Module)
+let databaseTasks = null;
 let tasksRef = null;
 let localTasksFallback = []; // Fallback local storage jika Firebase gagal/offline
 
-export function initTasks() {
+window.initTasks = function() {
   if (typeof firebase !== 'undefined') {
     if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
+      firebase.initializeApp(window.firebaseConfig);
     }
-    database = firebase.database();
-    tasksRef = database.ref('9b_tasks');
+    databaseTasks = firebase.database();
+    tasksRef = databaseTasks.ref('9b_tasks');
     
     setupTasksRealtimeListener();
   } else {
     console.warn("Firebase tidak terdeteksi, beralih ke penyimpanan Lokal (LocalStorage).");
     loadTasksFromLocalStorage();
-    renderTasksList();
+    window.renderTasksList();
   }
-}
+};
 
 function setupTasksRealtimeListener() {
   tasksRef.on('value', (snapshot) => {
@@ -35,11 +33,11 @@ function setupTasksRealtimeListener() {
     }
     // Update local copy & render
     localTasksFallback = tasksList;
-    renderTasksList();
+    window.renderTasksList();
   }, (error) => {
     console.error("Gagal mendengarkan database Firebase, memuat dari lokal:", error);
     loadTasksFromLocalStorage();
-    renderTasksList();
+    window.renderTasksList();
   });
 }
 
@@ -59,7 +57,7 @@ function saveTasksToLocalStorage() {
 }
 
 // Render Kanban Board
-export function renderTasksList() {
+window.renderTasksList = function() {
   const todoContainer = document.getElementById('todoCards');
   const progressContainer = document.getElementById('progressCards');
   const doneContainer = document.getElementById('doneCards');
@@ -93,7 +91,7 @@ export function renderTasksList() {
   document.getElementById('todoCount').innerText = countTodo;
   document.getElementById('progressCount').innerText = countProgress;
   document.getElementById('doneCount').innerText = countDone;
-}
+};
 
 function createTaskCardElement(task, isAdmin) {
   const div = document.createElement('div');
@@ -142,7 +140,7 @@ function createTaskCardElement(task, isAdmin) {
 }
 
 // Tambah Tugas Baru
-export function addNewTask(subject, desc, deadline, priority) {
+window.addNewTask = function(subject, desc, deadline, priority) {
   const newTask = {
     subject: subject.trim(),
     desc: desc.trim(),
@@ -160,14 +158,14 @@ export function addNewTask(subject, desc, deadline, priority) {
     newTask.id = 'local_' + Date.now();
     localTasksFallback.push(newTask);
     saveTasksToLocalStorage();
-    renderTasksList();
+    window.renderTasksList();
   }
 
   // Log ke aktivitas admin
-  import('./app.js').then(module => {
-    module.logAdminActivity(`Menambahkan tugas ${newTask.subject}`);
-  });
-}
+  if (window.logAdminActivity) {
+    window.logAdminActivity(`Menambahkan tugas ${newTask.subject}`);
+  }
+};
 
 // Pindahkan Status Tugas
 window.moveTask = function(taskId, newStatus) {
@@ -178,15 +176,15 @@ window.moveTask = function(taskId, newStatus) {
     if (task) {
       task.status = newStatus;
       saveTasksToLocalStorage();
-      renderTasksList();
+      window.renderTasksList();
     }
   }
 
   // Log ke aktivitas admin
-  import('./app.js').then(module => {
+  if (window.logAdminActivity) {
     const taskName = localTasksFallback.find(t => t.id === taskId)?.subject || 'tugas';
-    module.logAdminActivity(`Memindahkan tugas "${taskName}" ke status [${newStatus.toUpperCase()}]`);
-  });
+    window.logAdminActivity(`Memindahkan tugas "${taskName}" ke status [${newStatus.toUpperCase()}]`);
+  }
 };
 
 // Hapus Tugas
@@ -201,13 +199,13 @@ window.deleteTask = function(taskId) {
   } else {
     localTasksFallback = localTasksFallback.filter(t => t.id !== taskId);
     saveTasksToLocalStorage();
-    renderTasksList();
+    window.renderTasksList();
   }
 
   // Log ke aktivitas admin
-  import('./app.js').then(module => {
-    module.logAdminActivity(`Menghapus tugas "${taskSubject}"`);
-  });
+  if (window.logAdminActivity) {
+    window.logAdminActivity(`Menghapus tugas "${taskSubject}"`);
+  }
 };
 
 // Helpers

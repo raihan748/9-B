@@ -1,6 +1,4 @@
-import { ADMIN_PASSWORDS, firebaseConfig } from './config.js';
-import { initChat, sendMessage, clearChatHistory } from './chat.js';
-import { initTasks, addNewTask, renderTasksList } from './tasks.js';
+// Jantung Utama Logika Aplikasi (Non-Module Global Scope)
 
 // State Management
 let database = null;
@@ -44,7 +42,7 @@ function initApp() {
   // Inisialisasi Firebase jika ada
   if (typeof firebase !== 'undefined') {
     if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
+      firebase.initializeApp(window.firebaseConfig);
     }
     database = firebase.database();
     statusRef = database.ref('9b_status');
@@ -59,12 +57,17 @@ function initApp() {
   // Inisiasi Tab UI Router
   initTabRouter();
 
-  // Load Modul Chat & Tasks
-  initChat((username, avatar) => {
-    document.getElementById('myChatName').innerText = username;
-    document.getElementById('myChatAvatar').innerText = avatar;
-  });
-  initTasks();
+  // Load Modul Chat & Tasks (Melalui object window global)
+  if (window.initChat) {
+    window.initChat((username, avatar) => {
+      document.getElementById('myChatName').innerText = username;
+      document.getElementById('myChatAvatar').innerText = avatar;
+    });
+  }
+
+  if (window.initTasks) {
+    window.initTasks();
+  }
 
   // Event Listeners untuk UI & Tombol
   setupUIEventListeners();
@@ -121,7 +124,9 @@ function switchTab(tabId) {
       }, 50);
     }
   } else if (tabId === 'tasks') {
-    renderTasksList();
+    if (window.renderTasksList) {
+      window.renderTasksList();
+    }
   }
 }
 
@@ -350,7 +355,7 @@ window.deleteExamVideo = function(videoId) {
   if (!confirm("Hapus video materi ini dari daftar belajar siswa?")) return;
   if (videosRef) {
     videosRef.child(videoId).remove();
-    logAdminActivity("Menghapus video pembelajaran");
+    window.logAdminActivity("Menghapus video pembelajaran");
   }
 };
 
@@ -368,16 +373,16 @@ function attemptAdminLogin(password) {
   let adminLevel = '';
   let adminName = '';
 
-  if (cleanPass === ADMIN_PASSWORDS.HEAD_ADMIN) {
+  if (cleanPass === window.ADMIN_PASSWORDS.HEAD_ADMIN) {
     adminLevel = 'HEAD_ADMIN';
     adminName = 'Rehan (Owner)';
-  } else if (cleanPass === ADMIN_PASSWORDS.WALI_KELAS) {
+  } else if (cleanPass === window.ADMIN_PASSWORDS.WALI_KELAS) {
     adminLevel = 'WALI_KELAS';
     adminName = 'Wali Kelas';
-  } else if (cleanPass === ADMIN_PASSWORDS.SEKRETARIS) {
+  } else if (cleanPass === window.ADMIN_PASSWORDS.SEKRETARIS) {
     adminLevel = 'SEKRETARIS';
     adminName = 'Sekretaris';
-  } else if (cleanPass === ADMIN_PASSWORDS.TEMAN) {
+  } else if (cleanPass === window.ADMIN_PASSWORDS.TEMAN) {
     adminLevel = 'REGULAR_ADMIN';
     adminName = 'Admin Teman';
   } else {
@@ -406,7 +411,7 @@ function createAdminSession(level, name) {
       timestamp: Date.now()
     }).then(() => {
       // Catat log aktivitas login
-      logAdminActivity("Berhasil login ke panel admin");
+      window.logAdminActivity("Berhasil login ke panel admin");
       applyAdminUI(level, name);
       loginAdminModal.style.display = 'none';
       document.getElementById('adminPasswordInput').value = '';
@@ -487,7 +492,9 @@ function applyAdminUI(level, name) {
   }
 
   // Render ulang list tugas agar tombol-tombol pindah status admin muncul
-  renderTasksList();
+  if (window.renderTasksList) {
+    window.renderTasksList();
+  }
 }
 
 function handleLogout(forced = false) {
@@ -496,7 +503,7 @@ function handleLogout(forced = false) {
     if (!forced) {
       // Jika logout manual, hapus sesi di database
       sessionsRef.child(mySessionKey).remove();
-      logAdminActivity("Berhasil logout dari panel admin");
+      window.logAdminActivity("Berhasil logout dari panel admin");
     }
   }
 
@@ -514,7 +521,9 @@ function handleLogout(forced = false) {
   document.getElementById('openAddTaskModalBtn').style.display = 'none';
   document.getElementById('clearChatBtn').style.display = 'none';
 
-  renderTasksList();
+  if (window.renderTasksList) {
+    window.renderTasksList();
+  }
 
   if (forced) {
     alert("⚠️ Sesi Admin lo telah diputus secara paksa oleh Head Admin!");
@@ -523,7 +532,7 @@ function handleLogout(forced = false) {
 }
 
 // Catat histori aktivitas admin reguler ke database Firebase
-export function logAdminActivity(actionText) {
+window.logAdminActivity = function(actionText) {
   if (!logsRef) return;
   const adminName = localStorage.getItem('admin_name') || 'Admin';
   logsRef.push({
@@ -531,7 +540,7 @@ export function logAdminActivity(actionText) {
     action: actionText,
     timestamp: Date.now()
   });
-}
+};
 
 /* ==========================================================================
    HEAD ADMIN EXCLUSIVE FUNCTIONS
@@ -599,7 +608,7 @@ window.terminateAdminSession = function(sessionKey, name) {
   if (!confirm(`Apakah lo yakin mau mengeluarkan paksa admin "${name}" dari sesi aktif mereka?`)) return;
   if (sessionsRef) {
     sessionsRef.child(sessionKey).remove(); // hapus sesi di Firebase
-    logAdminActivity(`Memutus sesi admin reguler: "${name}"`);
+    window.logAdminActivity(`Memutus sesi admin reguler: "${name}"`);
   }
 };
 
@@ -675,7 +684,9 @@ function setupUIEventListeners() {
       return;
     }
 
-    addNewTask(subject, desc, deadline, priority);
+    if (window.addNewTask) {
+      window.addNewTask(subject, desc, deadline, priority);
+    }
     addTaskModal.style.display = 'none';
 
     // Reset input
@@ -694,29 +705,37 @@ function setupUIEventListeners() {
   // EDIT USERNAME & AVATAR CHAT
   document.getElementById('editUsernameBtn').onclick = () => {
     localStorage.removeItem('chat_username');
-    initChat((username, avatar) => {
-      document.getElementById('myChatName').innerText = username;
-      document.getElementById('myChatAvatar').innerText = avatar;
-    });
+    if (window.initChat) {
+      window.initChat((username, avatar) => {
+        document.getElementById('myChatName').innerText = username;
+        document.getElementById('myChatAvatar').innerText = avatar;
+      });
+    }
   };
 
   // TOMBOL SEND CHAT
   document.getElementById('sendChatBtn').onclick = () => {
     const input = document.getElementById('chatInputField');
-    sendMessage(input.value);
+    if (window.sendMessage) {
+      window.sendMessage(input.value);
+    }
     input.value = '';
   };
 
   document.getElementById('chatInputField').onkeydown = (e) => {
     if (e.key === 'Enter') {
-      sendMessage(e.target.value);
+      if (window.sendMessage) {
+        window.sendMessage(e.target.value);
+      }
       e.target.value = '';
     }
   };
 
   // CLEAR CHAT HISTORY (Head Admin Only)
   document.getElementById('clearChatBtn').onclick = () => {
-    clearChatHistory();
+    if (window.clearChatHistory) {
+      window.clearChatHistory();
+    }
   };
 
   /* ==========================================================================
@@ -727,7 +746,7 @@ function setupUIEventListeners() {
   document.getElementById('switchDeadlineMode').onchange = (e) => {
     if (statusRef) {
       statusRef.update({ deadline_mode: e.target.checked });
-      logAdminActivity(`Mengubah Deadline Alert Mode ke: [${e.target.checked ? 'AKTIF' : 'NONAKTIF'}]`);
+      window.logAdminActivity(`Mengubah Deadline Alert Mode ke: [${e.target.checked ? 'AKTIF' : 'NONAKTIF'}]`);
     }
   };
 
@@ -735,7 +754,7 @@ function setupUIEventListeners() {
   document.getElementById('switchExamPrepMode').onchange = (e) => {
     if (statusRef) {
       statusRef.update({ exam_prep_mode: e.target.checked });
-      logAdminActivity(`Mengubah Exam Prep Mode ke: [${e.target.checked ? 'AKTIF' : 'NONAKTIF'}]`);
+      window.logAdminActivity(`Mengubah Exam Prep Mode ke: [${e.target.checked ? 'AKTIF' : 'NONAKTIF'}]`);
       
       // Jika diaktifkan, tawarkan untuk memuat video baru
       if (e.target.checked && confirm("Exam Prep Mode aktif. Mau nambahin video materi baru sekarang?")) {
@@ -748,7 +767,7 @@ function setupUIEventListeners() {
   document.getElementById('switchTimeCapsuleMode').onchange = (e) => {
     if (statusRef) {
       statusRef.update({ time_capsule_mode: e.target.checked });
-      logAdminActivity(`Mengubah visibilitas Time Capsule Mode ke: [${e.target.checked ? 'AKTIF' : 'NONAKTIF'}]`);
+      window.logAdminActivity(`Mengubah visibilitas Time Capsule Mode ke: [${e.target.checked ? 'AKTIF' : 'NONAKTIF'}]`);
       
       // Jika diaktifkan, tawarkan untuk set waktu pembukaan
       if (e.target.checked) {
@@ -771,7 +790,7 @@ function setupUIEventListeners() {
         time_capsule_forced_open: false // reset bypass status
       }).then(() => {
         setCapsuleDateModal.style.display = 'none';
-        logAdminActivity(`Mengatur waktu pembukaan Kapsul Waktu pada: ${inputVal}`);
+        window.logAdminActivity(`Mengatur waktu pembukaan Kapsul Waktu pada: ${inputVal}`);
         alert("Waktu pembukaan kapsul waktu sukses di-set!");
       });
     }
@@ -796,7 +815,7 @@ function setupUIEventListeners() {
         addVideoModal.style.display = 'none';
         document.getElementById('videoTitleInput').value = '';
         document.getElementById('videoUrlInput').value = '';
-        logAdminActivity(`Menambahkan video materi: "${title}"`);
+        window.logAdminActivity(`Menambahkan video materi: "${title}"`);
         alert("Video berhasil ditambahkan!");
       });
     }
@@ -815,7 +834,7 @@ function setupUIEventListeners() {
     }
     if (statusRef) {
       statusRef.update({ broadcast_text: text }).then(() => {
-        logAdminActivity(`Mengubah pengumuman Live Broadcast menjadi: "${text}"`);
+        window.logAdminActivity(`Mengubah pengumuman Live Broadcast menjadi: "${text}"`);
         alert("Live Broadcast diperbarui!");
       });
     }
@@ -845,4 +864,17 @@ function initBgmPlayer() {
       bgmPlayBtn.style.background = 'var(--purple)';
     }
   };
+}
+
+// Helpers
+function escapeHTML(str) {
+  return str.replace(/[&<>'"]/g, 
+    tag => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[tag] || tag)
+  );
 }

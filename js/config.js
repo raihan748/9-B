@@ -1,16 +1,12 @@
-// Konfigurasi Kredensial Admin & Database Firebase
-export const ADMIN_PASSWORDS = {
+// Konfigurasi Kredensial Admin & Database Firebase (Non-Module Global Scope)
+window.ADMIN_PASSWORDS = {
   HEAD_ADMIN: "rehan1135",         // Akses penuh & kontrol sesi
   WALI_KELAS: "wali_kelas_9b",     // Akses reguler
   SEKRETARIS: "admin9b_keren",     // Akses reguler
   TEMAN: "tugas_menumpuk"          // Akses reguler
 };
 
-// Firebase Configuration
-// Database ini diset open read-write untuk sandbox demo awal agar web 100% langsung berfungsi.
-// Anda sangat disarankan untuk membuat proyek Firebase sendiri di console.firebase.google.com
-// dan mengganti kredensial di bawah ini dengan milik Anda agar data chat & tugas lebih aman.
-export const firebaseConfig = {
+window.firebaseConfig = {
   apiKey: "AIzaSyD79N_V1tS0e-4A8bC9dEfGhiJklMnOpQr",
   authDomain: "kelaskuh-9b-demo.firebaseapp.com",
   databaseURL: "https://kelaskuh-9b-demo-default-rtdb.asia-southeast1.firebasedatabase.app/",
