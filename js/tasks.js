@@ -1,5 +1,6 @@
 // Modul Pengecekan Tugas (Task Tracker) terintegrasi dengan Firebase Realtime Database (Non-Module)
-let databaseTasks = null;
+// BUG FIX: Rename variable 'database' -> 'tasksDatabase' agar tidak conflict dengan app.js
+let tasksDatabase = null;
 let tasksRef = null;
 let localTasksFallback = []; // Fallback local storage jika Firebase gagal/offline
 
@@ -8,8 +9,8 @@ window.initTasks = function() {
     if (!firebase.apps.length) {
       firebase.initializeApp(window.firebaseConfig);
     }
-    databaseTasks = firebase.database();
-    tasksRef = databaseTasks.ref('9b_tasks');
+    tasksDatabase = firebase.database();
+    tasksRef = tasksDatabase.ref('9b_tasks');
     
     setupTasksRealtimeListener();
   } else {
@@ -127,8 +128,8 @@ function createTaskCardElement(task, isAdmin) {
   }
 
   div.innerHTML = `
-    <div class="task-subject">${escapeHTML(task.subject)}</div>
-    <div class="task-desc">${escapeHTML(task.desc)}</div>
+    <div class="task-subject">${tasksEscapeHTML(task.subject)}</div>
+    <div class="task-desc">${tasksEscapeHTML(task.desc)}</div>
     <div class="task-meta">
       ${deadlineHTML}
       <span class="tag-label" style="background: ${getPriorityColor(task.priority)}; margin: 0; box-shadow: 1px 1px 0px #000; font-size: 0.6rem;">${task.priority}</span>
@@ -220,21 +221,35 @@ function getPriorityColor(priority) {
 
 function checkIsUrgent(deadlineStr) {
   if (!deadlineStr) return false;
-  const deadline = new Date(deadlineStr);
-  const diffTime = deadline - new Date();
+  // BUG FIX: Parse date string sebagai local time bukan UTC
+  // "YYYY-MM-DD" tanpa jam di-parse Firefox/Safari sebagai UTC, causing off-by-one
+  const parts = deadlineStr.split('-');
+  if (parts.length !== 3) return false;
+  const deadline = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // normalize to start of today
+  
+  const diffTime = deadline - today;
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays <= 2 && diffDays >= 0; // Urgent jika deadline dalam waktu 2 hari atau kurang
+  // BUG FIX: Urgent jika deadline hari ini, besok, lusa, ATAU sudah lewat (diffDays < 0)
+  return diffDays <= 2;
 }
 
 function formatDeadlineDate(dateStr) {
   if (!dateStr) return '';
-  const d = new Date(dateStr);
+  // BUG FIX: Parse date string sebagai local time
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) return dateStr;
+  const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   return `${d.getDate()} ${months[d.getMonth()]}`;
 }
 
-function escapeHTML(str) {
-  return str.replace(/[&<>'"]/g, 
+// BUG FIX: Rename escapeHTML di tasks.js agar tidak ada redeclaration conflict di global scope
+function tasksEscapeHTML(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>'"]/g, 
     tag => ({
       '&': '&amp;',
       '<': '&lt;',

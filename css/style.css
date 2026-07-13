@@ -57,15 +57,18 @@ body {
 }
 
 /* Scrollbar Style */
+/* BUG FIX: --border-color adalah #0A0A0A (hampir hitam, tidak terlihat di dark bg)
+   Ganti scrollbar thumb dengan warna yang lebih terlihat */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-dark);
+  background: var(--bg-card);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border: 2px solid var(--bg-dark);
+  background: #3a3a45;
+  border-radius: 4px;
+  border: 2px solid var(--bg-card);
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);

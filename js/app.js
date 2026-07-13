@@ -1,7 +1,8 @@
 // Jantung Utama Logika Aplikasi (Non-Module Global Scope)
 
 // State Management
-let database = null;
+// BUG FIX: Rename 'database' -> 'appDatabase' agar tidak conflict dengan chat.js dan tasks.js
+let appDatabase = null;
 let statusRef = null;
 let sessionsRef = null;
 let logsRef = null;
@@ -44,12 +45,12 @@ function initApp() {
     if (!firebase.apps.length) {
       firebase.initializeApp(window.firebaseConfig);
     }
-    database = firebase.database();
-    statusRef = database.ref('9b_status');
-    sessionsRef = database.ref('9b_admin_sessions');
-    logsRef = database.ref('9b_activity_logs');
-    capsuleRef = database.ref('9b_time_capsule');
-    videosRef = database.ref('9b_exam_videos');
+    appDatabase = firebase.database();
+    statusRef = appDatabase.ref('9b_status');
+    sessionsRef = appDatabase.ref('9b_admin_sessions');
+    logsRef = appDatabase.ref('9b_activity_logs');
+    capsuleRef = appDatabase.ref('9b_time_capsule');
+    videosRef = appDatabase.ref('9b_exam_videos');
 
     setupGlobalStatusListener();
   }
@@ -166,14 +167,16 @@ function setupGlobalStatusListener() {
     document.getElementById('switchTimeCapsuleMode').checked = isTimeCapsule;
     targetCapsuleDate = status.time_capsule_unlock_date || '';
     
-    // Sembunyikan/tampilkan tab capsule berdasarkan status aktif
-    const capsuleTabBtns = document.querySelectorAll('[data-tab="capsule"]');
-    capsuleTabBtns.forEach(btn => {
-      btn.style.display = isTimeCapsule ? 'block' : 'none';
-    });
-    
+    // BUG FIX: Tab capsule selalu tampil di nav, isinya yang berubah berdasarkan mode
+    // Jika Time Capsule mode tidak aktif, tampilkan pesan info saja
     if (isTimeCapsule) {
       initTimeCapsuleView(status.time_capsule_forced_open || false);
+    } else {
+      // Tampilkan locked view default agar tab tetap accessible
+      const lockedView = document.getElementById('capsuleLockedView');
+      const unlockedView = document.getElementById('capsuleUnlockedView');
+      if (lockedView) lockedView.style.display = 'block';
+      if (unlockedView) unlockedView.style.display = 'none';
     }
 
     // 4. Live Broadcast Text
@@ -355,7 +358,9 @@ window.deleteExamVideo = function(videoId) {
   if (!confirm("Hapus video materi ini dari daftar belajar siswa?")) return;
   if (videosRef) {
     videosRef.child(videoId).remove();
-    window.logAdminActivity("Menghapus video pembelajaran");
+    if (window.logAdminActivity) {
+      window.logAdminActivity("Menghapus video pembelajaran");
+    }
   }
 };
 
@@ -499,11 +504,13 @@ function applyAdminUI(level, name) {
 
 function handleLogout(forced = false) {
   if (sessionsRef && mySessionKey) {
-    sessionsRef.child(mySessionKey).off('value'); // matikan listener
+    sessionsRef.child(mySessionKey).off(); // matikan semua listener pada node sesi ini
     if (!forced) {
       // Jika logout manual, hapus sesi di database
       sessionsRef.child(mySessionKey).remove();
-      window.logAdminActivity("Berhasil logout dari panel admin");
+      if (window.logAdminActivity) {
+        window.logAdminActivity("Berhasil logout dari panel admin");
+      }
     }
   }
 
@@ -532,14 +539,18 @@ function handleLogout(forced = false) {
 }
 
 // Catat histori aktivitas admin reguler ke database Firebase
+// BUG FIX: Tambah guard agar tidak crash saat Firebase belum siap
 window.logAdminActivity = function(actionText) {
-  if (!logsRef) return;
+  if (!logsRef) {
+    console.log(`[Activity Log - Offline]: ${actionText}`);
+    return;
+  }
   const adminName = localStorage.getItem('admin_name') || 'Admin';
   logsRef.push({
     admin: adminName,
     action: actionText,
     timestamp: Date.now()
-  });
+  }).catch(err => console.warn('Gagal menulis log aktivitas:', err));
 };
 
 /* ==========================================================================
@@ -703,8 +714,10 @@ function setupUIEventListeners() {
   };
 
   // EDIT USERNAME & AVATAR CHAT
+  // BUG FIX: Hapus JUGA avatar dari localStorage agar fresh saat re-init
   document.getElementById('editUsernameBtn').onclick = () => {
     localStorage.removeItem('chat_username');
+    localStorage.removeItem('chat_avatar');
     if (window.initChat) {
       window.initChat((username, avatar) => {
         document.getElementById('myChatName').innerText = username;
@@ -867,8 +880,10 @@ function initBgmPlayer() {
 }
 
 // Helpers
+// BUG FIX: Tambah null check dan String() cast agar tidak crash jika input undefined/null
 function escapeHTML(str) {
-  return str.replace(/[&<>'"]/g, 
+  if (!str) return '';
+  return String(str).replace(/[&<>'"]/g, 
     tag => ({
       '&': '&amp;',
       '<': '&lt;',

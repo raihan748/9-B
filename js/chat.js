@@ -1,6 +1,8 @@
 // Modul Chat Realtime menggunakan Firebase Realtime Database (Non-Module)
-let database = null;
+// BUG FIX: Rename variable 'database' -> 'chatDatabase' agar tidak conflict dengan app.js
+let chatDatabase = null;
 let chatRef = null;
+let chatListenerAttached = false; // BUG FIX: flag untuk mencegah duplikasi listener
 let currentUsername = localStorage.getItem('chat_username') || '';
 let currentUserAvatar = localStorage.getItem('chat_avatar') || '🦖';
 
@@ -18,8 +20,14 @@ window.initChat = function(onUserReady) {
     firebase.initializeApp(window.firebaseConfig);
   }
   
-  database = firebase.database();
-  chatRef = database.ref('9b_chat');
+  chatDatabase = firebase.database();
+  chatRef = chatDatabase.ref('9b_chat');
+
+  // BUG FIX: Matikan listener lama sebelum re-init (mencegah duplikasi saat edit username)
+  if (chatListenerAttached) {
+    chatRef.off();
+    chatListenerAttached = false;
+  }
 
   // Periksa apakah user sudah set username
   if (!currentUsername) {
@@ -31,31 +39,32 @@ window.initChat = function(onUserReady) {
 };
 
 function showUsernameModal(callback) {
-  // Buat modal overlay secara dinamis jika belum ada
-  let modal = document.getElementById('chatUsernameModal');
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.id = 'chatUsernameModal';
-    modal.className = 'modal-overlay';
-    modal.innerHTML = `
-      <div class="modal-content">
-        <h3>Masuk Ruang Obrolan 9B</h3>
-        <p>Masukkan nama panggilan lo sebelum mulai ngobrol bareng anak-anak 9B secara real-time.</p>
-        <div class="form-group">
-          <label for="usernameInput">Nama Panggilan</label>
-          <input type="text" id="usernameInput" class="form-input" placeholder="Contoh: Rehan, Bagas, Clara..." maxlength="15">
-        </div>
-        <div class="form-group">
-          <label>Pilih Avatar Emoji</label>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px;" id="avatarSelector">
-            ${emojis.map(e => `<button class="brut-btn" style="padding: 8px; font-size: 1.2rem; min-width: 42px; box-shadow: 2px 2px 0px #000;" data-avatar="${e}">${e}</button>`).join('')}
-          </div>
-        </div>
-        <button id="saveUsernameBtn" class="brut-btn btn-purple" style="width: 100%; margin-top: 10px;">MASUK CHAT</button>
+  // Hapus modal lama jika ada (untuk re-init yang bersih)
+  const existingModal = document.getElementById('chatUsernameModal');
+  if (existingModal) existingModal.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'chatUsernameModal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal-content">
+      <h3>Masuk Ruang Obrolan 9B</h3>
+      <p>Masukkan nama panggilan lo sebelum mulai ngobrol bareng anak-anak 9B secara real-time.</p>
+      <div class="form-group">
+        <label for="usernameInput">Nama Panggilan</label>
+        <input type="text" id="usernameInput" class="form-input" placeholder="Contoh: Rehan, Bagas, Clara..." maxlength="15">
       </div>
-    `;
-    document.body.appendChild(modal);
-  }
+      <div class="form-group">
+        <label>Pilih Avatar Emoji</label>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px;" id="avatarSelector">
+          ${emojis.map(e => `<button class="brut-btn" style="padding: 8px; font-size: 1.2rem; min-width: 42px; box-shadow: 2px 2px 0px #000;" data-avatar="${e}">${e}</button>`).join('')}
+        </div>
+      </div>
+      <button id="saveUsernameBtn" class="brut-btn btn-purple" style="width: 100%; margin-top: 10px;">MASUK CHAT</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  modal.style.display = 'flex';
 
   let selectedAvatar = emojis[Math.floor(Math.random() * emojis.length)];
   const avatarButtons = modal.querySelectorAll('#avatarSelector button');
@@ -75,6 +84,11 @@ function showUsernameModal(callback) {
 
   const saveBtn = modal.querySelector('#saveUsernameBtn');
   const input = modal.querySelector('#usernameInput');
+
+  // BUG FIX: Dukung Enter key pada input username
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') saveBtn.click();
+  });
 
   saveBtn.onclick = () => {
     const val = input.value.trim();
@@ -104,9 +118,9 @@ function setupChatListeners() {
   // Bersihkan chat UI sebelum render dari database
   chatMessages.innerHTML = '';
 
-  // Listen data chat realtime (batas 100 pesan terakhir)
-  chatRef.limitToLast(100).off('child_added'); // hapus listener lama jika ada
-  chatRef.limitToLast(100).on('child_added', (snapshot) => {
+  // BUG FIX: Simpan reference query agar bisa di-off dengan benar
+  const chatQuery = chatRef.limitToLast(100);
+  chatQuery.on('child_added', (snapshot) => {
     const message = snapshot.val();
     const messageId = snapshot.key;
     renderMessage(message, messageId);
@@ -123,11 +137,16 @@ function setupChatListeners() {
       msgElement.remove();
     }
   });
+
+  chatListenerAttached = true;
 }
 
 function renderMessage(message, messageId) {
   const chatMessages = document.getElementById('chatMessages');
   if (!chatMessages) return;
+
+  // BUG FIX: Cegah duplikasi render pesan yang sama
+  if (document.getElementById(`msg-${messageId}`)) return;
 
   const isSelf = message.sender === currentUsername;
   const isSystem = message.type === 'system';
@@ -152,11 +171,11 @@ function renderMessage(message, messageId) {
     msgDiv.innerHTML = `
       <div class="message-meta">
         <span class="message-avatar">${message.avatar || '🦕'}</span>
-        <span class="message-sender">${message.sender}</span>
+        <span class="message-sender">${chatEscapeHTML(message.sender)}</span>
         <span class="message-time">${formatTime(message.timestamp)}</span>
         ${deleteBtn}
       </div>
-      <div class="message-text">${escapeHTML(message.text)}</div>
+      <div class="message-text">${chatEscapeHTML(message.text)}</div>
     `;
 
     // Pasang event handler untuk tombol hapus jika ada
@@ -175,6 +194,12 @@ window.sendMessage = function(text) {
   if (!chatRef) return;
   const cleanText = text.trim();
   if (!cleanText) return;
+
+  // BUG FIX: Cek username sebelum kirim pesan
+  if (!currentUsername) {
+    alert("Atur dulu nama panggilan lo sebelum kirim pesan!");
+    return;
+  }
 
   chatRef.push({
     sender: currentUsername,
@@ -196,7 +221,7 @@ function sendSystemMessage(text) {
 
 function deleteMessage(messageId) {
   if (!confirm("Hapus pesan ini dari database?")) return;
-  database.ref(`9b_chat/${messageId}`).remove();
+  chatDatabase.ref(`9b_chat/${messageId}`).remove();
   
   // Log ke aktivitas admin
   if (window.logAdminActivity) {
@@ -206,9 +231,10 @@ function deleteMessage(messageId) {
 
 window.clearChatHistory = function() {
   if (!confirm("⚠️ PERINGATAN: Apakah lo yakin mau mengosongkan semua riwayat chat di database? Tindakan ini permanen!")) return;
-  if (database) {
-    database.ref('9b_chat').remove();
-    sendSystemMessage("🔄 Riwayat obrolan dikosongkan oleh Head Admin.");
+  if (chatDatabase) {
+    chatDatabase.ref('9b_chat').remove().then(() => {
+      sendSystemMessage("🔄 Riwayat obrolan dikosongkan oleh Head Admin.");
+    });
   }
 };
 
@@ -221,8 +247,10 @@ function formatTime(timestamp) {
   return `${hours}:${minutes}`;
 }
 
-function escapeHTML(str) {
-  return str.replace(/[&<>'"]/g, 
+// BUG FIX: Rename escapeHTML di chat.js agar tidak ada redeclaration conflict di global scope
+function chatEscapeHTML(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>'"]/g, 
     tag => ({
       '&': '&amp;',
       '<': '&lt;',
