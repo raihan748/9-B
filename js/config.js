@@ -6,9 +6,10 @@ window.ADMIN_PASSWORDS = {
   TEMAN: "tugas_menumpuk"          // Akses reguler
 };
 
-// Gun.js Public Peer Relay List (Bebas digunakan tanpa pendaftaran akun)
+// Gun.js Public Peer Relay List yang Paling Cepat & Stabil saat ini
 window.gunPeers = [
   'https://gun-manhattan.herokuapp.com/gun',
-  'https://gundb-public.herokuapp.com/gun',
-  'https://raw-gun.herokuapp.com/gun'
+  'https://peer.wall.social/gun',
+  'https://gun-us.herokuapp.com/gun',
+  'https://gunjs.herokuapp.com/gun'
 ];
