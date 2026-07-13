@@ -172,50 +172,73 @@ function switchTab(tabId) {
 function setupGlobalStatusListener() {
   if (!statusRef) return;
 
-  statusRef.on((status) => {
-    if (!status) return;
-
-    // 1. Deadline Alert Mode
-    const isDeadlineMode = status.deadline_mode || false;
-    document.getElementById('switchDeadlineMode').checked = isDeadlineMode;
-    if (isDeadlineMode) {
+  // 1. Dengarkan Deadline Alert Mode secara spesifik
+  statusRef.get('deadline_mode').on((isDeadlineMode) => {
+    const active = !!isDeadlineMode;
+    document.getElementById('switchDeadlineMode').checked = active;
+    if (active) {
       bodyEl.classList.add('deadline-alert-active');
       document.getElementById('liveBroadcastBanner').style.background = 'var(--pink)';
     } else {
       bodyEl.classList.remove('deadline-alert-active');
       document.getElementById('liveBroadcastBanner').style.background = 'var(--yellow-light)';
     }
+  });
 
-    // 2. Exam Preparation Mode
-    const isExamPrep = status.exam_prep_mode || false;
-    document.getElementById('switchExamPrepMode').checked = isExamPrep;
+  // 2. Dengarkan Exam Preparation Mode secara spesifik
+  statusRef.get('exam_prep_mode').on((isExamPrep) => {
+    const active = !!isExamPrep;
+    document.getElementById('switchExamPrepMode').checked = active;
     const examPrepContainer = document.getElementById('examPrepCenter');
-    if (isExamPrep) {
+    if (active) {
       examPrepContainer.style.display = 'block';
       loadExamVideos();
     } else {
       examPrepContainer.style.display = 'none';
     }
+  });
 
-    // 3. Time Capsule Mode
-    const isTimeCapsule = status.time_capsule_mode || false;
-    document.getElementById('switchTimeCapsuleMode').checked = isTimeCapsule;
-    targetCapsuleDate = status.time_capsule_unlock_date || '';
+  // 3. Dengarkan Time Capsule Mode secara spesifik
+  statusRef.get('time_capsule_mode').on((isTimeCapsule) => {
+    const active = !!isTimeCapsule;
+    document.getElementById('switchTimeCapsuleMode').checked = active;
     
-    // Tab capsule selalu aktif untuk pengisian pesan rahasia
-    if (isTimeCapsule) {
-      initTimeCapsuleView(status.time_capsule_forced_open || false);
-    } else {
-      const lockedView = document.getElementById('capsuleLockedView');
-      const unlockedView = document.getElementById('capsuleUnlockedView');
-      if (lockedView) lockedView.style.display = 'block';
-      if (unlockedView) unlockedView.style.display = 'none';
-    }
+    // Tarik status forced_open dan unlock_date secara sinkron
+    statusRef.get('time_capsule_forced_open').once((forcedOpen) => {
+      statusRef.get('time_capsule_unlock_date').once((unlockDate) => {
+        targetCapsuleDate = unlockDate || '';
+        
+        if (active) {
+          initTimeCapsuleView(!!forcedOpen);
+        } else {
+          const lockedView = document.getElementById('capsuleLockedView');
+          const unlockedView = document.getElementById('capsuleUnlockedView');
+          if (lockedView) lockedView.style.display = 'block';
+          if (unlockedView) unlockedView.style.display = 'none';
+        }
+      });
+    });
+  });
 
-    // 4. Live Broadcast Text
-    const bcastText = status.broadcast_text || 'Selamat datang di website resmi Kelas 9B.';
-    document.getElementById('broadcastText').innerText = bcastText;
-    document.getElementById('broadcastTextEditor').value = bcastText;
+  // Dengarkan jika ada perubahan paksa pada waktu unlock kapsul
+  statusRef.get('time_capsule_unlock_date').on((unlockDate) => {
+    if (unlockDate) {
+      targetCapsuleDate = unlockDate;
+      statusRef.get('time_capsule_mode').once((isTimeCapsule) => {
+        statusRef.get('time_capsule_forced_open').once((forcedOpen) => {
+          if (!!isTimeCapsule) {
+            initTimeCapsuleView(!!forcedOpen);
+          }
+        });
+      });
+    }
+  });
+
+  // 4. Dengarkan Live Broadcast Text secara spesifik
+  statusRef.get('broadcast_text').on((bcastText) => {
+    const text = bcastText || 'Selamat datang di website resmi Kelas 9B.';
+    document.getElementById('broadcastText').innerText = text;
+    document.getElementById('broadcastTextEditor').value = text;
   });
 }
 
@@ -856,7 +879,7 @@ function setupUIEventListeners() {
   // 1. Switch Deadline Mode
   document.getElementById('switchDeadlineMode').onchange = (e) => {
     if (statusRef) {
-      statusRef.put({ deadline_mode: e.target.checked });
+      statusRef.get('deadline_mode').put(e.target.checked);
       window.logAdminActivity(`Mengubah status Deadline Alert Mode menjadi: [${e.target.checked ? 'AKTIF' : 'NONAKTIF'}]`);
     }
   };
@@ -864,7 +887,7 @@ function setupUIEventListeners() {
   // 2. Switch Exam Prep Mode
   document.getElementById('switchExamPrepMode').onchange = (e) => {
     if (statusRef) {
-      statusRef.put({ exam_prep_mode: e.target.checked });
+      statusRef.get('exam_prep_mode').put(e.target.checked);
       window.logAdminActivity(`Mengubah status Exam Prep Mode menjadi: [${e.target.checked ? 'AKTIF' : 'NONAKTIF'}]`);
       
       if (e.target.checked && confirm("Exam Prep Mode telah diaktifkan. Ingin menambahkan materi video pembelajaran baru sekarang?")) {
@@ -876,7 +899,7 @@ function setupUIEventListeners() {
   // 3. Switch Time Capsule Mode
   document.getElementById('switchTimeCapsuleMode').onchange = (e) => {
     if (statusRef) {
-      statusRef.put({ time_capsule_mode: e.target.checked });
+      statusRef.get('time_capsule_mode').put(e.target.checked);
       window.logAdminActivity(`Mengubah status Kapsul Waktu menjadi: [${e.target.checked ? 'AKTIF' : 'NONAKTIF'}]`);
       
       if (e.target.checked) {
@@ -894,10 +917,8 @@ function setupUIEventListeners() {
     }
     
     if (statusRef) {
-      statusRef.put({
-        time_capsule_unlock_date: inputVal,
-        time_capsule_forced_open: false
-      });
+      statusRef.get('time_capsule_unlock_date').put(inputVal);
+      statusRef.get('time_capsule_forced_open').put(false);
       setCapsuleDateModal.style.display = 'none';
       window.logAdminActivity(`Mengatur waktu pembukaan Kapsul Waktu pada tanggal: ${inputVal}`);
       alert("Pengaturan waktu pembukaan Kapsul Waktu berhasil disimpan!");
@@ -977,7 +998,7 @@ function setupUIEventListeners() {
       return;
     }
     if (statusRef) {
-      statusRef.put({ broadcast_text: text });
+      statusRef.get('broadcast_text').put(text);
       window.logAdminActivity(`Mengubah teks Siaran Langsung menjadi: "${text}"`);
       alert("Siaran Langsung berhasil diperbarui!");
     }
