@@ -1,23 +1,18 @@
-// Modul Chat Realtime — menggunakan singleton window.gunDB dari config.js
-let gunInstance = null;
-let chatNodeRef = null;
-let chatListenerRef = null;
+// Modul Chat Realtime — Firebase Realtime Database
+let chatRef = null;
 let currentUsername = localStorage.getItem('chat_username') || '';
 let currentUserAvatar = localStorage.getItem('chat_avatar') || '🦖';
+let chatListenerAttached = false;
 
 const emojis = ['🦖', '👾', '🦊', '🐱', '🐼', '🐨', '🐸', '🦁', '🐯', '🐙', '🥑', '🍕', '⚽', '🎸', '🚀'];
 
-window.initChat = function(onUserReady) {
-  if (!window.gunDB) {
-    console.error("Gun.js singleton belum siap di initChat");
+window.initChat = function (onUserReady) {
+  if (!window.db) {
+    console.error("Firebase belum siap di initChat");
     return;
   }
+  chatRef = window.db.ref('9b_class_chat_v1');
 
-  // Gunakan singleton gunDB — JANGAN buat instance Gun baru
-  gunInstance = window.gunDB;
-  chatNodeRef = gunInstance.get('9b_class_chat_v1');
-
-  // Periksa apakah pengguna sudah mengatur nama panggilan
   if (!currentUsername) {
     showUsernameModal(onUserReady);
   } else {
@@ -27,27 +22,26 @@ window.initChat = function(onUserReady) {
 };
 
 function showUsernameModal(callback) {
-  const existingModal = document.getElementById('chatUsernameModal');
-  if (existingModal) existingModal.remove();
+  const existing = document.getElementById('chatUsernameModal');
+  if (existing) existing.remove();
 
   const modal = document.createElement('div');
   modal.id = 'chatUsernameModal';
   modal.className = 'modal-overlay';
   modal.innerHTML = `
     <div class="modal-content">
-      <h3>Masuk Ruang Komunikasi Kelas 9B</h3>
-      <p>Silakan masukkan nama panggilan Anda untuk mulai berkomunikasi secara real-time dengan teman-teman sekelas.</p>
+      <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;margin-bottom:16px;">MASUK RUANG KOMUNIKASI</h2>
       <div class="form-group">
         <label for="usernameInput">Nama Panggilan</label>
         <input type="text" id="usernameInput" class="form-input" placeholder="Contoh: Rehan, Bagas, Clara..." maxlength="15">
       </div>
       <div class="form-group">
         <label>Pilih Avatar Emoji</label>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px;" id="avatarSelector">
-          ${emojis.map(e => `<button class="brut-btn" style="padding: 8px; font-size: 1.2rem; min-width: 42px; box-shadow: 2px 2px 0px #000;" data-avatar="${e}">${e}</button>`).join('')}
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;" id="avatarSelector">
+          ${emojis.map(e => `<button class="brut-btn" style="padding:8px;font-size:1.2rem;min-width:42px;box-shadow:2px 2px 0 #000;" data-avatar="${e}">${e}</button>`).join('')}
         </div>
       </div>
-      <button id="saveUsernameBtn" class="brut-btn btn-purple" style="width: 100%; margin-top: 10px;">MASUK RUANG DISKUSI</button>
+      <button id="saveUsernameBtn" class="brut-btn btn-purple" style="width:100%;margin-top:10px;">MASUK RUANG DISKUSI</button>
     </div>
   `;
   document.body.appendChild(modal);
@@ -55,11 +49,8 @@ function showUsernameModal(callback) {
 
   let selectedAvatar = emojis[Math.floor(Math.random() * emojis.length)];
   const avatarButtons = modal.querySelectorAll('#avatarSelector button');
-  
   avatarButtons.forEach(btn => {
-    if (btn.dataset.avatar === selectedAvatar) {
-      btn.style.background = 'var(--yellow-light)';
-    }
+    if (btn.dataset.avatar === selectedAvatar) btn.style.background = 'var(--yellow-light)';
     btn.onclick = (e) => {
       e.preventDefault();
       selectedAvatar = btn.dataset.avatar;
@@ -70,49 +61,42 @@ function showUsernameModal(callback) {
 
   const saveBtn = modal.querySelector('#saveUsernameBtn');
   const input = modal.querySelector('#usernameInput');
-
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') saveBtn.click();
-  });
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') saveBtn.click(); });
 
   saveBtn.onclick = () => {
     const val = input.value.trim();
-    if (!val) {
-      alert("Nama panggilan tidak boleh kosong!");
-      return;
-    }
-    
+    if (!val) { alert("Nama panggilan tidak boleh kosong!"); return; }
     currentUsername = val;
     currentUserAvatar = selectedAvatar;
     localStorage.setItem('chat_username', currentUsername);
     localStorage.setItem('chat_avatar', currentUserAvatar);
-    
     modal.remove();
     setupChatListeners();
     if (callback) callback(currentUsername, currentUserAvatar);
-
-    // Kirim pesan pengumuman bergabung
     sendSystemMessage(`${currentUserAvatar} ${currentUsername} telah bergabung ke dalam obrolan.`);
   };
 }
 
 function setupChatListeners() {
+  if (chatListenerAttached) return;
+  chatListenerAttached = true;
+
   const chatMessages = document.getElementById('chatMessages');
   if (!chatMessages) return;
-
   chatMessages.innerHTML = '';
 
-  // Listen data dari Gun.js secara real-time
-  chatNodeRef.map().on((message, messageId) => {
-    // Jika pesan dihapus (di-put null), hapus dari UI
-    if (!message) {
-      const msgElement = document.getElementById(`msg-${messageId}`);
-      if (msgElement) msgElement.remove();
-      return;
-    }
-
-    renderMessage(message, messageId);
+  // Firebase: dengarkan semua pesan baru secara realtime
+  chatRef.orderByChild('timestamp').on('child_added', (snap) => {
+    const message = snap.val();
+    if (!message) return;
+    renderMessage(message, snap.key);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+  });
+
+  // Firebase: pesan yang dihapus
+  chatRef.on('child_removed', (snap) => {
+    const msgEl = document.getElementById(`msg-${snap.key}`);
+    if (msgEl) msgEl.remove();
   });
 }
 
@@ -120,61 +104,42 @@ function renderMessage(message, messageId) {
   const chatMessages = document.getElementById('chatMessages');
   if (!chatMessages) return;
 
-  // Cek apakah pesan sudah ter-render sebelumnya untuk menghindari duplikasi
-  let msgDiv = document.getElementById(`msg-${messageId}`);
+  if (document.getElementById(`msg-${messageId}`)) return; // cegah duplikasi
+
+  const msgDiv = document.createElement('div');
+  msgDiv.id = `msg-${messageId}`;
   const isSelf = message.sender === currentUsername;
   const isSystem = message.type === 'system';
-  
-  if (!msgDiv) {
-    msgDiv = document.createElement('div');
-    msgDiv.id = `msg-${messageId}`;
-    chatMessages.appendChild(msgDiv);
-  }
-  
+
   if (isSystem) {
     msgDiv.className = 'message system';
-    msgDiv.innerHTML = `
-      <div class="message-text">${message.text}</div>
-    `;
+    msgDiv.innerHTML = `<div class="message-text">${message.text}</div>`;
   } else {
     msgDiv.className = `message ${isSelf ? 'sent' : 'received'}`;
-    
     const isHeadAdmin = localStorage.getItem('admin_level') === 'HEAD_ADMIN';
-    const deleteBtn = isHeadAdmin 
-      ? `<button class="task-action-btn btn-delete" style="padding: 2px 6px; font-size: 0.6rem; border-width: 1px; box-shadow: none;" data-msg-id="${messageId}">HAPUS</button>` 
+    const deleteBtn = isHeadAdmin
+      ? `<button class="task-action-btn btn-delete" style="padding:2px 6px;font-size:0.6rem;border-width:1px;box-shadow:none;" onclick="deleteChatMessage('${messageId}')">HAPUS</button>`
       : '';
-
     msgDiv.innerHTML = `
       <div class="message-meta">
         <span class="message-avatar">${message.avatar || '🦕'}</span>
-        <span class="message-sender">${chatEscapeHTML(message.sender)}</span>
+        <span class="message-sender">${chatEsc(message.sender)}</span>
         <span class="message-time">${formatTime(message.timestamp)}</span>
         ${deleteBtn}
       </div>
-      <div class="message-text">${chatEscapeHTML(message.text)}</div>
+      <div class="message-text">${chatEsc(message.text)}</div>
     `;
-
-    if (isHeadAdmin) {
-      const delBtnEl = msgDiv.querySelector('.btn-delete');
-      if (delBtnEl) {
-        delBtnEl.onclick = () => deleteMessage(messageId);
-      }
-    }
   }
+  chatMessages.appendChild(msgDiv);
 }
 
-window.sendMessage = function(text) {
-  if (!chatNodeRef) return;
+window.sendMessage = function (text) {
+  if (!chatRef) return;
   const cleanText = text.trim();
   if (!cleanText) return;
+  if (!currentUsername) { alert("Silakan atur nama panggilan Anda terlebih dahulu."); return; }
 
-  if (!currentUsername) {
-    alert("Silakan atur nama panggilan Anda terlebih dahulu.");
-    return;
-  }
-
-  // Gun.js .set() otomatis generate ID acak dan memasukkannya ke node list
-  chatNodeRef.set({
+  chatRef.push({
     sender: currentUsername,
     avatar: currentUserAvatar,
     text: cleanText,
@@ -184,57 +149,34 @@ window.sendMessage = function(text) {
 };
 
 function sendSystemMessage(text) {
-  if (!chatNodeRef) return;
-  chatNodeRef.set({
-    text: text,
-    timestamp: Date.now(),
-    type: 'system'
-  });
+  if (!chatRef) return;
+  chatRef.push({ text, timestamp: Date.now(), type: 'system' });
 }
 
-function deleteMessage(messageId) {
-  if (!confirm("Hapus pesan ini dari database?")) return;
-  // Di Gun.js, menghapus item dilakukan dengan menyetel nilainya menjadi null
-  chatNodeRef.get(messageId).put(null);
-  
-  if (window.logAdminActivity) {
-    window.logAdminActivity("Menghapus pesan komunikasi");
-  }
-}
+window.deleteChatMessage = function (messageId) {
+  if (!confirm("Hapus pesan ini?")) return;
+  chatRef.child(messageId).remove();
+  if (window.logAdminActivity) window.logAdminActivity("Menghapus pesan komunikasi");
+};
 
-window.clearChatHistory = function() {
-  if (!confirm("⚠️ PERINGATAN: Apakah Anda yakin ingin menghapus seluruh riwayat komunikasi di database? Tindakan ini bersifat permanen!")) return;
-  
-  if (chatNodeRef) {
-    // Lakukan iterasi dan hapus seluruh pesan satu per satu
-    chatNodeRef.map().once((message, messageId) => {
-      if (messageId) {
-        chatNodeRef.get(messageId).put(null);
-      }
+window.clearChatHistory = function () {
+  if (!confirm("⚠️ Hapus seluruh riwayat komunikasi secara permanen?")) return;
+  if (chatRef) {
+    chatRef.remove().then(() => {
+      sendSystemMessage("🔄 Riwayat obrolan telah dibersihkan oleh Administrator Utama.");
+      chatListenerAttached = false;
+      setupChatListeners();
     });
-    
-    sendSystemMessage("🔄 Riwayat obrolan telah dibersihkan oleh Administrator Utama.");
   }
 };
 
 // Helpers
-function formatTime(timestamp) {
-  if (!timestamp) return '';
-  const date = new Date(timestamp);
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  return `${hours}:${minutes}`;
+function formatTime(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
-
-function chatEscapeHTML(str) {
+function chatEsc(str) {
   if (!str) return '';
-  return String(str).replace(/[&<>'"]/g, 
-    tag => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      "'": '&#39;',
-      '"': '&quot;'
-    }[tag] || tag)
-  );
+  return String(str).replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]||t));
 }
