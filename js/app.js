@@ -13,6 +13,54 @@ let videosRef = null;
 let countdownInterval = null;
 let targetCapsuleDate = null;
 
+// Database Jadwal Piket Harian Kelas 9B Resmi
+window.JADWAL_PIKET = {
+  'Senin': [
+    'Ahmad Ubaidullah Sami',
+    'Adrian Rakha Prayoga',
+    'Andi Azman Awwadi',
+    'Muhammad Raffasya Afhariadi',
+    'Raihan Muhammad Ikhsan',
+    'Muhammad Arkananta Davian'
+  ],
+  'Selasa': [
+    'Muhammad Fathir Waliputra',
+    'Muhammad Fakhry Panji',
+    'Muhammad Farid Alvarez',
+    'Bayu Aditya Abdee Pratama Londro',
+    'Zaidan Makkuraga Fauzan',
+    'Dzaky Almair Zhafran'
+  ],
+  'Rabu': [
+    'Muh. Faris Aryaguna Akhmad',
+    'S. Muh. Alfatih Farham',
+    'Faqih Murtaja Adzaki',
+    'Ahmad Fadlan Putra Hairul',
+    'Radhi Ahmad Khairan',
+    'Achmad Sakha Wiratama Nazir',
+    'Muhammad Khaizuran Al Fatih'
+  ],
+  'Kamis': [
+    'Andi Raja Nabeel Dikri',
+    'Nabhan Radinka Raynar Fernajanan',
+    'M. Faiq Azka Ramadhan',
+    'Muhammad Faizi Basri',
+    'Hanif Wicaksono Farid Widodo',
+    'Muhammad Adrian Pradipta',
+    'Amar Shadiq Ry'
+  ],
+  'Jumat': [
+    'Abyan Fathir Mallombasi',
+    'Almer Danish Ahmad Fawwaz Rajab',
+    'Andi Ahmad Kasya Alvaro Asrah Wijaya',
+    'Muh. Adnan',
+    'Muh. Rama Permana Indra',
+    'Muhammad Aufa Khairi Asri'
+  ],
+  'Sabtu': [],
+  'Minggu': []
+};
+
 // DOM Elements
 const bodyEl = document.body;
 const tabButtons = document.querySelectorAll('.nav-tab-btn');
@@ -67,6 +115,9 @@ function initApp() {
   
   // Kembalikan sesi admin jika sebelumnya sudah login
   restoreAdminSession();
+
+  // Inisialisasi Jadwal Piket Harian Otomatis
+  updatePiketWidget();
 }
 
 /* ==========================================================================
@@ -689,6 +740,20 @@ function setupUIEventListeners() {
     switchTab('lobby');
   };
 
+  // Event Listener Modal Jobdesk Piket Kebersihan
+  const viewPiketJobdeskBtn = document.getElementById('viewPiketJobdeskBtn');
+  const closePiketJobdeskBtn = document.getElementById('closePiketJobdeskBtn');
+  const piketJobdeskModal = document.getElementById('piketJobdeskModal');
+
+  if (viewPiketJobdeskBtn && closePiketJobdeskBtn && piketJobdeskModal) {
+    viewPiketJobdeskBtn.onclick = () => {
+      piketJobdeskModal.style.display = 'flex';
+    };
+    closePiketJobdeskBtn.onclick = () => {
+      piketJobdeskModal.style.display = 'none';
+    };
+  }
+
   adminLoginBtn.onclick = () => {
     const isLogged = localStorage.getItem('admin_logged') === 'true';
     if (isLogged) {
@@ -1023,4 +1088,34 @@ function resetVideoForm() {
   document.getElementById('uploadProgressBar').style.width = '0%';
   document.getElementById('uploadPercent').innerText = '0%';
 }
+
+// Fungsi untuk memperbarui tampilan widget piket harian otomatis
+function updatePiketWidget() {
+  const dayNameEl = document.getElementById('piketDayName');
+  const memberListEl = document.getElementById('piketMemberList');
+  if (!dayNameEl || !memberListEl) return;
+
+  const daysEngToInd = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const todayName = daysEngToInd[new Date().getDay()];
+
+  dayNameEl.innerText = todayName;
+  memberListEl.innerHTML = '';
+
+  const members = window.JADWAL_PIKET[todayName] || [];
+
+  if (members.length > 0) {
+    members.forEach(member => {
+      const div = document.createElement('div');
+      div.className = 'piket-member';
+      div.innerHTML = `<i class="fa-solid fa-circle-check" style="color: var(--mint); margin-right: 6px;"></i> ${member}`;
+      memberListEl.appendChild(div);
+    });
+  } else {
+    memberListEl.innerHTML = `
+      <div class="piket-member" style="color: var(--text-muted); font-size: 0.85rem; padding: 10px 0; text-align: center;">
+        <i class="fa-solid fa-calendar-day" style="margin-right: 6px;"></i> Hari Libur Piket
+      </div>`;
+  }
+}
+
 

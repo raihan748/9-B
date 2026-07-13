@@ -128,13 +128,13 @@
           <!-- Piket Hari Ini -->
           <div class="widget-piket">
             <h4 class="widget-title"><i class="fa-solid fa-broom" style="color: var(--pink);"></i> PIKET HARI INI</h4>
-            <div class="piket-day-active" id="piketDayName">Senin</div>
+            <div class="piket-day-active" id="piketDayName">Memuat hari...</div>
             <div class="piket-list" id="piketMemberList">
-              <div class="piket-member"><i class="fa-solid fa-circle-check"></i> Rehan</div>
-              <div class="piket-member"><i class="fa-solid fa-circle-check"></i> Bagas</div>
-              <div class="piket-member"><i class="fa-solid fa-circle-check"></i> Clara</div>
-              <div class="piket-member"><i class="fa-solid fa-circle-check"></i> Dino</div>
+              <div class="piket-member">Menghubungkan jadwal...</div>
             </div>
+            <button id="viewPiketJobdeskBtn" class="brut-btn btn-yellow" style="width: 100%; margin-top: 14px; font-size: 0.75rem; padding: 8px; box-shadow: 2px 2px 0px #000;">
+              <i class="fa-solid fa-clipboard-list"></i> TUGAS KEBERSIHAN
+            </button>
           </div>
 
         </div>
@@ -529,6 +529,29 @@
         <button id="closeVideoModalBtn" class="brut-btn btn-pink" style="flex: 1; box-shadow: 3px 3px 0px #000;">BATAL</button>
         <button id="submitAddVideoBtn" class="brut-btn btn-cyan" style="flex: 1; box-shadow: 3px 3px 0px #000;">TAMBAH</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal Jobdesk Piket -->
+  <div id="piketJobdeskModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="width: 520px; max-height: 85vh; overflow-y: auto; text-align: left;">
+      <h3 style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-clipboard-list" style="color: var(--yellow);"></i> Tugas Kebersihan Piket Kelas</h3>
+      <p style="margin-bottom: 12px; color: var(--text-muted); font-size: 0.85rem;">Setiap tim piket bertanggung jawab untuk memastikan 12 poin tugas berikut selesai dengan baik:</p>
+      <ol style="padding-left: 20px; font-size: 0.85rem; line-height: 1.6; display: flex; flex-direction: column; gap: 10px; color: var(--text-light); font-weight: 500;">
+        <li>Menyapu dan mengepel lantai hingga seluruh bagian kelas bersih dan kering.</li>
+        <li>Mengosongkan tempat sampah serta membuang sampah ke tempat pembuangan yang telah disediakan.</li>
+        <li>Membersihkan dan merapikan meja guru, termasuk kursi guru serta perlengkapan yang ada di atas meja.</li>
+        <li>Merapikan susunan meja dan kursi siswa agar tertata rapi sesuai denah kelas.</li>
+        <li>Membersihkan papan tulis, penghapus, dan tempat spidol/kapur sehingga siap digunakan untuk pembelajaran berikutnya.</li>
+        <li>Memungut sampah yang berserakan di dalam maupun di sekitar depan kelas.</li>
+        <li>Membersihkan jendela, kusen, dan ventilasi dari debu (sesuai jadwal atau bila diperlukan).</li>
+        <li>Merapikan perlengkapan kelas, seperti sapu, pel, tempat sampah, dan alat kebersihan lainnya setelah digunakan.</li>
+        <li>Memastikan lampu, kipas angin/AC, proyektor, dan peralatan elektronik lainnya dimatikan saat kelas ditinggalkan.</li>
+        <li>Memastikan pintu dan jendela tertutup dengan baik ketika meninggalkan kelas setelah jam pelajaran selesai.</li>
+        <li>Menjaga kerapian sudut baca, lemari kelas, dan papan pajangan agar tetap bersih dan tertata.</li>
+        <li>Melaporkan kepada wali kelas atau guru piket apabila terdapat kerusakan fasilitas atau kekurangan alat kebersihan.</li>
+      </ol>
+      <button id="closePiketJobdeskBtn" class="brut-btn btn-pink" style="width: 100%; margin-top: 20px; box-shadow: 3px 3px 0px #000;">TUTUP</button>
     </div>
   </div>
 
