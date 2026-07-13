@@ -354,9 +354,6 @@ function renderVideosGrid(list) {
   }
 
   list.forEach(video => {
-    const ytId = extractYoutubeId(video.url);
-    if (!ytId) return;
-
     const card = document.createElement('div');
     card.className = 'video-card';
     
@@ -365,15 +362,40 @@ function renderVideosGrid(list) {
       ? `<button class="task-action-btn btn-delete" style="width:100%; border:none; border-top:2px solid var(--border-color); font-size:0.75rem; padding:8px;" onclick="deleteExamVideo('${video.id}')">HAPUS VIDEO</button>`
       : '';
 
-    card.innerHTML = `
-      <div class="video-container">
-        <iframe src="https://www.youtube.com/embed/${ytId}" allowfullscreen></iframe>
-      </div>
-      <div class="video-info">
-        <div class="video-title">${escapeHTML(video.title)}</div>
-      </div>
-      ${deleteBtn}
-    `;
+    // Cek apakah ini video upload (direct URL) atau YouTube
+    const isYt = !video.type || video.type === 'youtube';
+
+    if (isYt) {
+      const ytId = extractYoutubeId(video.url);
+      if (ytId) {
+        card.innerHTML = `
+          <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/${ytId}" allowfullscreen></iframe>
+          </div>
+          <div class="video-info" style="padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+            <div class="video-title" style="font-weight:700; font-size:0.9rem;">${escapeHTML(video.title)}</div>
+            <a href="${video.url}" target="_blank" class="brut-btn btn-yellow" style="box-shadow: 2px 2px 0px #000; padding: 6px 12px; font-size: 0.75rem; text-decoration: none; width: 100%; text-align: center;">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> TONTON DI YOUTUBE
+            </a>
+          </div>
+          ${deleteBtn}
+        `;
+      }
+    } else {
+      // Direct MP4 file (misalnya diunggah ke Pixeldrain)
+      card.innerHTML = `
+        <div class="video-container">
+          <video src="${video.url}" controls style="width:100%; height:100%; object-fit:contain; background:#000;"></video>
+        </div>
+        <div class="video-info" style="padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+          <div class="video-title" style="font-weight:700; font-size:0.9rem;">${escapeHTML(video.title)}</div>
+          <a href="${video.url}" download="${video.title}.mp4" target="_blank" class="brut-btn btn-cyan" style="box-shadow: 2px 2px 0px #000; padding: 6px 12px; font-size: 0.75rem; text-decoration: none; width: 100%; text-align: center;">
+            <i class="fa-solid fa-download"></i> UNDUH VIDEO (BELAJAR OFFLINE)
+          </a>
+        </div>
+        ${deleteBtn}
+      `;
+    }
     grid.appendChild(card);
   });
 }
@@ -821,28 +843,65 @@ function setupUIEventListeners() {
     setCapsuleDateModal.style.display = 'none';
   };
 
-  // 5. Add Video Ujian Submit
+  // 5. Opsi Sumber Video Toggle
+  const srcYtRadio = document.getElementById('srcYtRadio');
+  const srcUploadRadio = document.getElementById('srcUploadRadio');
+  const ytInputBox = document.getElementById('ytInputBox');
+  const localVideoInputBox = document.getElementById('localVideoInputBox');
+
+  if (srcYtRadio && srcUploadRadio) {
+    srcYtRadio.onchange = () => {
+      ytInputBox.style.display = 'block';
+      localVideoInputBox.style.display = 'none';
+    };
+    srcUploadRadio.onchange = () => {
+      ytInputBox.style.display = 'none';
+      localVideoInputBox.style.display = 'block';
+    };
+  }
+
+  // Add Video Ujian Submit
   document.getElementById('submitAddVideoBtn').onclick = () => {
     const title = document.getElementById('videoTitleInput').value.trim();
-    const url = document.getElementById('videoUrlInput').value.trim();
-
-    if (!title || !url) {
-      alert("Judul dan alamat tautan video wajib diisi!");
+    if (!title) {
+      alert("Harap masukkan judul video terlebih dahulu.");
       return;
     }
 
-    if (videosRef) {
-      videosRef.set({ title, url });
-      addVideoModal.style.display = 'none';
-      document.getElementById('videoTitleInput').value = '';
-      document.getElementById('videoUrlInput').value = '';
-      window.logAdminActivity(`Menambahkan materi video pembelajaran baru: "${title}"`);
-      alert("Video pembelajaran berhasil ditambahkan!");
+    const sourceVal = document.querySelector('input[name="videoSource"]:checked').value;
+
+    if (sourceVal === 'youtube') {
+      const url = document.getElementById('videoUrlInput').value.trim();
+      if (!url) {
+        alert("Alamat tautan video YouTube wajib diisi!");
+        return;
+      }
+      if (videosRef) {
+        videosRef.set({ 
+          title: title, 
+          url: url,
+          type: 'youtube',
+          timestamp: Date.now()
+        });
+        addVideoModal.style.display = 'none';
+        resetVideoForm();
+        alert("Video pembelajaran berhasil ditambahkan!");
+      }
+    } else {
+      // Unggah berkas lokal ke Pixeldrain
+      const fileInput = document.getElementById('videoFileInput');
+      if (fileInput.files.length === 0) {
+        alert("Harap pilih file video dari komputer Anda!");
+        return;
+      }
+      const file = fileInput.files[0];
+      uploadVideoToPixeldrain(file, title);
     }
   };
 
   document.getElementById('closeVideoModalBtn').onclick = () => {
     addVideoModal.style.display = 'none';
+    resetVideoForm();
   };
 
   // 6. Save Live Broadcast Text
@@ -873,3 +932,95 @@ function escapeHTML(str) {
     }[tag] || tag)
   );
 }
+
+// Fungsi AJAX untuk mengunggah video ke Pixeldrain
+function uploadVideoToPixeldrain(file, title) {
+  const xhr = new XMLHttpRequest();
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('anonymous', 'true');
+
+  const progressBox = document.getElementById('uploadProgressBox');
+  const progressBar = document.getElementById('uploadProgressBar');
+  const percentText = document.getElementById('uploadPercent');
+  const submitBtn = document.getElementById('submitAddVideoBtn');
+  const closeBtn = document.getElementById('closeVideoModalBtn');
+
+  progressBox.style.display = 'block';
+  submitBtn.disabled = true;
+  closeBtn.disabled = true;
+
+  xhr.upload.onprogress = (e) => {
+    if (e.lengthComputable) {
+      const percent = Math.round((e.loaded / e.total) * 100);
+      progressBar.style.width = percent + '%';
+      percentText.innerText = percent + '%';
+    }
+  };
+
+  xhr.onload = () => {
+    if (xhr.status === 201 || xhr.status === 200) {
+      try {
+        const res = JSON.parse(xhr.responseText);
+        if (res.success && res.id) {
+          // Tautan file stream Pixeldrain publik
+          const fileUrl = `https://pixeldrain.com/api/file/${res.id}`;
+          
+          if (videosRef) {
+            videosRef.set({
+              title: title,
+              url: fileUrl,
+              type: 'upload',
+              fileId: res.id,
+              timestamp: Date.now()
+            });
+          }
+          
+          if (window.logAdminActivity) {
+            window.logAdminActivity(`Mengunggah video materi baru ke cloud: "${title}"`);
+          }
+          
+          alert("Video materi berhasil diunggah secara online!");
+          addVideoModal.style.display = 'none';
+          resetVideoForm();
+        } else {
+          alert("Gagal mengunggah berkas: " + (res.message || "Kesalahan respon server."));
+        }
+      } catch (err) {
+        alert("Respon server tidak dapat diproses.");
+      }
+    } else {
+      alert("Terjadi kesalahan server saat mengunggah (Kode status: " + xhr.status + ").");
+    }
+    progressBox.style.display = 'none';
+    submitBtn.disabled = false;
+    closeBtn.disabled = false;
+  };
+
+  xhr.onerror = () => {
+    alert("Gagal mengunggah berkas karena gangguan jaringan.");
+    progressBox.style.display = 'none';
+    submitBtn.disabled = false;
+    closeBtn.disabled = false;
+  };
+
+  xhr.open('POST', 'https://pixeldrain.com/api/file');
+  xhr.send(fd);
+}
+
+function resetVideoForm() {
+  document.getElementById('videoTitleInput').value = '';
+  document.getElementById('videoUrlInput').value = '';
+  document.getElementById('videoFileInput').value = '';
+  
+  // Kembalikan ke pilihan default (YouTube)
+  document.getElementById('srcYtRadio').checked = true;
+  document.getElementById('ytInputBox').style.display = 'block';
+  document.getElementById('localVideoInputBox').style.display = 'none';
+  
+  // Sembunyikan progress bar
+  document.getElementById('uploadProgressBox').style.display = 'none';
+  document.getElementById('uploadProgressBar').style.width = '0%';
+  document.getElementById('uploadPercent').innerText = '0%';
+}
+

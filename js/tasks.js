@@ -1,4 +1,4 @@
-// Modul Pengecekan Tugas (Task Tracker) terintegrasi dengan Gun.js (Realtime Peer-to-Peer Database)
+// Modul Pengecekan Tugas (Task Tracker) terintegrasi dengan Gun.js (Personal Tracker Edition)
 let gunTasksInstance = null;
 let tasksNodeRef = null;
 let localTasksFallback = []; // Fallback local storage jika database gagal/offline
@@ -8,7 +8,7 @@ window.initTasks = function() {
     if (!gunTasksInstance) {
       gunTasksInstance = Gun(window.gunPeers);
     }
-    tasksNodeRef = gunTasksInstance.get('9b_class_tasks_v1');
+    tasksNodeRef = gunTasksInstance.get('9b_class_tasks_v2'); // Gunakan namespace v2 untuk struktur data baru
     
     setupTasksRealtimeListener();
   } else {
@@ -18,11 +18,29 @@ window.initTasks = function() {
   }
 };
 
+// Fungsi pembantu untuk mengelola status tugas per individu (Local Storage)
+function getPersonalTaskStatus(taskId) {
+  const personalStatuses = JSON.parse(localStorage.getItem('9b_tasks_personal_status') || '{}');
+  return personalStatuses[taskId] || 'todo'; // default 'todo' jika belum diatur
+}
+
+function setPersonalTaskStatus(taskId, status) {
+  const personalStatuses = JSON.parse(localStorage.getItem('9b_tasks_personal_status') || '{}');
+  personalStatuses[taskId] = status;
+  localStorage.setItem('9b_tasks_personal_status', JSON.stringify(personalStatuses));
+}
+
 function setupTasksRealtimeListener() {
   tasksNodeRef.map().on((task, taskId) => {
     if (!task) {
-      // Jika tugas dihapus (put null), hapus dari list lokal
+      // Jika tugas dihapus secara global oleh admin, hapus dari list lokal
       localTasksFallback = localTasksFallback.filter(t => t.id !== taskId);
+      // Hapus juga status personalnya dari localStorage
+      const personalStatuses = JSON.parse(localStorage.getItem('9b_tasks_personal_status') || '{}');
+      if (personalStatuses[taskId]) {
+        delete personalStatuses[taskId];
+        localStorage.setItem('9b_tasks_personal_status', JSON.stringify(personalStatuses));
+      }
     } else {
       // Perbarui atau tambahkan tugas ke list lokal
       const index = localTasksFallback.findIndex(t => t.id === taskId);
@@ -33,9 +51,7 @@ function setupTasksRealtimeListener() {
         localTasksFallback.push(updatedTask);
       }
     }
-    // Render ulang papan kanban
     window.renderTasksList();
-    // Cadangkan ke penyimpanan lokal browser
     saveTasksToLocalStorage();
   });
 }
@@ -76,14 +92,15 @@ window.renderTasksList = function() {
 
   sortedTasks.forEach(task => {
     const card = createTaskCardElement(task, isAdmin);
+    const personalStatus = getPersonalTaskStatus(task.id);
     
-    if (task.status === 'todo') {
+    if (personalStatus === 'todo') {
       todoContainer.appendChild(card);
       countTodo++;
-    } else if (task.status === 'progress') {
+    } else if (personalStatus === 'progress') {
       progressContainer.appendChild(card);
       countProgress++;
-    } else if (task.status === 'done') {
+    } else if (personalStatus === 'done') {
       doneContainer.appendChild(card);
       countDone++;
     }
@@ -107,26 +124,30 @@ function createTaskCardElement(task, isAdmin) {
        </span>`
     : '<span></span>';
 
-  // Tombol navigasi status tugas untuk admin
-  let actionsHTML = '';
-  if (isAdmin) {
-    let moveButtons = '';
-    if (task.status === 'todo') {
-      moveButtons += `<button class="task-action-btn" onclick="moveTask('${task.id}', 'progress')">PROSES &rarr;</button>`;
-    } else if (task.status === 'progress') {
-      moveButtons += `<button class="task-action-btn" onclick="moveTask('${task.id}', 'todo')">&larr; BELUM DIMULAI</button>`;
-      moveButtons += `<button class="task-action-btn" onclick="moveTask('${task.id}', 'done')">SELESAI &rarr;</button>`;
-    } else if (task.status === 'done') {
-      moveButtons += `<button class="task-action-btn" onclick="moveTask('${task.id}', 'progress')">&larr; PROSES</button>`;
-    }
-
-    actionsHTML = `
-      <div class="task-actions">
-        ${moveButtons}
-        <button class="task-action-btn btn-delete" onclick="deleteTask('${task.id}')">HAPUS</button>
-      </div>
-    `;
+  // Tombol navigasi status tugas dapat diakses oleh siapa saja (per individu)
+  const personalStatus = getPersonalTaskStatus(task.id);
+  let moveButtons = '';
+  if (personalStatus === 'todo') {
+    moveButtons += `<button class="task-action-btn" onclick="moveTask('${task.id}', 'progress')">PROSES &rarr;</button>`;
+  } else if (personalStatus === 'progress') {
+    moveButtons += `<button class="task-action-btn" onclick="moveTask('${task.id}', 'todo')">&larr; BELUM DIMULAI</button>`;
+    moveButtons += `<button class="task-action-btn" onclick="moveTask('${task.id}', 'done')">SELESAI &rarr;</button>`;
+  } else if (personalStatus === 'done') {
+    moveButtons += `<button class="task-action-btn" onclick="moveTask('${task.id}', 'progress')">&larr; PROSES</button>`;
   }
+
+  // Tombol hapus tugas secara permanen dari database global hanya boleh untuk admin
+  let deleteBtnHTML = '';
+  if (isAdmin) {
+    deleteBtnHTML = `<button class="task-action-btn btn-delete" onclick="deleteTask('${task.id}')">HAPUS PERMANEN</button>`;
+  }
+
+  const actionsHTML = `
+    <div class="task-actions">
+      ${moveButtons}
+      ${deleteBtnHTML}
+    </div>
+  `;
 
   div.innerHTML = `
     <div class="task-subject">${tasksEscapeHTML(task.subject)}</div>
@@ -141,19 +162,18 @@ function createTaskCardElement(task, isAdmin) {
   return div;
 }
 
-// Tambah Tugas Baru
+// Tambah Tugas Baru secara Global (Admin Only)
 window.addNewTask = function(subject, desc, deadline, priority) {
   const newTask = {
     subject: subject.trim(),
     desc: desc.trim(),
     deadline: deadline,
     priority: priority || 'medium',
-    status: 'todo',
     timestamp: Date.now()
   };
 
   if (tasksNodeRef) {
-    // Tulis ke Gun.js
+    // Tulis ke Gun.js global
     tasksNodeRef.set(newTask);
   } else {
     // Tulis ke penyimpanan lokal browser jika database offline
@@ -165,38 +185,24 @@ window.addNewTask = function(subject, desc, deadline, priority) {
   }
 
   if (window.logAdminActivity) {
-    window.logAdminActivity(`Menambahkan tugas baru: "${newTask.subject}"`);
+    window.logAdminActivity(`Menambahkan tugas baru secara global: "${newTask.subject}"`);
   }
 };
 
-// Ubah Status Pengerjaan Tugas
+// Ubah Status Pengerjaan Tugas secara Personal (Per Siswa)
 window.moveTask = function(taskId, newStatus) {
-  if (tasksNodeRef && !taskId.startsWith('local_')) {
-    tasksNodeRef.get(taskId).put({ status: newStatus });
-  } else {
-    const task = localTasksFallback.find(t => t.id === taskId);
-    if (task) {
-      task.status = newStatus;
-      saveTasksToLocalStorage();
-      window.renderTasksList();
-    }
-  }
-
-  if (window.logAdminActivity) {
-    const taskName = localTasksFallback.find(t => t.id === taskId)?.subject || 'tugas';
-    window.logAdminActivity(`Mengubah status tugas "${taskName}" menjadi [${newStatus.toUpperCase()}]`);
-  }
+  setPersonalTaskStatus(taskId, newStatus);
+  window.renderTasksList();
 };
 
-// Hapus Tugas
+// Hapus Tugas secara Global (Admin Only)
 window.deleteTask = function(taskId) {
-  if (!confirm("Apakah Anda yakin ingin menghapus tugas ini? Tugas tidak akan terlihat lagi oleh seluruh siswa.")) return;
+  if (!confirm("Apakah Anda yakin ingin menghapus tugas ini secara permanen dari database global? Tugas akan hilang dari layar seluruh siswa.")) return;
 
   const taskToDelete = localTasksFallback.find(t => t.id === taskId);
   const taskSubject = taskToDelete ? taskToDelete.subject : 'Tugas';
 
   if (tasksNodeRef && !taskId.startsWith('local_')) {
-    // Di Gun.js, menghapus item dilakukan dengan menyetel nilainya menjadi null
     tasksNodeRef.get(taskId).put(null);
   } else {
     localTasksFallback = localTasksFallback.filter(t => t.id !== taskId);
@@ -205,7 +211,7 @@ window.deleteTask = function(taskId) {
   }
 
   if (window.logAdminActivity) {
-    window.logAdminActivity(`Menghapus tugas: "${taskSubject}"`);
+    window.logAdminActivity(`Menghapus tugas secara permanen: "${taskSubject}"`);
   }
 };
 
@@ -230,7 +236,7 @@ function checkIsUrgent(deadlineStr) {
   
   const diffTime = deadline - today;
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays <= 2; // Urgent jika sisa waktu 2 hari atau kurang
+  return diffDays <= 2;
 }
 
 function formatDeadlineDate(dateStr) {
