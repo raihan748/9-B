@@ -85,9 +85,11 @@ nav {
 
 /* Nav Logo — Gradient + Glow */
 .nav-logo {
-  background: linear-gradient(135deg, var(--purple), var(--cyan)) !important;
+  background: transparent !important;
   box-shadow: var(--glow-purple), 3px 3px 0px var(--border-color) !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  border-radius: 8px;
 }
 
 .nav-logo:hover {
