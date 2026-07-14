@@ -530,3 +530,32 @@ body.deadline-alert-active .live-broadcast {
     transform: none !important;
   }
 }
+
+/* ==========================================================================
+   NAV TITLE SUBTITLES STYLING
+   ========================================================================== */
+.nav-title-main {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 0.95rem !important;
+  color: var(--text-light);
+  line-height: 1.1;
+}
+
+.nav-title-sub1 {
+  font-size: 0.72rem !important;
+  font-weight: 800;
+  color: var(--cyan) !important;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.nav-title-sub2 {
+  font-size: 0.6rem !important;
+  color: var(--text-muted) !important;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
