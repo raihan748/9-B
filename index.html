@@ -32,6 +32,7 @@
     </a>
     <ul class="nav-links">
       <li><a class="nav-tab-btn active" data-tab="lobby">Lobby</a></li>
+      <li><a class="nav-tab-btn" data-tab="jadwal">Jadwal</a></li>
       <li><a class="nav-tab-btn" data-tab="chat">Ruang Komunikasi</a></li>
       <li><a class="nav-tab-btn" data-tab="tasks">Papan Tugas</a></li>
       <li><a class="nav-tab-btn" data-tab="capsule">Kapsul Waktu</a></li>
@@ -49,6 +50,7 @@
   <!-- MOBILE NAVIGATION MENU -->
   <div id="mobileMenu">
     <a class="nav-tab-btn active" data-tab="lobby">Lobby</a>
+    <a class="nav-tab-btn" data-tab="jadwal">Jadwal</a>
     <a class="nav-tab-btn" data-tab="chat">Ruang Komunikasi</a>
     <a class="nav-tab-btn" data-tab="tasks">Papan Tugas</a>
     <a class="nav-tab-btn" data-tab="capsule">Kapsul Waktu</a>
@@ -388,6 +390,56 @@
       </div>
     </section>
 
+    <!-- ==========================================
+         TAB CONTENT: JADWAL PELAJARAN
+         ========================================== -->
+    <section id="jadwalTab" class="tab-content">
+      <div class="container" style="max-width:860px;margin:0 auto;">
+
+        <!-- Header -->
+        <div style="margin-bottom:28px;">
+          <div class="tag-label" style="background:var(--cyan);margin-bottom:12px;"><i class="fa-solid fa-calendar-days"></i> JADWAL PELAJARAN</div>
+          <h2 style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;margin-bottom:6px;">Jadwal Harian Kelas 9B</h2>
+          <p style="color:var(--text-muted);font-size:0.85rem;">SMPIT Al-Fityan — 1 JP = 40 Menit &nbsp;|&nbsp; <span style="color:var(--yellow-light);">★ = 3 JP (120 mnt)</span> &nbsp;|&nbsp; Tanpa tanda = 2 JP (80 mnt)</p>
+        </div>
+
+        <!-- Day Selector Tabs -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;" id="dayTabs">
+          <button class="brut-btn jadwal-day-btn" data-day="0" style="font-size:0.8rem;padding:8px 14px;">Senin</button>
+          <button class="brut-btn jadwal-day-btn" data-day="1" style="font-size:0.8rem;padding:8px 14px;">Selasa</button>
+          <button class="brut-btn jadwal-day-btn" data-day="2" style="font-size:0.8rem;padding:8px 14px;">Rabu</button>
+          <button class="brut-btn jadwal-day-btn" data-day="3" style="font-size:0.8rem;padding:8px 14px;">Kamis</button>
+          <button class="brut-btn jadwal-day-btn" data-day="4" style="font-size:0.8rem;padding:8px 14px;">Jumat</button>
+        </div>
+
+        <!-- Today Banner -->
+        <div id="jadwalTodayBanner" class="brut-card" style="padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(167,139,250,0.15),rgba(96,165,250,0.1));border-left:4px solid var(--purple);"></div>
+
+        <!-- Schedule Cards Grid -->
+        <div id="jadwalGrid" style="display:flex;flex-direction:column;gap:10px;"></div>
+
+        <!-- Keterangan -->
+        <div class="brut-card" style="padding:16px 20px;margin-top:24px;">
+          <div style="font-family:'Archivo Black',sans-serif;font-size:0.8rem;margin-bottom:10px;color:var(--text-muted);">KETERANGAN BEBAN BELAJAR</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:0.85rem;">
+            <div style="display:flex;gap:10px;align-items:center;">
+              <span style="background:var(--yellow-light);color:#000;font-family:'Archivo Black',sans-serif;font-size:0.7rem;padding:3px 8px;border:2px solid #000;">★ BINTANG</span>
+              <span style="color:var(--text-muted);">= 3 Jam Pembelajaran (120 Menit)</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <span style="background:var(--bg-card);color:var(--text-light);font-family:'Archivo Black',sans-serif;font-size:0.7rem;padding:3px 8px;border:2px solid #333;">NORMAL</span>
+              <span style="color:var(--text-muted);">= 2 Jam Pembelajaran (80 Menit)</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <span style="background:var(--mint);color:#000;font-family:'Archivo Black',sans-serif;font-size:0.7rem;padding:3px 8px;border:2px solid #000;">1 JP</span>
+              <span style="color:var(--text-muted);">= 40 Menit</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
   </main>
 
   <!-- ==========================================
@@ -566,6 +618,7 @@
   <script src="js/chat.js"></script>
   <script src="js/tasks.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/jadwal.js"></script>
   <script src="js/visual.js"></script>
 </body>
 </html>
