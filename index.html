@@ -33,7 +33,8 @@
     <ul class="nav-links">
       <li><a class="nav-tab-btn active" data-tab="lobby">Lobby</a></li>
       <li><a class="nav-tab-btn" data-tab="jadwal">Jadwal</a></li>
-      <li><a class="nav-tab-btn" data-tab="chat">Ruang Komunikasi</a></li>
+      <li><a class="nav-tab-btn" data-tab="galeri">Galeri</a></li>
+      <li><a class="nav-tab-btn" data-tab="chat">Komunikasi</a></li>
       <li><a class="nav-tab-btn" data-tab="tasks">Papan Tugas</a></li>
       <li><a class="nav-tab-btn" data-tab="capsule">Kapsul Waktu</a></li>
     </ul>
@@ -51,7 +52,8 @@
   <div id="mobileMenu">
     <a class="nav-tab-btn active" data-tab="lobby">Lobby</a>
     <a class="nav-tab-btn" data-tab="jadwal">Jadwal</a>
-    <a class="nav-tab-btn" data-tab="chat">Ruang Komunikasi</a>
+    <a class="nav-tab-btn" data-tab="galeri">Galeri</a>
+    <a class="nav-tab-btn" data-tab="chat">Komunikasi</a>
     <a class="nav-tab-btn" data-tab="tasks">Papan Tugas</a>
     <a class="nav-tab-btn" data-tab="capsule">Kapsul Waktu</a>
   </div>
@@ -143,6 +145,45 @@
             <button id="viewPiketJobdeskBtn" class="brut-btn btn-yellow" style="width: 100%; margin-top: 14px; font-size: 0.75rem; padding: 8px; box-shadow: 2px 2px 0px #000;">
               <i class="fa-solid fa-clipboard-list"></i> TUGAS KEBERSIHAN
             </button>
+          </div>
+
+          <!-- Widget: Quote Ulama Hari Ini -->
+          <div id="quoteWidget" class="brut-card" style="padding:16px;margin-top:14px;">
+            <h4 style="font-family:'Archivo Black',sans-serif;font-size:0.8rem;color:var(--mint);margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+              <i class="fa-solid fa-quote-left"></i> HIKMAH HARI INI
+            </h4>
+            <p id="quoteText" style="font-size:0.83rem;color:var(--text-light);line-height:1.6;font-style:italic;min-height:60px;transition:opacity 0.3s ease;">Memuat hikmah...</p>
+            <p id="quoteAuthor" style="font-size:0.72rem;color:var(--mint);font-weight:700;margin-top:8px;transition:opacity 0.3s ease;"></p>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+              <span id="quoteCounter" style="font-size:0.68rem;color:var(--text-muted);"></span>
+              <div style="display:flex;gap:6px;">
+                <button id="quoteBtnPrev" class="brut-btn" style="font-size:0.65rem;padding:4px 8px;box-shadow:2px 2px 0 #000;"><i class="fa-solid fa-chevron-left"></i></button>
+                <button id="quoteBtnNext" class="brut-btn" style="font-size:0.65rem;padding:4px 8px;box-shadow:2px 2px 0 #000;"><i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Widget: Event Mendatang -->
+          <div class="brut-card" style="padding:16px;margin-top:14px;">
+            <h4 style="font-family:'Archivo Black',sans-serif;font-size:0.8rem;color:var(--yellow-light);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">
+              <span><i class="fa-solid fa-calendar-days"></i> EVENT KELAS</span>
+              <span id="toggleAddEventForm" class="kalender-admin-only" style="display:none;font-size:0.65rem;cursor:pointer;color:var(--mint);text-decoration:underline;">+ Tambah</span>
+            </h4>
+            <!-- Form Tambah Event (admin only) -->
+            <div id="addEventForm" style="display:none;margin-bottom:12px;">
+              <input id="eventTitle" type="text" placeholder="Nama event..." style="width:100%;padding:7px 10px;background:var(--bg-dark);border:2px solid rgba(255,255,255,0.1);color:var(--text-light);font-size:0.8rem;margin-bottom:6px;">
+              <input id="eventDate" type="date" style="width:100%;padding:7px 10px;background:var(--bg-dark);border:2px solid rgba(255,255,255,0.1);color:var(--text-light);font-size:0.8rem;margin-bottom:6px;">
+              <input id="eventDesc" type="text" placeholder="Keterangan (opsional)..." style="width:100%;padding:7px 10px;background:var(--bg-dark);border:2px solid rgba(255,255,255,0.1);color:var(--text-light);font-size:0.8rem;margin-bottom:6px;">
+              <select id="eventColor" style="width:100%;padding:7px 10px;background:var(--bg-dark);border:2px solid rgba(255,255,255,0.1);color:var(--text-light);font-size:0.8rem;margin-bottom:8px;">
+                <option value="cyan">🔵 Kegiatan Kelas</option>
+                <option value="yellow">🟡 Ujian / Ulangan</option>
+                <option value="purple">🟣 Akademik</option>
+                <option value="pink">🔴 Penting / Deadline</option>
+                <option value="mint">🟢 Acara Sekolah</option>
+              </select>
+              <button id="addEventBtn" class="brut-btn btn-mint" style="width:100%;font-size:0.78rem;padding:8px;box-shadow:2px 2px 0 #000;"><i class="fa-solid fa-plus"></i> SIMPAN EVENT</button>
+            </div>
+            <div id="eventListWidget"><div style="color:var(--text-muted);font-size:0.8rem;text-align:center;padding:12px;"><i class="fa-regular fa-clock"></i> Memuat event...</div></div>
           </div>
 
         </div>
@@ -391,6 +432,69 @@
     </section>
 
     <!-- ==========================================
+         TAB CONTENT: GALERI FOTO KELAS
+         ========================================== -->
+    <section id="galeriTab" class="tab-content">
+      <div class="container" style="max-width:1100px;margin:0 auto;">
+        <!-- Header -->
+        <div style="margin-bottom:28px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div class="tag-label" style="background:var(--pink);margin-bottom:12px;"><i class="fa-solid fa-images"></i> GALERI FOTO</div>
+            <h2 style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;margin-bottom:6px;">Galeri Kelas 9B</h2>
+            <p style="color:var(--text-muted);font-size:0.85rem;">Momen & kenangan bersama kelas 9B SMPIT Al-Fityan</p>
+          </div>
+          <button id="toggleAddPhotoForm" class="brut-btn btn-mint galeri-admin-only" style="display:none;font-size:0.8rem;padding:10px 16px;box-shadow:3px 3px 0 #000;">
+            <i class="fa-solid fa-plus"></i> TAMBAH FOTO
+          </button>
+        </div>
+
+        <!-- Form Tambah Foto (Admin Only) -->
+        <div id="addPhotoForm" class="brut-card" style="display:none;padding:20px;margin-bottom:24px;border-left:4px solid var(--mint);">
+          <h4 style="font-family:'Archivo Black',sans-serif;font-size:0.85rem;margin-bottom:14px;color:var(--mint);">TAMBAH FOTO BARU</h4>
+          <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:14px;">Masukkan URL foto (Google Photos share link, Drive, dsb). Pastikan foto bisa diakses publik.</p>
+          <input id="photoUrl" type="url" placeholder="https://... (URL foto)" style="width:100%;padding:10px 14px;background:var(--bg-dark);border:2px solid rgba(255,255,255,0.1);color:var(--text-light);font-size:0.85rem;margin-bottom:8px;">
+          <input id="photoCaption" type="text" placeholder="Caption foto (opsional)..." style="width:100%;padding:10px 14px;background:var(--bg-dark);border:2px solid rgba(255,255,255,0.1);color:var(--text-light);font-size:0.85rem;margin-bottom:8px;">
+          <input id="photoAuthor" type="text" placeholder="Nama pengunggah (opsional)..." style="width:100%;padding:10px 14px;background:var(--bg-dark);border:2px solid rgba(255,255,255,0.1);color:var(--text-light);font-size:0.85rem;margin-bottom:12px;">
+          <button id="addPhotoBtn" class="brut-btn btn-mint" style="font-size:0.82rem;padding:10px 20px;box-shadow:3px 3px 0 #000;"><i class="fa-solid fa-upload"></i> SIMPAN FOTO</button>
+        </div>
+
+        <!-- Empty State -->
+        <div id="galeriEmpty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center;">
+          <i class="fa-regular fa-image" style="font-size:4rem;color:var(--text-muted);margin-bottom:16px;"></i>
+          <p style="color:var(--text-muted);font-size:0.9rem;">Belum ada foto di galeri.</p>
+          <p style="color:var(--text-muted);font-size:0.8rem;margin-top:4px;">Admin dapat menambahkan foto dengan klik tombol "Tambah Foto" di atas.</p>
+        </div>
+
+        <!-- Gallery Grid (Masonry-style) -->
+        <div id="galeriGrid" style="columns:2;column-gap:12px;" class="galeri-masonry"></div>
+
+      </div>
+    </section>
+
+    <!-- LIGHTBOX OVERLAY -->
+    <div id="galeriLightbox" style="
+      display:none;position:fixed;inset:0;z-index:9999;
+      background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);
+      align-items:center;justify-content:center;flex-direction:column;
+    ">
+      <button id="lbClose" style="position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:1.2rem;padding:10px 14px;cursor:pointer;border-radius:4px;">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <button id="lbPrev" style="position:absolute;left:20px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:1.4rem;padding:12px 16px;cursor:pointer;border-radius:4px;">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <button id="lbNext" style="position:absolute;right:20px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:1.4rem;padding:12px 16px;cursor:pointer;border-radius:4px;">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+      <img id="lbImg" src="" alt="" style="max-width:90vw;max-height:75vh;object-fit:contain;transition:opacity 0.3s ease;box-shadow:0 20px 60px rgba(0,0,0,0.8);">
+      <div style="margin-top:16px;text-align:center;">
+        <div id="lbCaption" style="font-size:0.95rem;font-weight:600;color:#fff;"></div>
+        <div id="lbAuthor" style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-top:4px;"></div>
+        <div id="lbCounter" style="font-size:0.72rem;color:rgba(255,255,255,0.3);margin-top:6px;font-family:'Archivo Black',sans-serif;"></div>
+      </div>
+    </div>
+
+    <!-- ==========================================
          TAB CONTENT: JADWAL PELAJARAN
          ========================================== -->
     <section id="jadwalTab" class="tab-content">
@@ -619,6 +723,9 @@
   <script src="js/tasks.js"></script>
   <script src="js/app.js"></script>
   <script src="js/jadwal.js"></script>
+  <script src="js/quotes.js"></script>
+  <script src="js/kalender.js"></script>
+  <script src="js/galeri.js"></script>
   <script src="js/visual.js"></script>
 </body>
 </html>

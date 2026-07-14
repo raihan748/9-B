@@ -484,7 +484,39 @@ body.deadline-alert-active .live-broadcast {
 }
 
 /* ==========================================================================
-   RESPONSIVE — POLISH ON MOBILE
+   GALERI — MASONRY GRID
+   ========================================================================== */
+.galeri-masonry {
+  columns: 3;
+  column-gap: 12px;
+}
+
+.galeri-masonry .galeri-item {
+  break-inside: avoid;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.galeri-masonry .galeri-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .galeri-masonry {
+    columns: 2;
+  }
+}
+
+@media (max-width: 480px) {
+  .galeri-masonry {
+    columns: 1;
+  }
+}
+
+/* ==========================================================================
+   MOBILE — POLISH ON MOBILE
    ========================================================================== */
 @media (max-width: 768px) {
   body::before, body::after { display: none; }
