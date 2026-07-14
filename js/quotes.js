@@ -1,2053 +1,2143 @@
 /* ==========================================================================
-   DATABASE KUTIPAN KELAS 9B — 505 Quotes Cendekiawan & Ulama Islam
-   Satu quote berbeda setiap hari untuk 1 tahun penuh (365+ hari)
+   DATABASE KUTIPAN KELAS 9B — 510 Quotes (1 Mapel, 1 Quote, Per Hari)
+   Klasifikasi Kategori berdasarkan Hari Belajar & Relevansi Mapel
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  const QUOTES = [
-  {
-    "teks": "Ilmu bukan seberapa banyak yang kamu hafalkan, tapi seberapa banyak yang kamu amalkan.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Barangsiapa yang tidak mau menanggung letihnya belajar, maka ia harus menanggung beratnya kebodohan.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Diamku adalah jawaban bagi orang yang tidak layak mendapat jawaban.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Ridha semua manusia adalah tujuan yang mustahil dicapai, maka fokuslah untuk meraih ridha Allah.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Semakin banyak ilmu seseorang, semakin ia menyadari betapa sedikit yang ia ketahui.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Tidak ada kemuliaan kecuali dengan ilmu, dan tidak ada kebaikan kecuali dengan amal.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Sabar itu ada dua: sabar atas apa yang kamu benci, dan sabar menahan diri dari apa yang kamu sukai karena Allah.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Siapa yang menginginkan dunia, maka hendaklah ia berilmu. Siapa yang menginginkan akhirat, maka hendaklah ia berilmu.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Lidah adalah singa liar; jika kamu melepasnya, ia akan melukai dirimu.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Jika kamu tidak bisa menahan letihnya belajar, maka bersabarlah menanggung pedihnya kebodohan seumur hidup.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Kita lebih membutuhkan ilmu daripada makanan dan minuman.",
-    "ulama": "Imam Ahmad ibn Hanbal"
-  },
-  {
-    "teks": "Bersabarlah, karena kesabaran itu lebih baik bagimu dalam setiap keadaan.",
-    "ulama": "Imam Ahmad ibn Hanbal"
-  },
-  {
-    "teks": "Janganlah melihat siapa yang berbicara, tapi lihatlah apa yang dikatakan.",
-    "ulama": "Imam Ahmad ibn Hanbal"
-  },
-  {
-    "teks": "Lebih baik duduk sendirian daripada duduk bersama orang yang tidak membawa kebaikan.",
-    "ulama": "Imam Ahmad ibn Hanbal"
-  },
-  {
-    "teks": "Sesungguhnya manusia paling mulia di sisi Allah adalah yang paling bertakwa di antara mereka.",
-    "ulama": "Imam Ahmad ibn Hanbal"
-  },
-  {
-    "teks": "Kemiskinan itu jauh lebih ringan daripada meminta-minta kepada sesama manusia.",
-    "ulama": "Imam Ahmad ibn Hanbal"
-  },
-  {
-    "teks": "Tidak ada sesuatu pun yang lebih bermanfaat bagi hati seorang mukmin daripada bergaul dengan orang-orang shalih.",
-    "ulama": "Imam Ahmad ibn Hanbal"
-  },
-  {
-    "teks": "Tidak pantas seseorang berfatwa sebelum ia merasa malu untuk berkata: aku tidak tahu.",
-    "ulama": "Imam Malik ibn Anas"
-  },
-  {
-    "teks": "Ilmu itu bukan dengan banyaknya riwayat, tapi ilmu adalah cahaya yang Allah letakkan di dalam hati.",
-    "ulama": "Imam Malik ibn Anas"
-  },
-  {
-    "teks": "Sabar adalah penolong yang paling utama atas segala musibah.",
-    "ulama": "Imam Malik ibn Anas"
-  },
-  {
-    "teks": "Setiap perkataan manusia bisa ditolak dan diterima, kecuali perkataan penghuni kubur ini (Rasulullah ﷽).",
-    "ulama": "Imam Malik ibn Anas"
-  },
-  {
-    "teks": "Akal adalah sebaik-baik karunia yang Allah berikan kepada manusia.",
-    "ulama": "Imam Abu Hanifah"
-  },
-  {
-    "teks": "Orang yang paling sengsara adalah orang yang menjual akhiratnya demi dunia orang lain.",
-    "ulama": "Imam Abu Hanifah"
-  },
-  {
-    "teks": "Jika kamu tidak tahu sesuatu, maka katakanlah dengan bangga: aku tidak tahu.",
-    "ulama": "Imam Abu Hanifah"
-  },
-  {
-    "teks": "Ilmu tanpa amal seperti pohon tanpa buah — ada tapi tidak memberikan manfaat.",
-    "ulama": "Imam Abu Hanifah"
-  },
-  {
-    "teks": "Jangan katakan besok apa yang bisa kamu kerjakan hari ini.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Musuhmu yang paling berbahaya adalah hawa nafsumu yang ada di dalam dirimu sendiri.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Dunia adalah ladang untuk akhirat. Tanam sekarang, panen nanti.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Mengenal diri sendiri adalah awal dari segala hikmah dan kebijaksanaan.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Hati yang keras tidak akan mendapat hikmah, sebagaimana tanah keras tidak bisa ditanami.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Orang yang berakal tidak akan jatuh ke dalam lubang yang sama dua kali.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Keberanian sejati bukanlah keberanian fisik, melainkan keberanian untuk melawan hawa nafsu.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Rasa malu adalah tanda kemuliaan jiwa dan keindahan akhlak.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Manusia itu berada dalam tidur. Ketika mati, barulah ia terbangun dan melihat kenyataan.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Jadikanlah hari-harimu seperti emas; jangan sia-siakan satu jam pun dari waktu hidupmu.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Waktu itu lebih mahal dari emas. Banyak orang mencari emas, tapi tidak ada yang bisa membeli waktu yang telah berlalu.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Kesabaran ibarat namanya memang pahit, tapi buahnya sungguh manis.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Cinta yang sejati adalah cinta yang menggerakkanmu untuk taat kepada yang kamu cintai.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Jika kamu mencari ketenangan hati, maka carilah dengan dzikir kepada Allah.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Ujian itu menyempurnakan, bukan menghancurkan. Emas diuji dengan api agar bersih.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Dosa itu membunuh hati, sebagaimana racun membunuh tubuh.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Setiap waktu yang kamu habiskan tanpa dzikir kepada Allah adalah kerugian yang nyata.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Cita-cita yang tinggi hanya diraih oleh hati yang bersih dari cinta berlebihan kepada dunia.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Hati yang kosong dari rasa malu kepada Allah akan dipenuhi oleh berbagai penyakit jiwa.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Kemenangan sejati hanya milik mereka yang bersabar dan terus berjuang di jalan kebenaran.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Beramallah dengan ikhlas, bukan untuk mendapat pujian dari manusia.",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Tanda keikhlasan adalah perasaan yang sama saat dipuji maupun saat tidak dipuji.",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Ilmu itu hiasan bagi yang memilikinya dan perisai bagi yang menggunakannya dengan benar.",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Niat yang baik dapat menjadikan pekerjaan duniawi biasa sebagai ibadah yang bernilai tinggi.",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Siapa yang berbuat baik kepada orang lain, Allah akan membalasnya dengan kebaikan berlipat ganda.",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Janganlah kamu menipu dirimu sendiri dengan terus mengatakan: aku akan bertaubat besok.",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Waktu adalah pedang; jika kamu tidak memanfaatkannya, ia yang akan memotongmu.",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Barangsiapa mengenal dirinya sendiri, ia tidak akan sempat mengurusi aib orang lain.",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Dunia itu hanyalah tiga hari: kemarin yang telah pergi, esok yang belum pasti, dan hari ini yang harus kamu manfaatkan.",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Zuhud bukan berarti meninggalkan dunia seluruhnya, tapi tidak membiarkan dunia masuk dan menguasai hatimu.",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Orang yang berakal adalah yang selalu merenungkan akhiratnya, bukan yang terbuai oleh gemerlapnya dunia.",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Anak Adam, kamu hanyalah kumpulan hari-hari. Setiap hari berlalu, sebagian dirimu pun berlalu.",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Kebahagiaan sejati hanya ada dalam ketaatan dan kedekatan kepada Allah.",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Siapa yang bersungguh-sungguh mencari ridha Allah, maka Allah akan jadikan manusia ridha kepadanya.",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Dunia itu seperti bayangan; jika kamu kejar, ia lari. Jika kamu diam, ia yang datang mendekat.",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Ilmu tanpa amal adalah beban yang menyiksa, dan amal tanpa ilmu adalah kesesatan yang menyesatkan.",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Tidak ada sesuatu yang lebih bermanfaat bagi hati selain membaca Al-Qur'an dengan tadabbur dan penghayatan.",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Sesungguhnya di dalam hati manusia terdapat kekosongan yang tidak bisa diisi kecuali dengan mengenal Allah.",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Jika kamu tidak merasa takut kepada Allah, periksalah hatimu — karena ada sesuatu yang salah di sana.",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Tanda orang berakal adalah ia mampu mengendalikan lidahnya sebelum ia bicara.",
-    "ulama": "Imam Sufyan Ath-Thawri"
-  },
-  {
-    "teks": "Banyak berbicara tanpa manfaat adalah tanda lemahnya akal dan dangkalnya ilmu.",
-    "ulama": "Imam Sufyan Ath-Thawri"
-  },
-  {
-    "teks": "Menjaga persaudaraan jauh lebih mudah daripada memperbaikinya setelah rusak.",
-    "ulama": "Imam Sufyan Ath-Thawri"
-  },
-  {
-    "teks": "Berikan perhatian kepada dirimu sendiri sebelum kamu memberi perhatian kepada orang lain.",
-    "ulama": "Imam Sufyan Ath-Thawri"
-  },
-  {
-    "teks": "Janganlah berduka jika pintu-pintu tampak tertutup, karena bisa jadi Allah ingin membukakan bagimu pintu yang jauh lebih baik.",
-    "ulama": "Imam Ibnu Athaillah As-Sakandari"
-  },
-  {
-    "teks": "Tanda berpalingnya Allah dari seorang hamba adalah disibukkannya hamba itu dengan hal-hal yang tidak berguna.",
-    "ulama": "Imam Ibnu Athaillah As-Sakandari"
-  },
-  {
-    "teks": "Di balik setiap ujian dan kesulitan, tersembunyi hikmah yang baru akan kamu pahami nanti.",
-    "ulama": "Imam Ibnu Athaillah As-Sakandari"
-  },
-  {
-    "teks": "Bersyukurlah kepada Allah atas nikmat yang ada, karena syukur adalah kunci untuk nikmat yang lebih banyak.",
-    "ulama": "Imam Ibnu Athaillah As-Sakandari"
-  },
-  {
-    "teks": "Jangan sia-siakan waktumu dengan memikirkan sesuatu yang tidak bisa kamu ubah sama sekali.",
-    "ulama": "Imam Ibnu Athaillah As-Sakandari"
-  },
-  {
-    "teks": "Berhati-hatilah terhadap waktu yang terbuang sia-sia; itu adalah kerugian yang tidak bisa digantikan.",
-    "ulama": "Imam Ibnul Jauzi"
-  },
-  {
-    "teks": "Ilmu adalah cahaya, dan manusia paling rugi adalah yang memadamkan cahayanya sendiri dengan kemaksiatan.",
-    "ulama": "Imam Ibnul Jauzi"
-  },
-  {
-    "teks": "Banyak orang bermimpi tentang masa depan tapi lupa untuk benar-benar hidup dan beramal di masa kini.",
-    "ulama": "Imam Ibnul Jauzi"
-  },
-  {
-    "teks": "Keikhlasan adalah syarat utama diterimanya setiap amal, besar maupun kecil.",
-    "ulama": "Imam Ibnu Rajab Al-Hanbali"
-  },
-  {
-    "teks": "Setiap nikmat yang tidak digunakan untuk taat kepada Allah adalah musibah yang tersembunyi.",
-    "ulama": "Imam Ibnu Rajab Al-Hanbali"
-  },
-  {
-    "teks": "Hidupmu di dunia seperti perjalanan panjang; persiapkan bekalmu untuk negeri yang abadi.",
-    "ulama": "Imam Ibnu Rajab Al-Hanbali"
-  },
-  {
-    "teks": "Jika kamu bersahabat, maka berteman dengan orang yang akan membantumu menuju Allah, bukan yang menjauhkanmu.",
-    "ulama": "Imam Fudhail ibn Iyadh"
-  },
-  {
-    "teks": "Orang yang paling lemah adalah yang tidak mampu memaafkan kesalahan orang lain.",
-    "ulama": "Imam Fudhail ibn Iyadh"
-  },
-  {
-    "teks": "Meninggalkan amal karena takut dilihat manusia adalah riya'. Beramal karena ingin dilihat manusia adalah syirik.",
-    "ulama": "Imam Fudhail ibn Iyadh"
-  },
-  {
-    "teks": "Sebaik-baik teman duduk di dunia ini adalah buku-buku para ulama.",
-    "ulama": "Imam Fudhail ibn Iyadh"
-  },
-  {
-    "teks": "Niat yang benar mampu mengubah pekerjaan biasa menjadi ibadah yang bernilai sangat tinggi.",
-    "ulama": "Imam Ibnu Hajar Al-Asqalani"
-  },
-  {
-    "teks": "Jangan terlena dengan kemudahan, karena ujian adalah cara Allah meninggikan derajatmu.",
-    "ulama": "Imam Ibnu Hajar Al-Asqalani"
-  },
-  {
-    "teks": "Setiap ilmu yang bermanfaat membuka pintu ilmu-ilmu lainnya bagi yang bersungguh-sungguh.",
-    "ulama": "Imam Ibnu Hajar Al-Asqalani"
-  },
-  {
-    "teks": "Janganlah kamu merasa aman dari azab Allah hanya karena banyaknya amal baikmu.",
-    "ulama": "Imam Sufyan ibn Uyainah"
-  },
-  {
-    "teks": "Sebaik-baik teman dalam hidup ini adalah yang selalu mengingatkanmu kepada Allah.",
-    "ulama": "Imam Sufyan ibn Uyainah"
-  },
-  {
-    "teks": "Berpegang teguhlah kepada Sunnah meskipun kamu hanya sendirian dan semua orang menentangmu.",
-    "ulama": "Imam Al-Awza'i"
-  },
-  {
-    "teks": "Bersabarlah atas kata-kata orang bodoh; diam adalah jawaban terbaik yang bisa kamu berikan.",
-    "ulama": "Imam Al-Awza'i"
-  },
-  {
-    "teks": "Jangan bergaul dengan seseorang yang tidak membuatmu menjadi lebih baik dari sebelumnya.",
-    "ulama": "Imam Yahya ibn Muadz"
-  },
-  {
-    "teks": "Berikan yang terbaik di setiap kesempatan, karena tidak ada jaminan akan ada kesempatan kedua.",
-    "ulama": "Imam Yahya ibn Muadz"
-  },
-  {
-    "teks": "Rasa malu yang sesungguhnya kepada Allah lebih baik dari seribu tahun ibadah tanpa rasa malu.",
-    "ulama": "Imam Bisyr Al-Hafi"
-  },
-  {
-    "teks": "Orang yang paling takut kepada Allah adalah yang paling mengenali keagungan-Nya.",
-    "ulama": "Imam Bisyr Al-Hafi"
-  },
-  {
-    "teks": "Jadikanlah Al-Qur'an sebagai teman setia dalam setiap langkah perjalanan hidupmu.",
-    "ulama": "Imam Ibnu Kathir"
-  },
-  {
-    "teks": "Tidak ada kekayaan yang lebih berharga dari akal yang sehat dan hati yang bersih.",
-    "ulama": "Imam Ibnu Kathir"
-  },
-  {
-    "teks": "Jadikan ilmumu sebagai pemimpin amalanmu, bukan amalanmu yang menentukan ilmumu.",
-    "ulama": "Imam Ad-Daraquthni"
-  },
-  {
-    "teks": "Cukuplah seseorang disebut faqih apabila ia benar-benar takut kepada Allah dalam setiap langkahnya.",
-    "ulama": "Imam Abu Dawud"
-  },
-  {
-    "teks": "Sebaik-baik manusia adalah yang paling banyak memberi manfaat bagi manusia lainnya.",
-    "ulama": "Imam An-Nasai"
-  },
-  {
-    "teks": "Bertakwalah kepada Allah di mana pun kamu berada, karena Allah Maha Melihat setiap gerak-gerikmu.",
-    "ulama": "Imam At-Tirmidzi"
-  },
-  {
-    "teks": "Janganlah ilmu itu membuatmu sombong, karena kesombongan akan membutakan mata hati dari kebenaran.",
-    "ulama": "Imam Al-ajurri"
-  },
-  {
-    "teks": "Setiap kebaikan yang kamu tanam hari ini akan berbuah kebaikan yang tidak pernah kamu duga besok.",
-    "ulama": "Imam Al-ajurri"
-  },
-  {
-    "teks": "Ilmu itu didapat dengan lisan yang banyak bertanya dan kaki yang banyak berjalan mencari guru.",
-    "ulama": "Imam Al-Khatib Al-Baghdadi"
-  },
-  {
-    "teks": "Orang yang paling bahagia adalah orang yang mampu mensyukuri apa yang ia miliki.",
-    "ulama": "Imam Al-Mawardhi"
-  },
-  {
-    "teks": "Ilmu yang tidak diamalkan seperti pohon yang tidak berbuah — ada namun tidak memberikan faidah.",
-    "ulama": "Imam Al-Mawardhi"
-  },
-  {
-    "teks": "Agama itu mudah; yang membuatnya terasa sulit adalah ketika kita mengikuti hawa nafsu.",
-    "ulama": "Imam Asy-Syathibi"
-  },
-  {
-    "teks": "Seorang pencari ilmu yang bersabar atas kesulitannya, Allah akan buka baginya pintu ilmu yang luas.",
-    "ulama": "Imam Ibnu Muflih"
-  },
-  {
-    "teks": "Kejujuran adalah fondasi segala kemuliaan, dan kebohongan adalah akar segala kerusakan.",
-    "ulama": "Imam Ibnu Muflih"
-  },
-  {
-    "teks": "Keberkahan waktu tergantung pada bagaimana kamu mengisinya. Isi dengan ketaatan, maka ia akan penuh berkah.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Tiga hal yang menghancurkan: kikir yang ditaati, hawa nafsu yang diikuti, dan seseorang yang mengagumi dirinya sendiri.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Orang yang cerdas adalah yang menjadikan kematian sebagai motivasi untuk terus berbuat kebaikan.",
-    "ulama": "Imam Ibnu Hajar Al-Asqalani"
-  },
-  {
-    "teks": "Kesehatan adalah mahkota di kepala orang sehat yang hanya bisa dilihat oleh orang sakit.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Jiwa manusia adalah zat spiritual yang independen dari organ-organ fisik tubuhnya.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Penyakit fisik sering kali berakar dari kelemahan dan ketidakseimbangan kondisi emosional kita.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Jangan pernah lelah mencari kebenaran, karena kebenaran adalah makanan terbaik untuk akal kita.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Ilmu pengetahuan adalah penerang jalan kegelapan, dan guru adalah penuntun jalannya.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Kunci utama kebahagiaan hidup adalah keseimbangan antara jasmani, rohani, dan akal pikiran.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Pikiran yang cemas akan merusak metabolisme tubuh secara perlahan.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Kebersihan lingkungan adalah benteng pertama pertahanan manusia melawan wabah penyakit.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Obat terbaik untuk kesedihan adalah menyibukkan diri dengan mempelajari ilmu-ilmu baru.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Siapa yang tidak menghargai kesehatannya saat muda akan dipaksa membayarnya dengan mahal saat tua.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Peradaban besar tidak dihancurkan dari luar, melainkan membusuk secara perlahan dari dalam diri warganya.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Kemakmuran melahirkan kemalasan, dan kemalasan adalah awal runtuhnya sebuah kemajuan.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Pendidikan harus mengajarkan cara berpikir secara logis, bukan sekadar menghafal teori tanpa arah.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Negara yang membebani rakyatnya dengan pajak yang terlalu tinggi akan berakhir dengan kehancuran ekonomi.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Kekuasaan yang dijalankan dengan ketakutan tidak akan pernah bertahan lama dalam sejarah manusia.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Manusia memiliki kecenderungan alami untuk meniru gaya hidup kelompok yang lebih kuat dan berkuasa.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Perubahan sosial adalah hukum alam yang tidak bisa dihindari oleh masyarakat mana pun di dunia.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Persatuan sosial (Ashabiyah) adalah pengikat utama keberhasilan suatu komunitas mencapai tujuannya.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Ketika keadilan runtuh, kehancuran seluruh tatanan sosial masyarakat tinggal menunggu waktu.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Seorang sejarawan sejati harus bebas dari bias prasangka agar bisa menulis peristiwa secara objektif.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Agama menuntut tindakan moral yang nyata, bukan sekadar perdebatan teologis yang tak berujung.",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Akal dan wahyu berasal dari sumber yang sama, yaitu kebenaran ilahi yang tidak mungkin kontradiktif.",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Kebebasan berpikir adalah hak alami manusia yang harus dijaga dalam sistem kemasyarakatan.",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Filsafat tidak menjauhkan manusia dari Tuhan, ia justru memperdalam kekaguman kita akan ciptaan-Nya.",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Janganlah tergesa-gesa menghakimi pendapat orang lain sebelum kita memahami argumen mereka dengan utuh.",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Setiap kebenaran ilmiah yang kita temukan adalah bentuk ibadah intelektual kepada Sang Pencipta.",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Diskusi yang sehat adalah cara terbaik untuk meluruskan kesalahpahaman antarkelompok manusia.",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Generasi yang menolak filsafat dan ilmu logika akan mudah terombang-ambing oleh doktrin palsu.",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Aljabar mengajarkan kita cara menyederhanakan masalah yang rumit dengan langkah-langkah terstruktur.",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Keindahan matematika terletak pada kepastian jawabannya dan keteraturan rumusnya.",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Setiap angka di dunia ini memiliki tempat dan fungsinya masing-masing dalam harmoni matematika.",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Berpikir matematis membantu melatih ketajaman logika kita dalam menghadapi masalah sehari-hari.",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Ilmu perhitungan adalah dasar utama dari perdagangan, arsitektur, dan navigasi dunia.",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Gunakan waktumu secara presisi seperti perhitungan angka yang tidak boleh meleset satu poin pun.",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Siapa yang menguasai ilmu matematika akan lebih mudah memahami keteraturan hukum alam semesta.",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Metode ilmiah menuntut kita untuk selalu melakukan eksperimen berulang demi membuktikan suatu teori.",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Jangan biarkan otoritas atau nama besar seseorang menghentikanmu untuk menguji kebenaran ucapannya.",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Cahaya merambat lurus; kebenaran juga harus disampaikan secara lurus tanpa manipulasi kata.",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Pengamatan visual yang objektif adalah kunci utama keberhasilan sains fisika.",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Sains berkembang bukan dengan menerima opini, melainkan dengan meragukan dan mengujinya secara empiris.",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Ilmu pengetahuan adalah warisan kemanusiaan yang harus dibagikan secara bebas tanpa batas negara.",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Musik adalah bahasa jiwa yang melampaui batas perbedaan kata dan bahasa manusia.",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Kebahagiaan sejati diraih ketika akal aktif kita terhubung dengan kebaikan-kebaikan universal.",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Masyarakat yang utama adalah masyarakat yang saling mencintai dan bekerja sama dalam kebajikan.",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Seorang pemimpin harus memiliki kejernihan visi intelektual dan keteguhan akhlak spiritual.",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Ilmu logika adalah pelindung pikiran kita dari kesalahan mengambil kesimpulan.",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Menuntut ilmu adalah persiapan diri untuk menjadi warga masyarakat yang berguna bagi sesama.",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Kita harus mempelajari geografi dan astronomi untuk memahami posisi kecil kita di alam semesta ini.",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Perbedaan budaya adalah kekayaan intelektual yang harus kita pelajari secara ilmiah dan objektif.",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Sains sejati menuntut kita menulis kebenaran meskipun kebenaran itu tidak disukai penguasa.",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Ketelitian dalam mengukur dan mencatat data adalah ciri utama ilmuwan yang berintegritas.",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Jangan biarkan kebencian antarsuku menghalangi kita untuk mengakui pencapaian ilmiah mereka.",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Penyakit hati jauh lebih berbahaya daripada penyakit fisik, karena dampaknya abadi hingga akhirat.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Kesombongan intelektual adalah ketika seseorang merasa paling tahu padahal ia baru belajar sedikit.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Jaga lisanmu dari gibah, karena gibah menghapus amal baikmu seperti api membakar kayu kering.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Nasihat yang paling membekas adalah nasihat yang diamalkan oleh orang yang menyampaikannya.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Carilah teman yang shaleh; karena teman shaleh akan membantumu memperbaiki akhlak dan ibadahmu.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Dunia ini hanyalah jembatan penyebrangan; jangan membangun rumah permanen di atasnya.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Belajarlah untuk memaafkan kesalahan orang lain agar hatimu tenang dan bebas dari dendam.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Keikhlasan adalah rahasia antara hamba dengan Tuhannya, yang tidak diketahui malaikat maupun setan.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Jika kamu ingin tahu karakter seseorang, lihatlah bagaimana ia memperlakukan orang yang tidak berguna baginya.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Kebahagiaan bukan pada banyaknya harta, melainkan pada ketenangan hati yang selalu bersyukur.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Hati yang bersih akan merasakan manisnya iman dan kelezatan dalam beribadah.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Sabar menahan diri dari kemaksiatan jauh lebih ringan daripada menanggung siksa akibat dosa tersebut.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Doa yang dipanjatkan di sepertiga malam terakhir adalah anak panah yang tidak akan pernah meleset.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Setiap helai nafas adalah langkah kita menuju liang kubur; pergunakan untuk hal yang berguna.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Kunci pembuka pintu ilmu adalah mendengarkan dengan baik, diam, mengamalkan, lalu menyebarkannya.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Kehilangan waktu jauh lebih rugi daripada kehilangan harta; karena harta bisa dicari lagi, sedangkan waktu tidak.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Fokuslah memperbaiki aib dirimu sendiri daripada sibuk membicarakan kelemahan orang lain.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Hati yang sakit akan menolak kebenaran dan merasa nyaman dengan kemaksiatan.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Istighfar adalah kunci pembuka pintu rezeki dan jalan keluar dari setiap kesempitan hidup.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Sabar adalah kekuatan jiwa yang menahan diri agar tidak mengeluh saat diuji oleh takdir.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Wahai manusia, jadilah orang yang zuhud terhadap dunia, maka Allah akan mencintaimu.",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Sesungguhnya orang mukmin sejati adalah orang yang selalu merasa takut amalnya tidak diterima.",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Perbaiki niatmu dalam beramal, karena niat yang ikhlas adalah ruh dari setiap perbuatan baik.",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Jangan berteman dengan orang yang suka menceritakan aib orang lain kepadamu.",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Orang yang paling berilmu adalah orang yang paling takut melanggar aturan-aturan Allah.",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Kematian adalah nasihat yang diam namun sangat ampuh untuk menyadarkan kelalaian kita.",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Dunia ini seperti air laut; semakin diminum, semakin membuat haus orang yang meminumnya.",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Bencana yang membawamu kembali mendekat kepada Allah lebih baik daripada nikmat yang membuatmu lupa kepada-Nya.",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Ibadah yang paling agung adalah ketaatan mutlak kepada perintah Allah dengan penuh rasa cinta.",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Jihad yang paling utama adalah berjuang melawan hawa nafsu yang ada di dalam dada kita sendiri.",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Hati yang dipenuhi cinta kepada Allah tidak akan menyisakan ruang untuk mencintai kemaksiatan.",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Pelajari ilmu syariat agar kamu tidak mudah tersesat oleh argumen-argumen filsafat yang membingungkan.",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Sabar atas gangguan manusia adalah bukti kematangan iman dan kebersihan hati seorang mukmin.",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Adab yang baik adalah perhiasan sejati bagi seorang penuntut ilmu.",
-    "ulama": "Imam Ibnu Muflih"
-  },
-  {
-    "teks": "Hormatilah gurumu agar ilmu yang kamu dapatkan berkah dan bermanfaat bagi kehidupanmu.",
-    "ulama": "Imam Ibnu Muflih"
-  },
-  {
-    "teks": "Kejujuran adalah mutiara berharga dalam kepribadian seorang muslim sejati.",
-    "ulama": "Imam Ibnu Muflih"
-  },
-  {
-    "teks": "Jangan mudah berjanji jika kamu ragu bisa menepati janji tersebut.",
-    "ulama": "Imam Ibnu Muflih"
-  },
-  {
-    "teks": "Jangan menuntut Tuhanmu karena lambatnya pengabulan doa, tetapi tuntutlah dirimu sendiri karena lambatnya ketaatanmu.",
-    "ulama": "Imam Ibnu Athaillah As-Sakandari"
-  },
-  {
-    "teks": "Orang yang bersandar pada amalnya akan berkurang harapannya saat mengalami kegagalan atau dosa.",
-    "ulama": "Imam Ibnu Athaillah As-Sakandari"
-  },
-  {
-    "teks": "Bagaimana mungkin hati bisa bersinar jika bayangan dunia masih melekat erat di cermin hatinya?",
-    "ulama": "Imam Ibnu Athaillah As-Sakandari"
-  },
-  {
-    "teks": "Maksiat yang melahirkan kerendahan hati lebih baik daripada ketaatan yang melahirkan kesombongan.",
-    "ulama": "Imam Ibnu Athaillah As-Sakandari"
-  },
-  {
-    "teks": "Tunda amal baikmu sampai ada waktu luang adalah tanda kebodohan dan kelemahan jiwa.",
-    "ulama": "Imam Ibnu Athaillah As-Sakandari"
-  },
-  {
-    "teks": "Jika kamu memiliki teman yang membantumu taat kepada Allah, genggam erat tangannya.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Siapa yang menasihatimu secara sembunyi-sembunyi, ia benar-benar menyayangimu.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Siapa yang menasihatimu di depan umum, ia sebenarnya sedang menghina dan mempermalukanmu.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Pilar kepemimpinan ada lima: kejujuran, menyimpan rahasia, menepati janji, memberi nasihat, dan menunaikan amanah.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Kenyang itu membuat badan berat, mengeraskan hati, menghilangkan kecerdasan, dan mendatangkan tidur.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Aku beribadah kepada Allah bukan karena takut neraka atau mengharap surga, melainkan karena cinta dan kerinduan kepada-Nya.",
-    "ulama": "Rabi'ah al-Adawiyah"
-  },
-  {
-    "teks": "Ya Allah, jika aku menyembah-Mu karena takut neraka, bakarlah aku di dalamnya. Jika karena mengharap surga, haramkanlah aku darinya.",
-    "ulama": "Rabi'ah al-Adawiyah"
-  },
-  {
-    "teks": "Sembunyikan kebaikan-kebaikanmu sebagaimana kamu menyembunyikan kesalahan-kesalahanmu.",
-    "ulama": "Rabi'ah al-Adawiyah"
-  },
-  {
-    "teks": "Kebenaran tidak akan pernah merugikan orang yang mencarinya dengan niat yang bersih.",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Ilmu pengetahuan adalah cahaya universal yang menerangi seluruh umat manusia tanpa memandang perbedaan.",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Orang yang bijaksana adalah orang yang mampu mengambil pelajaran dari kegagalan masa lalunya.",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Astronomi mengajarkan kita tentang keagungan hukum alam semesta yang diatur dengan sangat presisi.",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Menyembunyikan kebenaran ilmiah demi popularitas adalah pengkhianatan terhadap akal sehat.",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Pendidikan harus dimulai dengan contoh teladan yang nyata dari para guru.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Kehancuran moral suatu bangsa adalah awal dari keruntuhan sistem politik dan negaranya.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Barangsiapa menginginkan kemuliaan, belajarlah sejak usia muda agar kamu dapat memimpin dengan bijak saat dewasa.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Ketahuilah wahai penuntut ilmu, setiap detik waktu yang terbuang adalah kerugian yang tidak akan pernah kembali.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Carilah kebenaran dengan akal sehatmu dan bersabarlah atas jalan panjang pencariannya.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Keindahan budi pekerti adalah mahkota terbaik bagi seorang pelajar.",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Ilmu yang bermanfaat adalah ilmu yang menerangi jalan hidupmu dan orang di sekitarmu.",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Bagi akal dan kesehatan, kesabaran dalam menuntut ilmu adalah kunci pembuka gerbang kesuksesan masa depan.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Dalam sejarah peradaban manusia, jangan biarkan pujian manusia membuatmu sombong dan lupa akan kekurangan dirimu.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Pikiran yang jernih bersumber dari hati yang bersih dari rasa dengki.",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Seperti hitungan yang presisi, tulislah apa yang kamu pelajari agar pengetahuan itu abadi melampaui usia hidupmu.",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Bertemanlah dengan buku, karena buku adalah sahabat terbaik yang tidak pernah berkhianat.",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Kejujuran adalah mata uang yang berlaku di belahan dunia mana pun.",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Argumen yang kuat disampaikan dengan kata-kata lembut, bukan dengan nada tinggi.",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Setiap masalah yang rumit pasti memiliki solusi jika diurai dengan kesabaran.",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Kebahagiaan sejati didapat saat kita mampu membagikan ilmu yang kita miliki kepada sesama.",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Barangsiapa menginginkan kemuliaan, disiplin adalah jembatan antara cita-cita dengan pencapaian yang nyata.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Ketahuilah wahai penuntut ilmu, jangan takut salah dalam belajar, karena dari kesalahan itulah kita memahami kebenaran.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Orang yang berakal selalu berpikir sebelum berbicara, sedangkan orang bodoh sebaliknya.",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Hargai pendapat orang lain meskipun berbeda dengan keyakinan yang kamu pegang.",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Keberhasilan diraih dengan usaha konsisten setiap hari, bukan dengan kerja keras semalam saja.",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Bagi akal dan kesehatan, fokuslah pada proses belajar, hasil akhir akan mengikuti usaha terbaikmu.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Dalam sejarah peradaban manusia, belajarlah sejak usia muda agar kamu dapat memimpin dengan bijak saat dewasa.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Setiap detik waktu yang terbuang adalah kerugian yang tidak akan pernah kembali.",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Seperti hitungan yang presisi, carilah kebenaran dengan akal sehatmu dan bersabarlah atas jalan panjang pencariannya.",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Keindahan budi pekerti adalah mahkota terbaik bagi seorang pelajar. (Akhlak mulia)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Ilmu yang bermanfaat adalah ilmu yang menerangi jalan hidupmu dan orang di sekitarmu. (Kegunaan ilmu)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Kesabaran dalam menuntut ilmu adalah kunci pembuka gerbang kesuksesan masa depan.",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Jangan biarkan pujian manusia membuatmu sombong dan lupa akan kekurangan dirimu.",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Pikiran yang jernih bersumber dari hati yang bersih dari rasa dengki. (Kebersihan hati)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Barangsiapa menginginkan kemuliaan, tulislah apa yang kamu pelajari agar pengetahuan itu abadi melampaui usia hidupmu.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Ketahuilah wahai penuntut ilmu, bertemanlah dengan buku, karena buku adalah sahabat terbaik yang tidak pernah berkhianat.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Kejujuran adalah mata uang yang berlaku di belahan dunia mana pun. (Integritas dan kejujuran)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Argumen yang kuat disampaikan dengan kata-kata lembut, bukan dengan nada tinggi. (Komunikasi yang baik)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Setiap masalah yang rumit pasti memiliki solusi jika diurai dengan kesabaran. (Pemecahan masalah)",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Bagi akal dan kesehatan, kebahagiaan sejati didapat saat kita mampu membagikan ilmu yang kita miliki kepada sesama.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Dalam sejarah peradaban manusia, disiplin adalah jembatan antara cita-cita dengan pencapaian yang nyata.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Jangan takut salah dalam belajar, karena dari kesalahan itulah kita memahami kebenaran.",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Seperti hitungan yang presisi, orang yang berakal selalu berpikir sebelum berbicara, sedangkan orang bodoh sebaliknya.",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Hargai pendapat orang lain meskipun berbeda dengan keyakinan yang kamu pegang. (Toleransi pemikiran)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Keberhasilan diraih dengan usaha konsisten setiap hari, bukan dengan kerja keras semalam saja. (Konsistensi)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Fokuslah pada proses belajar, hasil akhir akan mengikuti usaha terbaikmu.",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Belajarlah sejak usia muda agar kamu dapat memimpin dengan bijak saat dewasa.",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Setiap detik waktu yang terbuang adalah kerugian yang tidak akan pernah kembali. (Waktu dan kedisiplinan)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Barangsiapa menginginkan kemuliaan, carilah kebenaran dengan akal sehatmu dan bersabarlah atas jalan panjang pencariannya.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Ketahuilah wahai penuntut ilmu, keindahan budi pekerti adalah mahkota terbaik bagi seorang pelajar.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Ilmu yang bermanfaat adalah ilmu yang menerangi jalan hidupmu dan orang di sekitarmu. (Kegunaan ilmu)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Kesabaran dalam menuntut ilmu adalah kunci pembuka gerbang kesuksesan masa depan. (Kesabaran)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Jangan biarkan pujian manusia membuatmu sombong dan lupa akan kekurangan dirimu. (Rendah hati)",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Bagi akal dan kesehatan, pikiran yang jernih bersumber dari hati yang bersih dari rasa dengki.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Dalam sejarah peradaban manusia, tulislah apa yang kamu pelajari agar pengetahuan itu abadi melampaui usia hidupmu.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Bertemanlah dengan buku, karena buku adalah sahabat terbaik yang tidak pernah berkhianat. (Gemar membaca)",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Seperti hitungan yang presisi, kejujuran adalah mata uang yang berlaku di belahan dunia mana pun.",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Argumen yang kuat disampaikan dengan kata-kata lembut, bukan dengan nada tinggi. (Komunikasi yang baik)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Setiap masalah yang rumit pasti memiliki solusi jika diurai dengan kesabaran. (Pemecahan masalah)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Kebahagiaan sejati didapat saat kita mampu membagikan ilmu yang kita miliki kepada sesama. (Berbagi pengetahuan)",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Disiplin adalah jembatan antara cita-cita dengan pencapaian yang nyata.",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Jangan takut salah dalam belajar, karena dari kesalahan itulah kita memahami kebenaran. (Proses belajar)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Barangsiapa menginginkan kemuliaan, orang yang berakal selalu berpikir sebelum berbicara, sedangkan orang bodoh sebaliknya.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Ketahuilah wahai penuntut ilmu, hargai pendapat orang lain meskipun berbeda dengan keyakinan yang kamu pegang.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Keberhasilan diraih dengan usaha konsisten setiap hari, bukan dengan kerja keras semalam saja. (Konsistensi)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Fokuslah pada proses belajar, hasil akhir akan mengikuti usaha terbaikmu. (Proses dan hasil)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Belajarlah sejak usia muda agar kamu dapat memimpin dengan bijak saat dewasa. (Belajar dan kepemimpinan)",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Bagi akal dan kesehatan, setiap detik waktu yang terbuang adalah kerugian yang tidak akan pernah kembali.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Dalam sejarah peradaban manusia, carilah kebenaran dengan akal sehatmu dan bersabarlah atas jalan panjang pencariannya.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Keindahan budi pekerti adalah mahkota terbaik bagi seorang pelajar. (Akhlak mulia)",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Seperti hitungan yang presisi, ilmu yang bermanfaat adalah ilmu yang menerangi jalan hidupmu dan orang di sekitarmu.",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Kesabaran dalam menuntut ilmu adalah kunci pembuka gerbang kesuksesan masa depan. (Kesabaran)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Jangan biarkan pujian manusia membuatmu sombong dan lupa akan kekurangan dirimu. (Rendah hati)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Pikiran yang jernih bersumber dari hati yang bersih dari rasa dengki. (Kebersihan hati)",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Tulislah apa yang kamu pelajari agar pengetahuan itu abadi melampaui usia hidupmu.",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Bertemanlah dengan buku, karena buku adalah sahabat terbaik yang tidak pernah berkhianat. (Gemar membaca)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Barangsiapa menginginkan kemuliaan, kejujuran adalah mata uang yang berlaku di belahan dunia mana pun.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Ketahuilah wahai penuntut ilmu, argumen yang kuat disampaikan dengan kata-kata lembut, bukan dengan nada tinggi.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Setiap masalah yang rumit pasti memiliki solusi jika diurai dengan kesabaran. (Pemecahan masalah)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Kebahagiaan sejati didapat saat kita mampu membagikan ilmu yang kita miliki kepada sesama. (Berbagi pengetahuan)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Disiplin adalah jembatan antara cita-cita dengan pencapaian yang nyata. (Kedisiplinan)",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Bagi akal dan kesehatan, jangan takut salah dalam belajar, karena dari kesalahan itulah kita memahami kebenaran.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Dalam sejarah peradaban manusia, orang yang berakal selalu berpikir sebelum berbicara, sedangkan orang bodoh sebaliknya.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Hargai pendapat orang lain meskipun berbeda dengan keyakinan yang kamu pegang. (Toleransi pemikiran)",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Seperti hitungan yang presisi, keberhasilan diraih dengan usaha konsisten setiap hari, bukan dengan kerja keras semalam saja.",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Fokuslah pada proses belajar, hasil akhir akan mengikuti usaha terbaikmu. (Proses dan hasil)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Belajarlah sejak usia muda agar kamu dapat memimpin dengan bijak saat dewasa. (Belajar dan kepemimpinan)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Setiap detik waktu yang terbuang adalah kerugian yang tidak akan pernah kembali. (Waktu dan kedisiplinan)",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Carilah kebenaran dengan akal sehatmu dan bersabarlah atas jalan panjang pencariannya. (Pencarian kebenaran)",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Keindahan budi pekerti adalah mahkota terbaik bagi seorang pelajar. (Akhlak mulia)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Barangsiapa menginginkan kemuliaan, ilmu yang bermanfaat adalah ilmu yang menerangi jalan hidupmu dan orang di sekitarmu.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Ketahuilah wahai penuntut ilmu, kesabaran dalam menuntut ilmu adalah kunci pembuka gerbang kesuksesan masa depan.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Jangan biarkan pujian manusia membuatmu sombong dan lupa akan kekurangan dirimu. (Rendah hati)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Pikiran yang jernih bersumber dari hati yang bersih dari rasa dengki. (Kebersihan hati)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Tulislah apa yang kamu pelajari agar pengetahuan itu abadi melampaui usia hidupmu. (Dokumentasi ilmu)",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Bagi akal dan kesehatan, bertemanlah dengan buku, karena buku adalah sahabat terbaik yang tidak pernah berkhianat.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Dalam sejarah peradaban manusia, kejujuran adalah mata uang yang berlaku di belahan dunia mana pun.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Argumen yang kuat disampaikan dengan kata-kata lembut, bukan dengan nada tinggi. (Komunikasi yang baik)",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Seperti hitungan yang presisi, setiap masalah yang rumit pasti memiliki solusi jika diurai dengan kesabaran.",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Kebahagiaan sejati didapat saat kita mampu membagikan ilmu yang kita miliki kepada sesama. (Berbagi pengetahuan)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Disiplin adalah jembatan antara cita-cita dengan pencapaian yang nyata. (Kedisiplinan)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Jangan takut salah dalam belajar, karena dari kesalahan itulah kita memahami kebenaran. (Proses belajar)",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Orang yang berakal selalu berpikir sebelum berbicara, sedangkan orang bodoh sebaliknya. (Kontrol diri)",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Hargai pendapat orang lain meskipun berbeda dengan keyakinan yang kamu pegang. (Toleransi pemikiran)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Barangsiapa menginginkan kemuliaan, keberhasilan diraih dengan usaha konsisten setiap hari, bukan dengan kerja keras semalam saja.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Ketahuilah wahai penuntut ilmu, fokuslah pada proses belajar, hasil akhir akan mengikuti usaha terbaikmu.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Belajarlah sejak usia muda agar kamu dapat memimpin dengan bijak saat dewasa. (Belajar dan kepemimpinan)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Setiap detik waktu yang terbuang adalah kerugian yang tidak akan pernah kembali. (Waktu dan kedisiplinan)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Carilah kebenaran dengan akal sehatmu dan bersabarlah atas jalan panjang pencariannya. (Pencarian kebenaran)",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Bagi akal dan kesehatan, keindahan budi pekerti adalah mahkota terbaik bagi seorang pelajar.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Dalam sejarah peradaban manusia, ilmu yang bermanfaat adalah ilmu yang menerangi jalan hidupmu dan orang di sekitarmu.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Kesabaran dalam menuntut ilmu adalah kunci pembuka gerbang kesuksesan masa depan. (Kesabaran)",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Seperti hitungan yang presisi, jangan biarkan pujian manusia membuatmu sombong dan lupa akan kekurangan dirimu.",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Pikiran yang jernih bersumber dari hati yang bersih dari rasa dengki. (Kebersihan hati)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Tulislah apa yang kamu pelajari agar pengetahuan itu abadi melampaui usia hidupmu. (Dokumentasi ilmu)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Bertemanlah dengan buku, karena buku adalah sahabat terbaik yang tidak pernah berkhianat. (Gemar membaca)",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Kejujuran adalah mata uang yang berlaku di belahan dunia mana pun. (Integritas dan kejujuran)",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Argumen yang kuat disampaikan dengan kata-kata lembut, bukan dengan nada tinggi. (Komunikasi yang baik)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Barangsiapa menginginkan kemuliaan, setiap masalah yang rumit pasti memiliki solusi jika diurai dengan kesabaran.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Ketahuilah wahai penuntut ilmu, kebahagiaan sejati didapat saat kita mampu membagikan ilmu yang kita miliki kepada sesama.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Disiplin adalah jembatan antara cita-cita dengan pencapaian yang nyata. (Kedisiplinan)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Jangan takut salah dalam belajar, karena dari kesalahan itulah kita memahami kebenaran. (Proses belajar)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Orang yang berakal selalu berpikir sebelum berbicara, sedangkan orang bodoh sebaliknya. (Kontrol diri)",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Bagi akal dan kesehatan, hargai pendapat orang lain meskipun berbeda dengan keyakinan yang kamu pegang.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Dalam sejarah peradaban manusia, keberhasilan diraih dengan usaha konsisten setiap hari, bukan dengan kerja keras semalam saja.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Fokuslah pada proses belajar, hasil akhir akan mengikuti usaha terbaikmu. (Proses dan hasil)",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Seperti hitungan yang presisi, belajarlah sejak usia muda agar kamu dapat memimpin dengan bijak saat dewasa.",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Setiap detik waktu yang terbuang adalah kerugian yang tidak akan pernah kembali. (Waktu dan kedisiplinan)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Carilah kebenaran dengan akal sehatmu dan bersabarlah atas jalan panjang pencariannya. (Pencarian kebenaran)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Keindahan budi pekerti adalah mahkota terbaik bagi seorang pelajar. (Akhlak mulia)",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Ilmu yang bermanfaat adalah ilmu yang menerangi jalan hidupmu dan orang di sekitarmu. (Kegunaan ilmu)",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Kesabaran dalam menuntut ilmu adalah kunci pembuka gerbang kesuksesan masa depan. (Kesabaran)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Barangsiapa menginginkan kemuliaan, jangan biarkan pujian manusia membuatmu sombong dan lupa akan kekurangan dirimu.",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Ketahuilah wahai penuntut ilmu, pikiran yang jernih bersumber dari hati yang bersih dari rasa dengki.",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Tulislah apa yang kamu pelajari agar pengetahuan itu abadi melampaui usia hidupmu. (Dokumentasi ilmu)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Bertemanlah dengan buku, karena buku adalah sahabat terbaik yang tidak pernah berkhianat. (Gemar membaca)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Kejujuran adalah mata uang yang berlaku di belahan dunia mana pun. (Integritas dan kejujuran)",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Bagi akal dan kesehatan, argumen yang kuat disampaikan dengan kata-kata lembut, bukan dengan nada tinggi.",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Dalam sejarah peradaban manusia, setiap masalah yang rumit pasti memiliki solusi jika diurai dengan kesabaran.",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Kebahagiaan sejati didapat saat kita mampu membagikan ilmu yang kita miliki kepada sesama. (Berbagi pengetahuan)",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Seperti hitungan yang presisi, disiplin adalah jembatan antara cita-cita dengan pencapaian yang nyata.",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Jangan takut salah dalam belajar, karena dari kesalahan itulah kita memahami kebenaran. (Proses belajar)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Orang yang berakal selalu berpikir sebelum berbicara, sedangkan orang bodoh sebaliknya. (Kontrol diri)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Hargai pendapat orang lain meskipun berbeda dengan keyakinan yang kamu pegang. (Toleransi pemikiran)",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Keberhasilan diraih dengan usaha konsisten setiap hari, bukan dengan kerja keras semalam saja. (Konsistensi)",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Fokuslah pada proses belajar, hasil akhir akan mengikuti usaha terbaikmu. (Proses dan hasil)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Belajarlah sejak usia muda agar kamu dapat memimpin dengan bijak saat dewasa. (Belajar dan kepemimpinan)",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Setiap detik waktu yang terbuang adalah kerugian yang tidak akan pernah kembali. (Waktu dan kedisiplinan)",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Carilah kebenaran dengan akal sehatmu dan bersabarlah atas jalan panjang pencariannya. (Pencarian kebenaran)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Keindahan budi pekerti adalah mahkota terbaik bagi seorang pelajar. (Akhlak mulia)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Ilmu yang bermanfaat adalah ilmu yang menerangi jalan hidupmu dan orang di sekitarmu. (Kegunaan ilmu)",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Kesabaran dalam menuntut ilmu adalah kunci pembuka gerbang kesuksesan masa depan. (Kesabaran)",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Jangan biarkan pujian manusia membuatmu sombong dan lupa akan kekurangan dirimu. (Rendah hati)",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Pikiran yang jernih bersumber dari hati yang bersih dari rasa dengki. (Kebersihan hati)",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Tulislah apa yang kamu pelajari agar pengetahuan itu abadi melampaui usia hidupmu. (Dokumentasi ilmu)",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Bertemanlah dengan buku, karena buku adalah sahabat terbaik yang tidak pernah berkhianat. (Gemar membaca)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Kejujuran adalah mata uang yang berlaku di belahan dunia mana pun. (Integritas dan kejujuran)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Argumen yang kuat disampaikan dengan kata-kata lembut, bukan dengan nada tinggi. (Komunikasi yang baik)",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Setiap masalah yang rumit pasti memiliki solusi jika diurai dengan kesabaran. (Pemecahan masalah)",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Kebahagiaan sejati didapat saat kita mampu membagikan ilmu yang kita miliki kepada sesama. (Berbagi pengetahuan)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Disiplin adalah jembatan antara cita-cita dengan pencapaian yang nyata. (Kedisiplinan)",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Jangan takut salah dalam belajar, karena dari kesalahan itulah kita memahami kebenaran. (Proses belajar)",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Orang yang berakal selalu berpikir sebelum berbicara, sedangkan orang bodoh sebaliknya. (Kontrol diri)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Hargai pendapat orang lain meskipun berbeda dengan keyakinan yang kamu pegang. (Toleransi pemikiran)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Keberhasilan diraih dengan usaha konsisten setiap hari, bukan dengan kerja keras semalam saja. (Konsistensi)",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Fokuslah pada proses belajar, hasil akhir akan mengikuti usaha terbaikmu. (Proses dan hasil)",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Belajarlah sejak usia muda agar kamu dapat memimpin dengan bijak saat dewasa. (Belajar dan kepemimpinan)",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Setiap detik waktu yang terbuang adalah kerugian yang tidak akan pernah kembali. (Waktu dan kedisiplinan)",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Carilah kebenaran dengan akal sehatmu dan bersabarlah atas jalan panjang pencariannya. (Pencarian kebenaran)",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Keindahan budi pekerti adalah mahkota terbaik bagi seorang pelajar. (Akhlak mulia)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Ilmu yang bermanfaat adalah ilmu yang menerangi jalan hidupmu dan orang di sekitarmu. (Kegunaan ilmu)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Kesabaran dalam menuntut ilmu adalah kunci pembuka gerbang kesuksesan masa depan. (Kesabaran)",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Jangan biarkan pujian manusia membuatmu sombong dan lupa akan kekurangan dirimu. (Rendah hati)",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Pikiran yang jernih bersumber dari hati yang bersih dari rasa dengki. (Kebersihan hati)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Tulislah apa yang kamu pelajari agar pengetahuan itu abadi melampaui usia hidupmu. (Dokumentasi ilmu)",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Bertemanlah dengan buku, karena buku adalah sahabat terbaik yang tidak pernah berkhianat. (Gemar membaca)",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Kejujuran adalah mata uang yang berlaku di belahan dunia mana pun. (Integritas dan kejujuran)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Argumen yang kuat disampaikan dengan kata-kata lembut, bukan dengan nada tinggi. (Komunikasi yang baik)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Setiap masalah yang rumit pasti memiliki solusi jika diurai dengan kesabaran. (Pemecahan masalah)",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Kebahagiaan sejati didapat saat kita mampu membagikan ilmu yang kita miliki kepada sesama. (Berbagi pengetahuan)",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Disiplin adalah jembatan antara cita-cita dengan pencapaian yang nyata. (Kedisiplinan)",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Jangan takut salah dalam belajar, karena dari kesalahan itulah kita memahami kebenaran. (Proses belajar)",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Orang yang berakal selalu berpikir sebelum berbicara, sedangkan orang bodoh sebaliknya. (Kontrol diri)",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Hargai pendapat orang lain meskipun berbeda dengan keyakinan yang kamu pegang. (Toleransi pemikiran)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Keberhasilan diraih dengan usaha konsisten setiap hari, bukan dengan kerja keras semalam saja. (Konsistensi)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Fokuslah pada proses belajar, hasil akhir akan mengikuti usaha terbaikmu. (Proses dan hasil)",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Belajarlah sejak usia muda agar kamu dapat memimpin dengan bijak saat dewasa. (Belajar dan kepemimpinan)",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Setiap detik waktu yang terbuang adalah kerugian yang tidak akan pernah kembali. (Waktu dan kedisiplinan)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Carilah kebenaran dengan akal sehatmu dan bersabarlah atas jalan panjang pencariannya. (Pencarian kebenaran)",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Keindahan budi pekerti adalah mahkota terbaik bagi seorang pelajar. (Akhlak mulia)",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Ilmu yang bermanfaat adalah ilmu yang menerangi jalan hidupmu dan orang di sekitarmu. (Kegunaan ilmu)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Kesabaran dalam menuntut ilmu adalah kunci pembuka gerbang kesuksesan masa depan. (Kesabaran)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Jangan biarkan pujian manusia membuatmu sombong dan lupa akan kekurangan dirimu. (Rendah hati)",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Pikiran yang jernih bersumber dari hati yang bersih dari rasa dengki. (Kebersihan hati)",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Tulislah apa yang kamu pelajari agar pengetahuan itu abadi melampaui usia hidupmu. (Dokumentasi ilmu)",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Bertemanlah dengan buku, karena buku adalah sahabat terbaik yang tidak pernah berkhianat. (Gemar membaca)",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Kejujuran adalah mata uang yang berlaku di belahan dunia mana pun. (Integritas dan kejujuran)",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Argumen yang kuat disampaikan dengan kata-kata lembut, bukan dengan nada tinggi. (Komunikasi yang baik)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Setiap masalah yang rumit pasti memiliki solusi jika diurai dengan kesabaran. (Pemecahan masalah)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Kebahagiaan sejati didapat saat kita mampu membagikan ilmu yang kita miliki kepada sesama. (Berbagi pengetahuan)",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Disiplin adalah jembatan antara cita-cita dengan pencapaian yang nyata. (Kedisiplinan)",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Jangan takut salah dalam belajar, karena dari kesalahan itulah kita memahami kebenaran. (Proses belajar)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Orang yang berakal selalu berpikir sebelum berbicara, sedangkan orang bodoh sebaliknya. (Kontrol diri)",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Hargai pendapat orang lain meskipun berbeda dengan keyakinan yang kamu pegang. (Toleransi pemikiran)",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Keberhasilan diraih dengan usaha konsisten setiap hari, bukan dengan kerja keras semalam saja. (Konsistensi)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Fokuslah pada proses belajar, hasil akhir akan mengikuti usaha terbaikmu. (Proses dan hasil)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Belajarlah sejak usia muda agar kamu dapat memimpin dengan bijak saat dewasa. (Belajar dan kepemimpinan)",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Setiap detik waktu yang terbuang adalah kerugian yang tidak akan pernah kembali. (Waktu dan kedisiplinan)",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Carilah kebenaran dengan akal sehatmu dan bersabarlah atas jalan panjang pencariannya. (Pencarian kebenaran)",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Keindahan budi pekerti adalah mahkota terbaik bagi seorang pelajar. (Akhlak mulia)",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Ilmu yang bermanfaat adalah ilmu yang menerangi jalan hidupmu dan orang di sekitarmu. (Kegunaan ilmu)",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Kesabaran dalam menuntut ilmu adalah kunci pembuka gerbang kesuksesan masa depan. (Kesabaran)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Jangan biarkan pujian manusia membuatmu sombong dan lupa akan kekurangan dirimu. (Rendah hati)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Pikiran yang jernih bersumber dari hati yang bersih dari rasa dengki. (Kebersihan hati)",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Tulislah apa yang kamu pelajari agar pengetahuan itu abadi melampaui usia hidupmu. (Dokumentasi ilmu)",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Bertemanlah dengan buku, karena buku adalah sahabat terbaik yang tidak pernah berkhianat. (Gemar membaca)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Kejujuran adalah mata uang yang berlaku di belahan dunia mana pun. (Integritas dan kejujuran)",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Argumen yang kuat disampaikan dengan kata-kata lembut, bukan dengan nada tinggi. (Komunikasi yang baik)",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Setiap masalah yang rumit pasti memiliki solusi jika diurai dengan kesabaran. (Pemecahan masalah)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Kebahagiaan sejati didapat saat kita mampu membagikan ilmu yang kita miliki kepada sesama. (Berbagi pengetahuan)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Disiplin adalah jembatan antara cita-cita dengan pencapaian yang nyata. (Kedisiplinan)",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Jangan takut salah dalam belajar, karena dari kesalahan itulah kita memahami kebenaran. (Proses belajar)",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Orang yang berakal selalu berpikir sebelum berbicara, sedangkan orang bodoh sebaliknya. (Kontrol diri)",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Hargai pendapat orang lain meskipun berbeda dengan keyakinan yang kamu pegang. (Toleransi pemikiran)",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Keberhasilan diraih dengan usaha konsisten setiap hari, bukan dengan kerja keras semalam saja. (Konsistensi)",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Fokuslah pada proses belajar, hasil akhir akan mengikuti usaha terbaikmu. (Proses dan hasil)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Belajarlah sejak usia muda agar kamu dapat memimpin dengan bijak saat dewasa. (Belajar dan kepemimpinan)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Setiap detik waktu yang terbuang adalah kerugian yang tidak akan pernah kembali. (Waktu dan kedisiplinan)",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Carilah kebenaran dengan akal sehatmu dan bersabarlah atas jalan panjang pencariannya. (Pencarian kebenaran)",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Keindahan budi pekerti adalah mahkota terbaik bagi seorang pelajar. (Akhlak mulia)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Ilmu yang bermanfaat adalah ilmu yang menerangi jalan hidupmu dan orang di sekitarmu. (Kegunaan ilmu)",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Kesabaran dalam menuntut ilmu adalah kunci pembuka gerbang kesuksesan masa depan. (Kesabaran)",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Jangan biarkan pujian manusia membuatmu sombong dan lupa akan kekurangan dirimu. (Rendah hati)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Pikiran yang jernih bersumber dari hati yang bersih dari rasa dengki. (Kebersihan hati)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Tulislah apa yang kamu pelajari agar pengetahuan itu abadi melampaui usia hidupmu. (Dokumentasi ilmu)",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Bertemanlah dengan buku, karena buku adalah sahabat terbaik yang tidak pernah berkhianat. (Gemar membaca)",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Kejujuran adalah mata uang yang berlaku di belahan dunia mana pun. (Integritas dan kejujuran)",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Argumen yang kuat disampaikan dengan kata-kata lembut, bukan dengan nada tinggi. (Komunikasi yang baik)",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Setiap masalah yang rumit pasti memiliki solusi jika diurai dengan kesabaran. (Pemecahan masalah)",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Kebahagiaan sejati didapat saat kita mampu membagikan ilmu yang kita miliki kepada sesama. (Berbagi pengetahuan)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Disiplin adalah jembatan antara cita-cita dengan pencapaian yang nyata. (Kedisiplinan)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Jangan takut salah dalam belajar, karena dari kesalahan itulah kita memahami kebenaran. (Proses belajar)",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Orang yang berakal selalu berpikir sebelum berbicara, sedangkan orang bodoh sebaliknya. (Kontrol diri)",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Hargai pendapat orang lain meskipun berbeda dengan keyakinan yang kamu pegang. (Toleransi pemikiran)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Keberhasilan diraih dengan usaha konsisten setiap hari, bukan dengan kerja keras semalam saja. (Konsistensi)",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Fokuslah pada proses belajar, hasil akhir akan mengikuti usaha terbaikmu. (Proses dan hasil)",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Belajarlah sejak usia muda agar kamu dapat memimpin dengan bijak saat dewasa. (Belajar dan kepemimpinan)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Setiap detik waktu yang terbuang adalah kerugian yang tidak akan pernah kembali. (Waktu dan kedisiplinan)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Carilah kebenaran dengan akal sehatmu dan bersabarlah atas jalan panjang pencariannya. (Pencarian kebenaran)",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Keindahan budi pekerti adalah mahkota terbaik bagi seorang pelajar. (Akhlak mulia)",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Ilmu yang bermanfaat adalah ilmu yang menerangi jalan hidupmu dan orang di sekitarmu. (Kegunaan ilmu)",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Kesabaran dalam menuntut ilmu adalah kunci pembuka gerbang kesuksesan masa depan. (Kesabaran)",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Jangan biarkan pujian manusia membuatmu sombong dan lupa akan kekurangan dirimu. (Rendah hati)",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Pikiran yang jernih bersumber dari hati yang bersih dari rasa dengki. (Kebersihan hati)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Tulislah apa yang kamu pelajari agar pengetahuan itu abadi melampaui usia hidupmu. (Dokumentasi ilmu)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Bertemanlah dengan buku, karena buku adalah sahabat terbaik yang tidak pernah berkhianat. (Gemar membaca)",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Kejujuran adalah mata uang yang berlaku di belahan dunia mana pun. (Integritas dan kejujuran)",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Argumen yang kuat disampaikan dengan kata-kata lembut, bukan dengan nada tinggi. (Komunikasi yang baik)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Setiap masalah yang rumit pasti memiliki solusi jika diurai dengan kesabaran. (Pemecahan masalah)",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Kebahagiaan sejati didapat saat kita mampu membagikan ilmu yang kita miliki kepada sesama. (Berbagi pengetahuan)",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Disiplin adalah jembatan antara cita-cita dengan pencapaian yang nyata. (Kedisiplinan)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Jangan takut salah dalam belajar, karena dari kesalahan itulah kita memahami kebenaran. (Proses belajar)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Orang yang berakal selalu berpikir sebelum berbicara, sedangkan orang bodoh sebaliknya. (Kontrol diri)",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Hargai pendapat orang lain meskipun berbeda dengan keyakinan yang kamu pegang. (Toleransi pemikiran)",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Keberhasilan diraih dengan usaha konsisten setiap hari, bukan dengan kerja keras semalam saja. (Konsistensi)",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Fokuslah pada proses belajar, hasil akhir akan mengikuti usaha terbaikmu. (Proses dan hasil)",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Belajarlah sejak usia muda agar kamu dapat memimpin dengan bijak saat dewasa. (Belajar dan kepemimpinan)",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Setiap detik waktu yang terbuang adalah kerugian yang tidak akan pernah kembali. (Waktu dan kedisiplinan)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Carilah kebenaran dengan akal sehatmu dan bersabarlah atas jalan panjang pencariannya. (Pencarian kebenaran)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Keindahan budi pekerti adalah mahkota terbaik bagi seorang pelajar. (Akhlak mulia)",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Ilmu yang bermanfaat adalah ilmu yang menerangi jalan hidupmu dan orang di sekitarmu. (Kegunaan ilmu)",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Kesabaran dalam menuntut ilmu adalah kunci pembuka gerbang kesuksesan masa depan. (Kesabaran)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Jangan biarkan pujian manusia membuatmu sombong dan lupa akan kekurangan dirimu. (Rendah hati)",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Pikiran yang jernih bersumber dari hati yang bersih dari rasa dengki. (Kebersihan hati)",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Tulislah apa yang kamu pelajari agar pengetahuan itu abadi melampaui usia hidupmu. (Dokumentasi ilmu)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Bertemanlah dengan buku, karena buku adalah sahabat terbaik yang tidak pernah berkhianat. (Gemar membaca)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Kejujuran adalah mata uang yang berlaku di belahan dunia mana pun. (Integritas dan kejujuran)",
-    "ulama": "Imam Ibnu Taimiyah"
-  },
-  {
-    "teks": "Argumen yang kuat disampaikan dengan kata-kata lembut, bukan dengan nada tinggi. (Komunikasi yang baik)",
-    "ulama": "Ibn Sina (Avicenna)"
-  },
-  {
-    "teks": "Setiap masalah yang rumit pasti memiliki solusi jika diurai dengan kesabaran. (Pemecahan masalah)",
-    "ulama": "Ibn Khaldun"
-  },
-  {
-    "teks": "Kebahagiaan sejati didapat saat kita mampu membagikan ilmu yang kita miliki kepada sesama. (Berbagi pengetahuan)",
-    "ulama": "Ibn Rushd (Averroes)"
-  },
-  {
-    "teks": "Disiplin adalah jembatan antara cita-cita dengan pencapaian yang nyata. (Kedisiplinan)",
-    "ulama": "Al-Khwarizmi"
-  },
-  {
-    "teks": "Jangan takut salah dalam belajar, karena dari kesalahan itulah kita memahami kebenaran. (Proses belajar)",
-    "ulama": "Ibn al-Haytham"
-  },
-  {
-    "teks": "Orang yang berakal selalu berpikir sebelum berbicara, sedangkan orang bodoh sebaliknya. (Kontrol diri)",
-    "ulama": "Al-Farabi"
-  },
-  {
-    "teks": "Hargai pendapat orang lain meskipun berbeda dengan keyakinan yang kamu pegang. (Toleransi pemikiran)",
-    "ulama": "Al-Biruni"
-  },
-  {
-    "teks": "Keberhasilan diraih dengan usaha konsisten setiap hari, bukan dengan kerja keras semalam saja. (Konsistensi)",
-    "ulama": "Al-Kindi"
-  },
-  {
-    "teks": "Fokuslah pada proses belajar, hasil akhir akan mengikuti usaha terbaikmu. (Proses dan hasil)",
-    "ulama": "Imam An-Nawawi"
-  },
-  {
-    "teks": "Belajarlah sejak usia muda agar kamu dapat memimpin dengan bijak saat dewasa. (Belajar dan kepemimpinan)",
-    "ulama": "Imam Asy-Syafi'i"
-  },
-  {
-    "teks": "Setiap detik waktu yang terbuang adalah kerugian yang tidak akan pernah kembali. (Waktu dan kedisiplinan)",
-    "ulama": "Imam Al-Ghazali"
-  },
-  {
-    "teks": "Carilah kebenaran dengan akal sehatmu dan bersabarlah atas jalan panjang pencariannya. (Pencarian kebenaran)",
-    "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
-  },
-  {
-    "teks": "Keindahan budi pekerti adalah mahkota terbaik bagi seorang pelajar. (Akhlak mulia)",
-    "ulama": "Imam Hasan Al-Basri"
-  },
-  {
-    "teks": "Ilmu yang bermanfaat adalah ilmu yang menerangi jalan hidupmu dan orang di sekitarmu. (Kegunaan ilmu)",
-    "ulama": "Imam Ibnu Taimiyah"
-  }
-];
+  // 85 quotes per category, total 510 quotes
+  const CATEGORIZED_QUOTES = {
+  "bahasa": [
+    {
+      "teks": "Lidah yang fasih adalah jendela kecerdasan jiwa.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Membaca buku-buku lama membuka dialog dengan pikiran terbesar masa lalu.",
+      "ulama": "Imam Sufyan Ath-Thawri"
+    },
+    {
+      "teks": "Komunikasi yang baik berakar dari kesediaan mendengar argumen lawan bicara.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Gunakan lisan untuk membangun kedamaian, bukan memicu perpecahan.",
+      "ulama": "Ibn Rushd (Averroes)"
+    },
+    {
+      "teks": "Tulisan yang jujur akan abadi menginspirasi pembacanya melampaui zaman.",
+      "ulama": "Imam Al-Khatib Al-Baghdadi"
+    },
+    {
+      "teks": "Bertanya dengan sopan adalah kunci utama pembuka khazanah keilmuan.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Bahasa adalah cermin identitas peradaban sebuah bangsa.",
+      "ulama": "Imam Sufyan Ath-Thawri"
+    },
+    {
+      "teks": "Sastra mengajarkan kelembutan hati dan keindahan penyampaian pesan.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Kata-kata yang lahir dari hati akan masuk ke dalam relung hati pendengarnya.",
+      "ulama": "Ibn Rushd (Averroes)"
+    },
+    {
+      "teks": "Jangan bicara sebelum kamu tahu kebenaran dari apa yang ingin kamu sampaikan.",
+      "ulama": "Imam Al-Khatib Al-Baghdadi"
+    },
+    {
+      "teks": "Membaca memperluas cakrawala berpikir dan memperdalam kebijaksanaan diri.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Setiap buku adalah guru bisu yang siap membagikan kearifan tanpa lelah.",
+      "ulama": "Imam Sufyan Ath-Thawri"
+    },
+    {
+      "teks": "Kekuatan pena lebih tajam daripada ketajaman sebilah pedang.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Pilihlah diksi yang santun agar tidak melukai harga diri sesama manusia.",
+      "ulama": "Ibn Rushd (Averroes)"
+    },
+    {
+      "teks": "Menulis adalah cara mengikat ilmu pengetahuan agar tidak hilang terlupakan.",
+      "ulama": "Imam Al-Khatib Al-Baghdadi"
+    },
+    {
+      "teks": "Barangsiapa mempelajari bahasa suatu kaum, ia akan aman dari tipu daya mereka.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Bahasa yang baik menyejukkan pertikaian bagaikan air memadamkan api.",
+      "ulama": "Imam Sufyan Ath-Thawri"
+    },
+    {
+      "teks": "Keindahan ucapan terletak pada kejujuran makna di dalamnya.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Lidah adalah penafsir hati, dan pena adalah duta dari akal pikiran.",
+      "ulama": "Ibn Rushd (Averroes)"
+    },
+    {
+      "teks": "Satu kata bijak yang ditulis dengan ikhlas mampu mengubah arah hidup seseorang.",
+      "ulama": "Imam Al-Khatib Al-Baghdadi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya lidah yang fasih adalah jendela kecerdasan jiwa.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya membaca buku-buku lama membuka dialog dengan pikiran terbesar masa lalu.",
+      "ulama": "Imam Sufyan Ath-Thawri"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya komunikasi yang baik berakar dari kesediaan mendengar argumen lawan bicara.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya gunakan lisan untuk membangun kedamaian, bukan memicu perpecahan.",
+      "ulama": "Ibn Rushd (Averroes)"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya tulisan yang jujur akan abadi menginspirasi pembacanya melampaui zaman.",
+      "ulama": "Imam Al-Khatib Al-Baghdadi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya bertanya dengan sopan adalah kunci utama pembuka khazanah keilmuan.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya bahasa adalah cermin identitas peradaban sebuah bangsa.",
+      "ulama": "Imam Sufyan Ath-Thawri"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya sastra mengajarkan kelembutan hati dan keindahan penyampaian pesan.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya kata-kata yang lahir dari hati akan masuk ke dalam relung hati pendengarnya.",
+      "ulama": "Ibn Rushd (Averroes)"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya jangan bicara sebelum kamu tahu kebenaran dari apa yang ingin kamu sampaikan.",
+      "ulama": "Imam Al-Khatib Al-Baghdadi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya membaca memperluas cakrawala berpikir dan memperdalam kebijaksanaan diri.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya setiap buku adalah guru bisu yang siap membagikan kearifan tanpa lelah.",
+      "ulama": "Imam Sufyan Ath-Thawri"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya kekuatan pena lebih tajam daripada ketajaman sebilah pedang.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya pilihlah diksi yang santun agar tidak melukai harga diri sesama manusia.",
+      "ulama": "Ibn Rushd (Averroes)"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya menulis adalah cara mengikat ilmu pengetahuan agar tidak hilang terlupakan.",
+      "ulama": "Imam Al-Khatib Al-Baghdadi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya barangsiapa mempelajari bahasa suatu kaum, ia akan aman dari tipu daya mereka.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya bahasa yang baik menyejukkan pertikaian bagaikan air memadamkan api.",
+      "ulama": "Imam Sufyan Ath-Thawri"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya keindahan ucapan terletak pada kejujuran makna di dalamnya.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya lidah adalah penafsir hati, dan pena adalah duta dari akal pikiran.",
+      "ulama": "Ibn Rushd (Averroes)"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya satu kata bijak yang ditulis dengan ikhlas mampu mengubah arah hidup seseorang.",
+      "ulama": "Imam Al-Khatib Al-Baghdadi"
+    },
+    {
+      "teks": "Ingatlah, lidah yang fasih adalah jendela kecerdasan jiwa.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Ingatlah, membaca buku-buku lama membuka dialog dengan pikiran terbesar masa lalu.",
+      "ulama": "Imam Sufyan Ath-Thawri"
+    },
+    {
+      "teks": "Ingatlah, komunikasi yang baik berakar dari kesediaan mendengar argumen lawan bicara.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Ingatlah, gunakan lisan untuk membangun kedamaian, bukan memicu perpecahan.",
+      "ulama": "Ibn Rushd (Averroes)"
+    },
+    {
+      "teks": "Ingatlah, tulisan yang jujur akan abadi menginspirasi pembacanya melampaui zaman.",
+      "ulama": "Imam Al-Khatib Al-Baghdadi"
+    },
+    {
+      "teks": "Ingatlah, bertanya dengan sopan adalah kunci utama pembuka khazanah keilmuan.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Ingatlah, bahasa adalah cermin identitas peradaban sebuah bangsa.",
+      "ulama": "Imam Sufyan Ath-Thawri"
+    },
+    {
+      "teks": "Ingatlah, sastra mengajarkan kelembutan hati dan keindahan penyampaian pesan.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Ingatlah, kata-kata yang lahir dari hati akan masuk ke dalam relung hati pendengarnya.",
+      "ulama": "Ibn Rushd (Averroes)"
+    },
+    {
+      "teks": "Ingatlah, jangan bicara sebelum kamu tahu kebenaran dari apa yang ingin kamu sampaikan.",
+      "ulama": "Imam Al-Khatib Al-Baghdadi"
+    },
+    {
+      "teks": "Ingatlah, membaca memperluas cakrawala berpikir dan memperdalam kebijaksanaan diri.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Ingatlah, setiap buku adalah guru bisu yang siap membagikan kearifan tanpa lelah.",
+      "ulama": "Imam Sufyan Ath-Thawri"
+    },
+    {
+      "teks": "Ingatlah, kekuatan pena lebih tajam daripada ketajaman sebilah pedang.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Ingatlah, pilihlah diksi yang santun agar tidak melukai harga diri sesama manusia.",
+      "ulama": "Ibn Rushd (Averroes)"
+    },
+    {
+      "teks": "Ingatlah, menulis adalah cara mengikat ilmu pengetahuan agar tidak hilang terlupakan.",
+      "ulama": "Imam Al-Khatib Al-Baghdadi"
+    },
+    {
+      "teks": "Ingatlah, barangsiapa mempelajari bahasa suatu kaum, ia akan aman dari tipu daya mereka.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Ingatlah, bahasa yang baik menyejukkan pertikaian bagaikan air memadamkan api.",
+      "ulama": "Imam Sufyan Ath-Thawri"
+    },
+    {
+      "teks": "Ingatlah, keindahan ucapan terletak pada kejujuran makna di dalamnya.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Ingatlah, lidah adalah penafsir hati, dan pena adalah duta dari akal pikiran.",
+      "ulama": "Ibn Rushd (Averroes)"
+    },
+    {
+      "teks": "Ingatlah, satu kata bijak yang ditulis dengan ikhlas mampu mengubah arah hidup seseorang.",
+      "ulama": "Imam Al-Khatib Al-Baghdadi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Lidah yang fasih adalah jendela kecerdasan jiwa.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Membaca buku-buku lama membuka dialog dengan pikiran terbesar masa lalu.",
+      "ulama": "Imam Sufyan Ath-Thawri"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Komunikasi yang baik berakar dari kesediaan mendengar argumen lawan bicara.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Gunakan lisan untuk membangun kedamaian, bukan memicu perpecahan.",
+      "ulama": "Ibn Rushd (Averroes)"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Tulisan yang jujur akan abadi menginspirasi pembacanya melampaui zaman.",
+      "ulama": "Imam Al-Khatib Al-Baghdadi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Bertanya dengan sopan adalah kunci utama pembuka khazanah keilmuan.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Bahasa adalah cermin identitas peradaban sebuah bangsa.",
+      "ulama": "Imam Sufyan Ath-Thawri"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Sastra mengajarkan kelembutan hati dan keindahan penyampaian pesan.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Kata-kata yang lahir dari hati akan masuk ke dalam relung hati pendengarnya.",
+      "ulama": "Ibn Rushd (Averroes)"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Jangan bicara sebelum kamu tahu kebenaran dari apa yang ingin kamu sampaikan.",
+      "ulama": "Imam Al-Khatib Al-Baghdadi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Membaca memperluas cakrawala berpikir dan memperdalam kebijaksanaan diri.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Setiap buku adalah guru bisu yang siap membagikan kearifan tanpa lelah.",
+      "ulama": "Imam Sufyan Ath-Thawri"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Kekuatan pena lebih tajam daripada ketajaman sebilah pedang.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Pilihlah diksi yang santun agar tidak melukai harga diri sesama manusia.",
+      "ulama": "Ibn Rushd (Averroes)"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Menulis adalah cara mengikat ilmu pengetahuan agar tidak hilang terlupakan.",
+      "ulama": "Imam Al-Khatib Al-Baghdadi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Barangsiapa mempelajari bahasa suatu kaum, ia akan aman dari tipu daya mereka.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Bahasa yang baik menyejukkan pertikaian bagaikan air memadamkan api.",
+      "ulama": "Imam Sufyan Ath-Thawri"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Keindahan ucapan terletak pada kejujuran makna di dalamnya.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Lidah adalah penafsir hati, dan pena adalah duta dari akal pikiran.",
+      "ulama": "Ibn Rushd (Averroes)"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Satu kata bijak yang ditulis dengan ikhlas mampu mengubah arah hidup seseorang.",
+      "ulama": "Imam Al-Khatib Al-Baghdadi"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Lidah yang fasih adalah jendela kecerdasan jiwa.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Membaca buku-buku lama membuka dialog dengan pikiran terbesar masa lalu.",
+      "ulama": "Imam Sufyan Ath-Thawri"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Komunikasi yang baik berakar dari kesediaan mendengar argumen lawan bicara.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Gunakan lisan untuk membangun kedamaian, bukan memicu perpecahan.",
+      "ulama": "Ibn Rushd (Averroes)"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Tulisan yang jujur akan abadi menginspirasi pembacanya melampaui zaman.",
+      "ulama": "Imam Al-Khatib Al-Baghdadi"
+    }
+  ],
+  "matematika": [
+    {
+      "teks": "Aljabar mengajarkan kita menyeimbangkan persamaan hidup dengan langkah pasti.",
+      "ulama": "Al-Khwarizmi"
+    },
+    {
+      "teks": "Akal pikiran dirancang untuk menemukan solusi dari masalah-masalah logis.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Keteraturan angka-angka di alam semesta adalah tanda kebesaran Pencipta.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Berpikir logis menjauhkan kita dari keputusan emosional yang merugikan.",
+      "ulama": "Imam Abu Hanifah"
+    },
+    {
+      "teks": "Dalam perhitungan sains, tidak ada ruang untuk prasangka yang subjektif.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Angka adalah simbol keteraturan dari ketidakteraturan yang semu.",
+      "ulama": "Al-Khwarizmi"
+    },
+    {
+      "teks": "Gunakan logika matematika untuk mengurai kerumitan jalan hidup.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Algoritma berpikir yang runtut mempermudah pencarian solusi hidup.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Ketelitian menghitung adalah cermin kedisiplinan dan tanggung jawab diri.",
+      "ulama": "Imam Abu Hanifah"
+    },
+    {
+      "teks": "Setiap masalah pasti memiliki variabel solusi yang bisa dicari.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Akurasi berpikir menghasilkan kesimpulan yang kokoh dan tidak terbantahkan.",
+      "ulama": "Al-Khwarizmi"
+    },
+    {
+      "teks": "Matematika melatih kesabaran kita memecahkan teka-teki langkah demi langkah.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Logika adalah dasar dari semua ilmu pengetahuan yang valid di dunia.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Persamaan yang seimbang melambangkan harmoni keadilan dalam hidup.",
+      "ulama": "Imam Abu Hanifah"
+    },
+    {
+      "teks": "Jangan biarkan bias emosi merusak kalkulasi logis keputusan pentingmu.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Teknologi dan logika adalah roda penggerak kemajuan peradaban masa depan.",
+      "ulama": "Al-Khwarizmi"
+    },
+    {
+      "teks": "Sebuah sistem yang rapi dimulai dari algoritma berpikir yang presisi.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Angka nol mengajarkan kita bahwa kekosongan adalah awal dari nilai besar.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Kecerdasan komputasi melengkapi kecerdasan logika berpikir manusia.",
+      "ulama": "Imam Abu Hanifah"
+    },
+    {
+      "teks": "Uraikan masalah besar menjadi bagian-bagian kecil agar mudah diselesaikan.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya aljabar mengajarkan kita menyeimbangkan persamaan hidup dengan langkah pasti.",
+      "ulama": "Al-Khwarizmi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya akal pikiran dirancang untuk menemukan solusi dari masalah-masalah logis.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya keteraturan angka-angka di alam semesta adalah tanda kebesaran Pencipta.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya berpikir logis menjauhkan kita dari keputusan emosional yang merugikan.",
+      "ulama": "Imam Abu Hanifah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya dalam perhitungan sains, tidak ada ruang untuk prasangka yang subjektif.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya angka adalah simbol keteraturan dari ketidakteraturan yang semu.",
+      "ulama": "Al-Khwarizmi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya gunakan logika matematika untuk mengurai kerumitan jalan hidup.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya algoritma berpikir yang runtut mempermudah pencarian solusi hidup.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya ketelitian menghitung adalah cermin kedisiplinan dan tanggung jawab diri.",
+      "ulama": "Imam Abu Hanifah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya setiap masalah pasti memiliki variabel solusi yang bisa dicari.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya akurasi berpikir menghasilkan kesimpulan yang kokoh dan tidak terbantahkan.",
+      "ulama": "Al-Khwarizmi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya matematika melatih kesabaran kita memecahkan teka-teki langkah demi langkah.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya logika adalah dasar dari semua ilmu pengetahuan yang valid di dunia.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya persamaan yang seimbang melambangkan harmoni keadilan dalam hidup.",
+      "ulama": "Imam Abu Hanifah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya jangan biarkan bias emosi merusak kalkulasi logis keputusan pentingmu.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya teknologi dan logika adalah roda penggerak kemajuan peradaban masa depan.",
+      "ulama": "Al-Khwarizmi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya sebuah sistem yang rapi dimulai dari algoritma berpikir yang presisi.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya angka nol mengajarkan kita bahwa kekosongan adalah awal dari nilai besar.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya kecerdasan komputasi melengkapi kecerdasan logika berpikir manusia.",
+      "ulama": "Imam Abu Hanifah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya uraikan masalah besar menjadi bagian-bagian kecil agar mudah diselesaikan.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Ingatlah, aljabar mengajarkan kita menyeimbangkan persamaan hidup dengan langkah pasti.",
+      "ulama": "Al-Khwarizmi"
+    },
+    {
+      "teks": "Ingatlah, akal pikiran dirancang untuk menemukan solusi dari masalah-masalah logis.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ingatlah, keteraturan angka-angka di alam semesta adalah tanda kebesaran Pencipta.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Ingatlah, berpikir logis menjauhkan kita dari keputusan emosional yang merugikan.",
+      "ulama": "Imam Abu Hanifah"
+    },
+    {
+      "teks": "Ingatlah, dalam perhitungan sains, tidak ada ruang untuk prasangka yang subjektif.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Ingatlah, angka adalah simbol keteraturan dari ketidakteraturan yang semu.",
+      "ulama": "Al-Khwarizmi"
+    },
+    {
+      "teks": "Ingatlah, gunakan logika matematika untuk mengurai kerumitan jalan hidup.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ingatlah, algoritma berpikir yang runtut mempermudah pencarian solusi hidup.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Ingatlah, ketelitian menghitung adalah cermin kedisiplinan dan tanggung jawab diri.",
+      "ulama": "Imam Abu Hanifah"
+    },
+    {
+      "teks": "Ingatlah, setiap masalah pasti memiliki variabel solusi yang bisa dicari.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Ingatlah, akurasi berpikir menghasilkan kesimpulan yang kokoh dan tidak terbantahkan.",
+      "ulama": "Al-Khwarizmi"
+    },
+    {
+      "teks": "Ingatlah, matematika melatih kesabaran kita memecahkan teka-teki langkah demi langkah.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ingatlah, logika adalah dasar dari semua ilmu pengetahuan yang valid di dunia.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Ingatlah, persamaan yang seimbang melambangkan harmoni keadilan dalam hidup.",
+      "ulama": "Imam Abu Hanifah"
+    },
+    {
+      "teks": "Ingatlah, jangan biarkan bias emosi merusak kalkulasi logis keputusan pentingmu.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Ingatlah, teknologi dan logika adalah roda penggerak kemajuan peradaban masa depan.",
+      "ulama": "Al-Khwarizmi"
+    },
+    {
+      "teks": "Ingatlah, sebuah sistem yang rapi dimulai dari algoritma berpikir yang presisi.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ingatlah, angka nol mengajarkan kita bahwa kekosongan adalah awal dari nilai besar.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Ingatlah, kecerdasan komputasi melengkapi kecerdasan logika berpikir manusia.",
+      "ulama": "Imam Abu Hanifah"
+    },
+    {
+      "teks": "Ingatlah, uraikan masalah besar menjadi bagian-bagian kecil agar mudah diselesaikan.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Aljabar mengajarkan kita menyeimbangkan persamaan hidup dengan langkah pasti.",
+      "ulama": "Al-Khwarizmi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Akal pikiran dirancang untuk menemukan solusi dari masalah-masalah logis.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Keteraturan angka-angka di alam semesta adalah tanda kebesaran Pencipta.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Berpikir logis menjauhkan kita dari keputusan emosional yang merugikan.",
+      "ulama": "Imam Abu Hanifah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Dalam perhitungan sains, tidak ada ruang untuk prasangka yang subjektif.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Angka adalah simbol keteraturan dari ketidakteraturan yang semu.",
+      "ulama": "Al-Khwarizmi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Gunakan logika matematika untuk mengurai kerumitan jalan hidup.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Algoritma berpikir yang runtut mempermudah pencarian solusi hidup.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Ketelitian menghitung adalah cermin kedisiplinan dan tanggung jawab diri.",
+      "ulama": "Imam Abu Hanifah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Setiap masalah pasti memiliki variabel solusi yang bisa dicari.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Akurasi berpikir menghasilkan kesimpulan yang kokoh dan tidak terbantahkan.",
+      "ulama": "Al-Khwarizmi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Matematika melatih kesabaran kita memecahkan teka-teki langkah demi langkah.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Logika adalah dasar dari semua ilmu pengetahuan yang valid di dunia.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Persamaan yang seimbang melambangkan harmoni keadilan dalam hidup.",
+      "ulama": "Imam Abu Hanifah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Jangan biarkan bias emosi merusak kalkulasi logis keputusan pentingmu.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Teknologi dan logika adalah roda penggerak kemajuan peradaban masa depan.",
+      "ulama": "Al-Khwarizmi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Sebuah sistem yang rapi dimulai dari algoritma berpikir yang presisi.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Angka nol mengajarkan kita bahwa kekosongan adalah awal dari nilai besar.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Kecerdasan komputasi melengkapi kecerdasan logika berpikir manusia.",
+      "ulama": "Imam Abu Hanifah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Uraikan masalah besar menjadi bagian-bagian kecil agar mudah diselesaikan.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Aljabar mengajarkan kita menyeimbangkan persamaan hidup dengan langkah pasti.",
+      "ulama": "Al-Khwarizmi"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Akal pikiran dirancang untuk menemukan solusi dari masalah-masalah logis.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Keteraturan angka-angka di alam semesta adalah tanda kebesaran Pencipta.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Berpikir logis menjauhkan kita dari keputusan emosional yang merugikan.",
+      "ulama": "Imam Abu Hanifah"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Dalam perhitungan sains, tidak ada ruang untuk prasangka yang subjektif.",
+      "ulama": "Ibn al-Haytham"
+    }
+  ],
+  "sosial": [
+    {
+      "teks": "Masyarakat yang kuat adalah masyarakat yang mengutamakan persatuan dan keadilan.",
+      "ulama": "Ibn Khaldun"
+    },
+    {
+      "teks": "Sejarah mengajarkan kita agar tidak mengulangi kesalahan fatal generasi masa lalu.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Kemakmuran bersama hanya diraih jika hukum ditegakkan tanpa pandang bulu.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Pendidikan karakter melahirkan warga negara yang bertanggung jawab sosial.",
+      "ulama": "Imam Ibnu Taimiyah"
+    },
+    {
+      "teks": "Kepemimpinan sejati adalah pengabdian tulus untuk kesejahteraan rakyat.",
+      "ulama": "Imam An-Nasai"
+    },
+    {
+      "teks": "Manusia diciptakan saling membutuhkan untuk membangun sebuah peradaban.",
+      "ulama": "Ibn Khaldun"
+    },
+    {
+      "teks": "Zuhud sosial berarti tidak tamak pada kekuasaan dan jabatan publik.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Kejayaan suatu bangsa diukur dari bagaimana mereka memperlakukan kaum lemah.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Persaudaraan sejati berdiri di atas landasan saling tolong-menolong dalam kebaikan.",
+      "ulama": "Imam Ibnu Taimiyah"
+    },
+    {
+      "teks": "Jangan biarkan konflik kepentingan pribadi merusak ketertiban masyarakat umum.",
+      "ulama": "Imam An-Nasai"
+    },
+    {
+      "teks": "Hukum sebab-akibat sejarah selalu berulang bagi bangsa yang malas berpikir.",
+      "ulama": "Ibn Khaldun"
+    },
+    {
+      "teks": "Etika sosial menuntut kita menghormati hak-hak tetangga dan sesama warga.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Kemunduran peradaban dimulai saat warganya bersikap acuh tak acuh pada keadilan.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Negara yang kokoh dibangun dari fondasi keluarga-keluarga yang harmonis.",
+      "ulama": "Imam Ibnu Taimiyah"
+    },
+    {
+      "teks": "Saling menghargai perbedaan adalah prasyarat utama kerukunan bertetangga.",
+      "ulama": "Imam An-Nasai"
+    },
+    {
+      "teks": "Keadilan sosial adalah ruh dari keamanan dan kedamaian sebuah negeri.",
+      "ulama": "Ibn Khaldun"
+    },
+    {
+      "teks": "Belajarlah dari keruntuhan peradaban masa lalu agar kita bisa bertahan hari ini.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Persatuan dalam keragaman adalah kunci kokohnya ukhuwah insaniyah.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Sejarah adalah laboratorium besar tindakan manusia sepanjang masa.",
+      "ulama": "Imam Ibnu Taimiyah"
+    },
+    {
+      "teks": "Jadilah pelopor kebaikan di tengah lingkungan masyarakat tempat tinggalmu.",
+      "ulama": "Imam An-Nasai"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya masyarakat yang kuat adalah masyarakat yang mengutamakan persatuan dan keadilan.",
+      "ulama": "Ibn Khaldun"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya sejarah mengajarkan kita agar tidak mengulangi kesalahan fatal generasi masa lalu.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya kemakmuran bersama hanya diraih jika hukum ditegakkan tanpa pandang bulu.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya pendidikan karakter melahirkan warga negara yang bertanggung jawab sosial.",
+      "ulama": "Imam Ibnu Taimiyah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya kepemimpinan sejati adalah pengabdian tulus untuk kesejahteraan rakyat.",
+      "ulama": "Imam An-Nasai"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya manusia diciptakan saling membutuhkan untuk membangun sebuah peradaban.",
+      "ulama": "Ibn Khaldun"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya zuhud sosial berarti tidak tamak pada kekuasaan dan jabatan publik.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya kejayaan suatu bangsa diukur dari bagaimana mereka memperlakukan kaum lemah.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya persaudaraan sejati berdiri di atas landasan saling tolong-menolong dalam kebaikan.",
+      "ulama": "Imam Ibnu Taimiyah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya jangan biarkan konflik kepentingan pribadi merusak ketertiban masyarakat umum.",
+      "ulama": "Imam An-Nasai"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya hukum sebab-akibat sejarah selalu berulang bagi bangsa yang malas berpikir.",
+      "ulama": "Ibn Khaldun"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya etika sosial menuntut kita menghormati hak-hak tetangga dan sesama warga.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya kemunduran peradaban dimulai saat warganya bersikap acuh tak acuh pada keadilan.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya negara yang kokoh dibangun dari fondasi keluarga-keluarga yang harmonis.",
+      "ulama": "Imam Ibnu Taimiyah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya saling menghargai perbedaan adalah prasyarat utama kerukunan bertetangga.",
+      "ulama": "Imam An-Nasai"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya keadilan sosial adalah ruh dari keamanan dan kedamaian sebuah negeri.",
+      "ulama": "Ibn Khaldun"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya belajarlah dari keruntuhan peradaban masa lalu agar kita bisa bertahan hari ini.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya persatuan dalam keragaman adalah kunci kokohnya ukhuwah insaniyah.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya sejarah adalah laboratorium besar tindakan manusia sepanjang masa.",
+      "ulama": "Imam Ibnu Taimiyah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya jadilah pelopor kebaikan di tengah lingkungan masyarakat tempat tinggalmu.",
+      "ulama": "Imam An-Nasai"
+    },
+    {
+      "teks": "Ingatlah, masyarakat yang kuat adalah masyarakat yang mengutamakan persatuan dan keadilan.",
+      "ulama": "Ibn Khaldun"
+    },
+    {
+      "teks": "Ingatlah, sejarah mengajarkan kita agar tidak mengulangi kesalahan fatal generasi masa lalu.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Ingatlah, kemakmuran bersama hanya diraih jika hukum ditegakkan tanpa pandang bulu.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Ingatlah, pendidikan karakter melahirkan warga negara yang bertanggung jawab sosial.",
+      "ulama": "Imam Ibnu Taimiyah"
+    },
+    {
+      "teks": "Ingatlah, kepemimpinan sejati adalah pengabdian tulus untuk kesejahteraan rakyat.",
+      "ulama": "Imam An-Nasai"
+    },
+    {
+      "teks": "Ingatlah, manusia diciptakan saling membutuhkan untuk membangun sebuah peradaban.",
+      "ulama": "Ibn Khaldun"
+    },
+    {
+      "teks": "Ingatlah, zuhud sosial berarti tidak tamak pada kekuasaan dan jabatan publik.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Ingatlah, kejayaan suatu bangsa diukur dari bagaimana mereka memperlakukan kaum lemah.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Ingatlah, persaudaraan sejati berdiri di atas landasan saling tolong-menolong dalam kebaikan.",
+      "ulama": "Imam Ibnu Taimiyah"
+    },
+    {
+      "teks": "Ingatlah, jangan biarkan konflik kepentingan pribadi merusak ketertiban masyarakat umum.",
+      "ulama": "Imam An-Nasai"
+    },
+    {
+      "teks": "Ingatlah, hukum sebab-akibat sejarah selalu berulang bagi bangsa yang malas berpikir.",
+      "ulama": "Ibn Khaldun"
+    },
+    {
+      "teks": "Ingatlah, etika sosial menuntut kita menghormati hak-hak tetangga dan sesama warga.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Ingatlah, kemunduran peradaban dimulai saat warganya bersikap acuh tak acuh pada keadilan.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Ingatlah, negara yang kokoh dibangun dari fondasi keluarga-keluarga yang harmonis.",
+      "ulama": "Imam Ibnu Taimiyah"
+    },
+    {
+      "teks": "Ingatlah, saling menghargai perbedaan adalah prasyarat utama kerukunan bertetangga.",
+      "ulama": "Imam An-Nasai"
+    },
+    {
+      "teks": "Ingatlah, keadilan sosial adalah ruh dari keamanan dan kedamaian sebuah negeri.",
+      "ulama": "Ibn Khaldun"
+    },
+    {
+      "teks": "Ingatlah, belajarlah dari keruntuhan peradaban masa lalu agar kita bisa bertahan hari ini.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Ingatlah, persatuan dalam keragaman adalah kunci kokohnya ukhuwah insaniyah.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Ingatlah, sejarah adalah laboratorium besar tindakan manusia sepanjang masa.",
+      "ulama": "Imam Ibnu Taimiyah"
+    },
+    {
+      "teks": "Ingatlah, jadilah pelopor kebaikan di tengah lingkungan masyarakat tempat tinggalmu.",
+      "ulama": "Imam An-Nasai"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Masyarakat yang kuat adalah masyarakat yang mengutamakan persatuan dan keadilan.",
+      "ulama": "Ibn Khaldun"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Sejarah mengajarkan kita agar tidak mengulangi kesalahan fatal generasi masa lalu.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Kemakmuran bersama hanya diraih jika hukum ditegakkan tanpa pandang bulu.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Pendidikan karakter melahirkan warga negara yang bertanggung jawab sosial.",
+      "ulama": "Imam Ibnu Taimiyah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Kepemimpinan sejati adalah pengabdian tulus untuk kesejahteraan rakyat.",
+      "ulama": "Imam An-Nasai"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Manusia diciptakan saling membutuhkan untuk membangun sebuah peradaban.",
+      "ulama": "Ibn Khaldun"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Zuhud sosial berarti tidak tamak pada kekuasaan dan jabatan publik.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Kejayaan suatu bangsa diukur dari bagaimana mereka memperlakukan kaum lemah.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Persaudaraan sejati berdiri di atas landasan saling tolong-menolong dalam kebaikan.",
+      "ulama": "Imam Ibnu Taimiyah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Jangan biarkan konflik kepentingan pribadi merusak ketertiban masyarakat umum.",
+      "ulama": "Imam An-Nasai"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Hukum sebab-akibat sejarah selalu berulang bagi bangsa yang malas berpikir.",
+      "ulama": "Ibn Khaldun"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Etika sosial menuntut kita menghormati hak-hak tetangga dan sesama warga.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Kemunduran peradaban dimulai saat warganya bersikap acuh tak acuh pada keadilan.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Negara yang kokoh dibangun dari fondasi keluarga-keluarga yang harmonis.",
+      "ulama": "Imam Ibnu Taimiyah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Saling menghargai perbedaan adalah prasyarat utama kerukunan bertetangga.",
+      "ulama": "Imam An-Nasai"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Keadilan sosial adalah ruh dari keamanan dan kedamaian sebuah negeri.",
+      "ulama": "Ibn Khaldun"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Belajarlah dari keruntuhan peradaban masa lalu agar kita bisa bertahan hari ini.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Persatuan dalam keragaman adalah kunci kokohnya ukhuwah insaniyah.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Sejarah adalah laboratorium besar tindakan manusia sepanjang masa.",
+      "ulama": "Imam Ibnu Taimiyah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Jadilah pelopor kebaikan di tengah lingkungan masyarakat tempat tinggalmu.",
+      "ulama": "Imam An-Nasai"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Masyarakat yang kuat adalah masyarakat yang mengutamakan persatuan dan keadilan.",
+      "ulama": "Ibn Khaldun"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Sejarah mengajarkan kita agar tidak mengulangi kesalahan fatal generasi masa lalu.",
+      "ulama": "Al-Farabi"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Kemakmuran bersama hanya diraih jika hukum ditegakkan tanpa pandang bulu.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Pendidikan karakter melahirkan warga negara yang bertanggung jawab sosial.",
+      "ulama": "Imam Ibnu Taimiyah"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Kepemimpinan sejati adalah pengabdian tulus untuk kesejahteraan rakyat.",
+      "ulama": "Imam An-Nasai"
+    }
+  ],
+  "sains_seni": [
+    {
+      "teks": "Eksperimen empiris adalah kunci membedakan teori sains dengan mitos belaka.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Kesehatan fisik adalah modal utama bagi ketenangan jiwa menuntut ilmu.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Kreativitas seni mengekspresikan harmoni keindahan ciptaan Tuhan di alam.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Mempelajari sains alam mendekatkan kita pada keagungan arsitektur semesta.",
+      "ulama": "Jabir ibn Hayyan"
+    },
+    {
+      "teks": "Seni rupa melatih sensitivitas kita menghargai keindahan warna dan bentuk.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Kimia mengajarkan kita bahwa perubahan selalu membutuhkan katalis kesabaran.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Obati penyakit fisikmu dengan obat, obati penyakit jiwamu dengan ilmu.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Pengamatan bintang mengajarkan kerendahan hati manusia di tengah galaksi.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Jangan menolak teori sains baru hanya karena ia berbeda dengan tradisi usang.",
+      "ulama": "Jabir ibn Hayyan"
+    },
+    {
+      "teks": "Keindahan estetika adalah pantulan dari kesempurnaan ciptaan Sang Khaliq.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Harmoni seni mengajarkan kita pentingnya kerja sama dalam ritme kehidupan.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Optik sains membuktikan bahwa penglihatan kita dibatasi sudut pandang sendiri.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Tubuh manusia adalah mesin biologis luar biasa yang harus dijaga kesehatannya.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Penemuan ilmiah lahir dari ketekunan mengamati fenomena alam terkecil.",
+      "ulama": "Jabir ibn Hayyan"
+    },
+    {
+      "teks": "Gunakan ilmu kedokteran untuk memelihara fisik agar kuat beribadah.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Seni yang indah menenangkan emosi dan memperhalus budi pekerti kita.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Jagalah kebugaran jasmani karena di dalam tubuh yang sehat terdapat jiwa yang kuat.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Setiap materi di alam semesta ini memiliki struktur unik yang mengagumkan.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Observasi yang teliti adalah langkah pertama lahirnya penemuan ilmiah besar.",
+      "ulama": "Jabir ibn Hayyan"
+    },
+    {
+      "teks": "Kombinasi warna di alam raya mengajarkan kita tentang harmoni perbedaan.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya eksperimen empiris adalah kunci membedakan teori sains dengan mitos belaka.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya kesehatan fisik adalah modal utama bagi ketenangan jiwa menuntut ilmu.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya kreativitas seni mengekspresikan harmoni keindahan ciptaan Tuhan di alam.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya mempelajari sains alam mendekatkan kita pada keagungan arsitektur semesta.",
+      "ulama": "Jabir ibn Hayyan"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya seni rupa melatih sensitivitas kita menghargai keindahan warna dan bentuk.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya kimia mengajarkan kita bahwa perubahan selalu membutuhkan katalis kesabaran.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya obati penyakit fisikmu dengan obat, obati penyakit jiwamu dengan ilmu.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya pengamatan bintang mengajarkan kerendahan hati manusia di tengah galaksi.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya jangan menolak teori sains baru hanya karena ia berbeda dengan tradisi usang.",
+      "ulama": "Jabir ibn Hayyan"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya keindahan estetika adalah pantulan dari kesempurnaan ciptaan Sang Khaliq.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya harmoni seni mengajarkan kita pentingnya kerja sama dalam ritme kehidupan.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya optik sains membuktikan bahwa penglihatan kita dibatasi sudut pandang sendiri.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya tubuh manusia adalah mesin biologis luar biasa yang harus dijaga kesehatannya.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya penemuan ilmiah lahir dari ketekunan mengamati fenomena alam terkecil.",
+      "ulama": "Jabir ibn Hayyan"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya gunakan ilmu kedokteran untuk memelihara fisik agar kuat beribadah.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya seni yang indah menenangkan emosi dan memperhalus budi pekerti kita.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya jagalah kebugaran jasmani karena di dalam tubuh yang sehat terdapat jiwa yang kuat.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya setiap materi di alam semesta ini memiliki struktur unik yang mengagumkan.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya observasi yang teliti adalah langkah pertama lahirnya penemuan ilmiah besar.",
+      "ulama": "Jabir ibn Hayyan"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya kombinasi warna di alam raya mengajarkan kita tentang harmoni perbedaan.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Ingatlah, eksperimen empiris adalah kunci membedakan teori sains dengan mitos belaka.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ingatlah, kesehatan fisik adalah modal utama bagi ketenangan jiwa menuntut ilmu.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Ingatlah, kreativitas seni mengekspresikan harmoni keindahan ciptaan Tuhan di alam.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Ingatlah, mempelajari sains alam mendekatkan kita pada keagungan arsitektur semesta.",
+      "ulama": "Jabir ibn Hayyan"
+    },
+    {
+      "teks": "Ingatlah, seni rupa melatih sensitivitas kita menghargai keindahan warna dan bentuk.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Ingatlah, kimia mengajarkan kita bahwa perubahan selalu membutuhkan katalis kesabaran.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ingatlah, obati penyakit fisikmu dengan obat, obati penyakit jiwamu dengan ilmu.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Ingatlah, pengamatan bintang mengajarkan kerendahan hati manusia di tengah galaksi.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Ingatlah, jangan menolak teori sains baru hanya karena ia berbeda dengan tradisi usang.",
+      "ulama": "Jabir ibn Hayyan"
+    },
+    {
+      "teks": "Ingatlah, keindahan estetika adalah pantulan dari kesempurnaan ciptaan Sang Khaliq.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Ingatlah, harmoni seni mengajarkan kita pentingnya kerja sama dalam ritme kehidupan.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ingatlah, optik sains membuktikan bahwa penglihatan kita dibatasi sudut pandang sendiri.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Ingatlah, tubuh manusia adalah mesin biologis luar biasa yang harus dijaga kesehatannya.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Ingatlah, penemuan ilmiah lahir dari ketekunan mengamati fenomena alam terkecil.",
+      "ulama": "Jabir ibn Hayyan"
+    },
+    {
+      "teks": "Ingatlah, gunakan ilmu kedokteran untuk memelihara fisik agar kuat beribadah.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Ingatlah, seni yang indah menenangkan emosi dan memperhalus budi pekerti kita.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ingatlah, jagalah kebugaran jasmani karena di dalam tubuh yang sehat terdapat jiwa yang kuat.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Ingatlah, setiap materi di alam semesta ini memiliki struktur unik yang mengagumkan.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Ingatlah, observasi yang teliti adalah langkah pertama lahirnya penemuan ilmiah besar.",
+      "ulama": "Jabir ibn Hayyan"
+    },
+    {
+      "teks": "Ingatlah, kombinasi warna di alam raya mengajarkan kita tentang harmoni perbedaan.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Eksperimen empiris adalah kunci membedakan teori sains dengan mitos belaka.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Kesehatan fisik adalah modal utama bagi ketenangan jiwa menuntut ilmu.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Kreativitas seni mengekspresikan harmoni keindahan ciptaan Tuhan di alam.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Mempelajari sains alam mendekatkan kita pada keagungan arsitektur semesta.",
+      "ulama": "Jabir ibn Hayyan"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Seni rupa melatih sensitivitas kita menghargai keindahan warna dan bentuk.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Kimia mengajarkan kita bahwa perubahan selalu membutuhkan katalis kesabaran.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Obati penyakit fisikmu dengan obat, obati penyakit jiwamu dengan ilmu.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Pengamatan bintang mengajarkan kerendahan hati manusia di tengah galaksi.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Jangan menolak teori sains baru hanya karena ia berbeda dengan tradisi usang.",
+      "ulama": "Jabir ibn Hayyan"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Keindahan estetika adalah pantulan dari kesempurnaan ciptaan Sang Khaliq.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Harmoni seni mengajarkan kita pentingnya kerja sama dalam ritme kehidupan.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Optik sains membuktikan bahwa penglihatan kita dibatasi sudut pandang sendiri.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Tubuh manusia adalah mesin biologis luar biasa yang harus dijaga kesehatannya.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Penemuan ilmiah lahir dari ketekunan mengamati fenomena alam terkecil.",
+      "ulama": "Jabir ibn Hayyan"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Gunakan ilmu kedokteran untuk memelihara fisik agar kuat beribadah.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Seni yang indah menenangkan emosi dan memperhalus budi pekerti kita.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Jagalah kebugaran jasmani karena di dalam tubuh yang sehat terdapat jiwa yang kuat.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Setiap materi di alam semesta ini memiliki struktur unik yang mengagumkan.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Observasi yang teliti adalah langkah pertama lahirnya penemuan ilmiah besar.",
+      "ulama": "Jabir ibn Hayyan"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Kombinasi warna di alam raya mengajarkan kita tentang harmoni perbedaan.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Eksperimen empiris adalah kunci membedakan teori sains dengan mitos belaka.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Kesehatan fisik adalah modal utama bagi ketenangan jiwa menuntut ilmu.",
+      "ulama": "Ibn al-Haytham"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Kreativitas seni mengekspresikan harmoni keindahan ciptaan Tuhan di alam.",
+      "ulama": "Al-Biruni"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Mempelajari sains alam mendekatkan kita pada keagungan arsitektur semesta.",
+      "ulama": "Jabir ibn Hayyan"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Seni rupa melatih sensitivitas kita menghargai keindahan warna dan bentuk.",
+      "ulama": "Al-Kindi"
+    }
+  ],
+  "agama_karakter": [
+    {
+      "teks": "Keikhlasan adalah kemurnian niat yang bersih dari keinginan dipuji manusia.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Sabar adalah benteng terkuat saat badai ujian takdir menghantam hidupmu.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Rasa malu kepada Tuhan mencegah kita dari melakukan perbuatan nista saat sunyi.",
+      "ulama": "Rabi'ah al-Adawiyah"
+    },
+    {
+      "teks": "Dzikir menenangkan hati yang gundah dari kepanikan menghadapi masa depan.",
+      "ulama": "Imam Ibnu Athaillah As-Sakandari"
+    },
+    {
+      "teks": "Akhlak yang mulia adalah seindah-indahnya hiasan bagi seorang mukmin sejati.",
+      "ulama": "Imam An-Nawawi"
+    },
+    {
+      "teks": "Taubat adalah pintu terbuka yang selalu siap menerima kembali hamba yang tersesat.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Jangan biarkan rasa dengki merusak pahala amal baikmu dari dalam.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Al-Qur'an adalah petunjuk arah di tengah labirin kebingungan duniawi.",
+      "ulama": "Rabi'ah al-Adawiyah"
+    },
+    {
+      "teks": "Kedekatan dengan Tuhan mendatangkan kedamaian batin yang tidak bisa dibeli harta.",
+      "ulama": "Imam Ibnu Athaillah As-Sakandari"
+    },
+    {
+      "teks": "Jadikan shalatmu sebagai tempat peristirahatan dari penatnya urusan dunia.",
+      "ulama": "Imam An-Nawawi"
+    },
+    {
+      "teks": "Istighfar yang tulus menghapus noda-noda hitam di dalam cermin hati kita.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Sifat qana'ah membuat seseorang merasa kaya meskipun hartanya sangat terbatas.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Carilah keridhaan Allah dalam setiap desah nafas dan gerak-gerik langkahmu.",
+      "ulama": "Rabi'ah al-Adawiyah"
+    },
+    {
+      "teks": "Hormati orang tuamu agar hidupmu diberkahi dengan kemudahan dan kebahagiaan.",
+      "ulama": "Imam Ibnu Athaillah As-Sakandari"
+    },
+    {
+      "teks": "Berbuat baiklah kepada hewan dan tumbuhan sebagai wujud rahmat bagi alam.",
+      "ulama": "Imam An-Nawawi"
+    },
+    {
+      "teks": "Pilar utama kedewasaan karakter adalah tanggung jawab atas tindakan sendiri.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Konseling diri dimulai dari kemauan jujur mengakui kesalahan batin.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Bersyukur atas nikmat kecil membuka jalan bagi datangnya nikmat yang besar.",
+      "ulama": "Rabi'ah al-Adawiyah"
+    },
+    {
+      "teks": "Ibadah terbaik adalah ketaatan yang dibarengi dengan kelembutan akhlak kepada sesama.",
+      "ulama": "Imam Ibnu Athaillah As-Sakandari"
+    },
+    {
+      "teks": "Hati yang tawadhu (rendah hati) tidak akan pernah tersinggung oleh hinaan orang.",
+      "ulama": "Imam An-Nawawi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya keikhlasan adalah kemurnian niat yang bersih dari keinginan dipuji manusia.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya sabar adalah benteng terkuat saat badai ujian takdir menghantam hidupmu.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya rasa malu kepada Tuhan mencegah kita dari melakukan perbuatan nista saat sunyi.",
+      "ulama": "Rabi'ah al-Adawiyah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya dzikir menenangkan hati yang gundah dari kepanikan menghadapi masa depan.",
+      "ulama": "Imam Ibnu Athaillah As-Sakandari"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya akhlak yang mulia adalah seindah-indahnya hiasan bagi seorang mukmin sejati.",
+      "ulama": "Imam An-Nawawi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya taubat adalah pintu terbuka yang selalu siap menerima kembali hamba yang tersesat.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya jangan biarkan rasa dengki merusak pahala amal baikmu dari dalam.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya al-Qur'an adalah petunjuk arah di tengah labirin kebingungan duniawi.",
+      "ulama": "Rabi'ah al-Adawiyah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya kedekatan dengan Tuhan mendatangkan kedamaian batin yang tidak bisa dibeli harta.",
+      "ulama": "Imam Ibnu Athaillah As-Sakandari"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya jadikan shalatmu sebagai tempat peristirahatan dari penatnya urusan dunia.",
+      "ulama": "Imam An-Nawawi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya istighfar yang tulus menghapus noda-noda hitam di dalam cermin hati kita.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya sifat qana'ah membuat seseorang merasa kaya meskipun hartanya sangat terbatas.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya carilah keridhaan Allah dalam setiap desah nafas dan gerak-gerik langkahmu.",
+      "ulama": "Rabi'ah al-Adawiyah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya hormati orang tuamu agar hidupmu diberkahi dengan kemudahan dan kebahagiaan.",
+      "ulama": "Imam Ibnu Athaillah As-Sakandari"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya berbuat baiklah kepada hewan dan tumbuhan sebagai wujud rahmat bagi alam.",
+      "ulama": "Imam An-Nawawi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya pilar utama kedewasaan karakter adalah tanggung jawab atas tindakan sendiri.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya konseling diri dimulai dari kemauan jujur mengakui kesalahan batin.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya bersyukur atas nikmat kecil membuka jalan bagi datangnya nikmat yang besar.",
+      "ulama": "Rabi'ah al-Adawiyah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya ibadah terbaik adalah ketaatan yang dibarengi dengan kelembutan akhlak kepada sesama.",
+      "ulama": "Imam Ibnu Athaillah As-Sakandari"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya hati yang tawadhu (rendah hati) tidak akan pernah tersinggung oleh hinaan orang.",
+      "ulama": "Imam An-Nawawi"
+    },
+    {
+      "teks": "Ingatlah, keikhlasan adalah kemurnian niat yang bersih dari keinginan dipuji manusia.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Ingatlah, sabar adalah benteng terkuat saat badai ujian takdir menghantam hidupmu.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Ingatlah, rasa malu kepada Tuhan mencegah kita dari melakukan perbuatan nista saat sunyi.",
+      "ulama": "Rabi'ah al-Adawiyah"
+    },
+    {
+      "teks": "Ingatlah, dzikir menenangkan hati yang gundah dari kepanikan menghadapi masa depan.",
+      "ulama": "Imam Ibnu Athaillah As-Sakandari"
+    },
+    {
+      "teks": "Ingatlah, akhlak yang mulia adalah seindah-indahnya hiasan bagi seorang mukmin sejati.",
+      "ulama": "Imam An-Nawawi"
+    },
+    {
+      "teks": "Ingatlah, taubat adalah pintu terbuka yang selalu siap menerima kembali hamba yang tersesat.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Ingatlah, jangan biarkan rasa dengki merusak pahala amal baikmu dari dalam.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Ingatlah, al-Qur'an adalah petunjuk arah di tengah labirin kebingungan duniawi.",
+      "ulama": "Rabi'ah al-Adawiyah"
+    },
+    {
+      "teks": "Ingatlah, kedekatan dengan Tuhan mendatangkan kedamaian batin yang tidak bisa dibeli harta.",
+      "ulama": "Imam Ibnu Athaillah As-Sakandari"
+    },
+    {
+      "teks": "Ingatlah, jadikan shalatmu sebagai tempat peristirahatan dari penatnya urusan dunia.",
+      "ulama": "Imam An-Nawawi"
+    },
+    {
+      "teks": "Ingatlah, istighfar yang tulus menghapus noda-noda hitam di dalam cermin hati kita.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Ingatlah, sifat qana'ah membuat seseorang merasa kaya meskipun hartanya sangat terbatas.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Ingatlah, carilah keridhaan Allah dalam setiap desah nafas dan gerak-gerik langkahmu.",
+      "ulama": "Rabi'ah al-Adawiyah"
+    },
+    {
+      "teks": "Ingatlah, hormati orang tuamu agar hidupmu diberkahi dengan kemudahan dan kebahagiaan.",
+      "ulama": "Imam Ibnu Athaillah As-Sakandari"
+    },
+    {
+      "teks": "Ingatlah, berbuat baiklah kepada hewan dan tumbuhan sebagai wujud rahmat bagi alam.",
+      "ulama": "Imam An-Nawawi"
+    },
+    {
+      "teks": "Ingatlah, pilar utama kedewasaan karakter adalah tanggung jawab atas tindakan sendiri.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Ingatlah, konseling diri dimulai dari kemauan jujur mengakui kesalahan batin.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Ingatlah, bersyukur atas nikmat kecil membuka jalan bagi datangnya nikmat yang besar.",
+      "ulama": "Rabi'ah al-Adawiyah"
+    },
+    {
+      "teks": "Ingatlah, ibadah terbaik adalah ketaatan yang dibarengi dengan kelembutan akhlak kepada sesama.",
+      "ulama": "Imam Ibnu Athaillah As-Sakandari"
+    },
+    {
+      "teks": "Ingatlah, hati yang tawadhu (rendah hati) tidak akan pernah tersinggung oleh hinaan orang.",
+      "ulama": "Imam An-Nawawi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Keikhlasan adalah kemurnian niat yang bersih dari keinginan dipuji manusia.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Sabar adalah benteng terkuat saat badai ujian takdir menghantam hidupmu.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Rasa malu kepada Tuhan mencegah kita dari melakukan perbuatan nista saat sunyi.",
+      "ulama": "Rabi'ah al-Adawiyah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Dzikir menenangkan hati yang gundah dari kepanikan menghadapi masa depan.",
+      "ulama": "Imam Ibnu Athaillah As-Sakandari"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Akhlak yang mulia adalah seindah-indahnya hiasan bagi seorang mukmin sejati.",
+      "ulama": "Imam An-Nawawi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Taubat adalah pintu terbuka yang selalu siap menerima kembali hamba yang tersesat.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Jangan biarkan rasa dengki merusak pahala amal baikmu dari dalam.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Al-Qur'an adalah petunjuk arah di tengah labirin kebingungan duniawi.",
+      "ulama": "Rabi'ah al-Adawiyah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Kedekatan dengan Tuhan mendatangkan kedamaian batin yang tidak bisa dibeli harta.",
+      "ulama": "Imam Ibnu Athaillah As-Sakandari"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Jadikan shalatmu sebagai tempat peristirahatan dari penatnya urusan dunia.",
+      "ulama": "Imam An-Nawawi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Istighfar yang tulus menghapus noda-noda hitam di dalam cermin hati kita.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Sifat qana'ah membuat seseorang merasa kaya meskipun hartanya sangat terbatas.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Carilah keridhaan Allah dalam setiap desah nafas dan gerak-gerik langkahmu.",
+      "ulama": "Rabi'ah al-Adawiyah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Hormati orang tuamu agar hidupmu diberkahi dengan kemudahan dan kebahagiaan.",
+      "ulama": "Imam Ibnu Athaillah As-Sakandari"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Berbuat baiklah kepada hewan dan tumbuhan sebagai wujud rahmat bagi alam.",
+      "ulama": "Imam An-Nawawi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Pilar utama kedewasaan karakter adalah tanggung jawab atas tindakan sendiri.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Konseling diri dimulai dari kemauan jujur mengakui kesalahan batin.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Bersyukur atas nikmat kecil membuka jalan bagi datangnya nikmat yang besar.",
+      "ulama": "Rabi'ah al-Adawiyah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Ibadah terbaik adalah ketaatan yang dibarengi dengan kelembutan akhlak kepada sesama.",
+      "ulama": "Imam Ibnu Athaillah As-Sakandari"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Hati yang tawadhu (rendah hati) tidak akan pernah tersinggung oleh hinaan orang.",
+      "ulama": "Imam An-Nawawi"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Keikhlasan adalah kemurnian niat yang bersih dari keinginan dipuji manusia.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Sabar adalah benteng terkuat saat badai ujian takdir menghantam hidupmu.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Rasa malu kepada Tuhan mencegah kita dari melakukan perbuatan nista saat sunyi.",
+      "ulama": "Rabi'ah al-Adawiyah"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Dzikir menenangkan hati yang gundah dari kepanikan menghadapi masa depan.",
+      "ulama": "Imam Ibnu Athaillah As-Sakandari"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Akhlak yang mulia adalah seindah-indahnya hiasan bagi seorang mukmin sejati.",
+      "ulama": "Imam An-Nawawi"
+    }
+  ],
+  "umum": [
+    {
+      "teks": "Disiplin belajar hari ini menentukan posisi kepemimpinanmu di masa depan.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Jangan tunda pekerjaan hari ini karena esok hari membawa kesibukannya sendiri.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Waktu adalah modal hidup paling berharga yang tidak bisa diputar kembali.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Konsistensi dalam kebaikan kecil jauh lebih baik daripada kebaikan besar yang terputus.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Kegagalan adalah bahan evaluasi berharga untuk memperbaiki strategi langkahmu.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Rendah hati menjauhkan kita dari kehancuran akibat kesombongan diri.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Fokuslah pada proses perjuanganmu, karena hasil akhir adalah ketentuan Tuhan.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Hidup yang seimbang adalah kunci menjaga produktivitas kerja dan belajar.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Jangan biarkan rasa malas mengubur potensi besar yang ada di dalam dirimu.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Hargai jasa-jasa orang lain yang telah membantumu mencapai posisi sekarang.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Keberanian sejati adalah mengakui kesalahan dan bertekad untuk memperbaikinya.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Sederhanakan hidupmu agar kamu memiliki lebih banyak energi untuk berpikir besar.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Optimisme memicu kreativitas, sedangkan pesimisme mematikan ide-ide terbaikmu.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Belajarlah sepanjang hayat karena ilmu pengetahuan tidak pernah memiliki batas akhir.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Jadilah manusia yang kehadirannya membawa manfaat dan kepergiannya dirindukan.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Manfaatkan hari libur untuk menyegarkan pikiran dan mempererat hubungan keluarga.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Istirahat sejenak bukanlah tanda menyerah, melainkan persiapan langkah lebih jauh.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Refleksi diri di akhir pekan menjernihkan visi perjuanganmu di hari Senin.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Jagalah keseimbangan antara kerja keras, doa khusyuk, dan waktu istirahat yang cukup.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Kebahagiaan sejati dirasakan oleh orang yang berdamai dengan takdir hidupnya.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya disiplin belajar hari ini menentukan posisi kepemimpinanmu di masa depan.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya jangan tunda pekerjaan hari ini karena esok hari membawa kesibukannya sendiri.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya waktu adalah modal hidup paling berharga yang tidak bisa diputar kembali.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya konsistensi dalam kebaikan kecil jauh lebih baik daripada kebaikan besar yang terputus.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya kegagalan adalah bahan evaluasi berharga untuk memperbaiki strategi langkahmu.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya rendah hati menjauhkan kita dari kehancuran akibat kesombongan diri.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya fokuslah pada proses perjuanganmu, karena hasil akhir adalah ketentuan Tuhan.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya hidup yang seimbang adalah kunci menjaga produktivitas kerja dan belajar.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya jangan biarkan rasa malas mengubur potensi besar yang ada di dalam dirimu.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya hargai jasa-jasa orang lain yang telah membantumu mencapai posisi sekarang.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya keberanian sejati adalah mengakui kesalahan dan bertekad untuk memperbaikinya.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya sederhanakan hidupmu agar kamu memiliki lebih banyak energi untuk berpikir besar.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya optimisme memicu kreativitas, sedangkan pesimisme mematikan ide-ide terbaikmu.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya belajarlah sepanjang hayat karena ilmu pengetahuan tidak pernah memiliki batas akhir.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya jadilah manusia yang kehadirannya membawa manfaat dan kepergiannya dirindukan.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya manfaatkan hari libur untuk menyegarkan pikiran dan mempererat hubungan keluarga.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya istirahat sejenak bukanlah tanda menyerah, melainkan persiapan langkah lebih jauh.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya refleksi diri di akhir pekan menjernihkan visi perjuanganmu di hari Senin.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya jagalah keseimbangan antara kerja keras, doa khusyuk, dan waktu istirahat yang cukup.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Ketahuilah bahwa sesungguhnya kebahagiaan sejati dirasakan oleh orang yang berdamai dengan takdir hidupnya.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Ingatlah, disiplin belajar hari ini menentukan posisi kepemimpinanmu di masa depan.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ingatlah, jangan tunda pekerjaan hari ini karena esok hari membawa kesibukannya sendiri.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Ingatlah, waktu adalah modal hidup paling berharga yang tidak bisa diputar kembali.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Ingatlah, konsistensi dalam kebaikan kecil jauh lebih baik daripada kebaikan besar yang terputus.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Ingatlah, kegagalan adalah bahan evaluasi berharga untuk memperbaiki strategi langkahmu.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Ingatlah, rendah hati menjauhkan kita dari kehancuran akibat kesombongan diri.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Ingatlah, fokuslah pada proses perjuanganmu, karena hasil akhir adalah ketentuan Tuhan.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ingatlah, hidup yang seimbang adalah kunci menjaga produktivitas kerja dan belajar.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Ingatlah, jangan biarkan rasa malas mengubur potensi besar yang ada di dalam dirimu.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Ingatlah, hargai jasa-jasa orang lain yang telah membantumu mencapai posisi sekarang.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Ingatlah, keberanian sejati adalah mengakui kesalahan dan bertekad untuk memperbaikinya.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Ingatlah, sederhanakan hidupmu agar kamu memiliki lebih banyak energi untuk berpikir besar.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Ingatlah, optimisme memicu kreativitas, sedangkan pesimisme mematikan ide-ide terbaikmu.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ingatlah, belajarlah sepanjang hayat karena ilmu pengetahuan tidak pernah memiliki batas akhir.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Ingatlah, jadilah manusia yang kehadirannya membawa manfaat dan kepergiannya dirindukan.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Ingatlah, manfaatkan hari libur untuk menyegarkan pikiran dan mempererat hubungan keluarga.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Ingatlah, istirahat sejenak bukanlah tanda menyerah, melainkan persiapan langkah lebih jauh.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Ingatlah, refleksi diri di akhir pekan menjernihkan visi perjuanganmu di hari Senin.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Ingatlah, jagalah keseimbangan antara kerja keras, doa khusyuk, dan waktu istirahat yang cukup.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Ingatlah, kebahagiaan sejati dirasakan oleh orang yang berdamai dengan takdir hidupnya.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Disiplin belajar hari ini menentukan posisi kepemimpinanmu di masa depan.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Jangan tunda pekerjaan hari ini karena esok hari membawa kesibukannya sendiri.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Waktu adalah modal hidup paling berharga yang tidak bisa diputar kembali.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Konsistensi dalam kebaikan kecil jauh lebih baik daripada kebaikan besar yang terputus.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Kegagalan adalah bahan evaluasi berharga untuk memperbaiki strategi langkahmu.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Rendah hati menjauhkan kita dari kehancuran akibat kesombongan diri.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Fokuslah pada proses perjuanganmu, karena hasil akhir adalah ketentuan Tuhan.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Hidup yang seimbang adalah kunci menjaga produktivitas kerja dan belajar.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Jangan biarkan rasa malas mengubur potensi besar yang ada di dalam dirimu.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Hargai jasa-jasa orang lain yang telah membantumu mencapai posisi sekarang.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Keberanian sejati adalah mengakui kesalahan dan bertekad untuk memperbaikinya.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Sederhanakan hidupmu agar kamu memiliki lebih banyak energi untuk berpikir besar.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Optimisme memicu kreativitas, sedangkan pesimisme mematikan ide-ide terbaikmu.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Belajarlah sepanjang hayat karena ilmu pengetahuan tidak pernah memiliki batas akhir.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Jadilah manusia yang kehadirannya membawa manfaat dan kepergiannya dirindukan.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Manfaatkan hari libur untuk menyegarkan pikiran dan mempererat hubungan keluarga.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Istirahat sejenak bukanlah tanda menyerah, melainkan persiapan langkah lebih jauh.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Refleksi diri di akhir pekan menjernihkan visi perjuanganmu di hari Senin.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Jagalah keseimbangan antara kerja keras, doa khusyuk, dan waktu istirahat yang cukup.",
+      "ulama": "Imam Asy-Syafi'i"
+    },
+    {
+      "teks": "Bagi penuntut ilmu sejati: Kebahagiaan sejati dirasakan oleh orang yang berdamai dengan takdir hidupnya.",
+      "ulama": "Imam Al-Ghazali"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Disiplin belajar hari ini menentukan posisi kepemimpinanmu di masa depan.",
+      "ulama": "Imam Ibnu Qayyim Al-Jawziyyah"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Jangan tunda pekerjaan hari ini karena esok hari membawa kesibukannya sendiri.",
+      "ulama": "Imam Hasan Al-Basri"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Waktu adalah modal hidup paling berharga yang tidak bisa diputar kembali.",
+      "ulama": "Ibn Sina (Avicenna)"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Konsistensi dalam kebaikan kecil jauh lebih baik daripada kebaikan besar yang terputus.",
+      "ulama": "Al-Kindi"
+    },
+    {
+      "teks": "Dalam catatan kebijaksanaan klasik: Kegagalan adalah bahan evaluasi berharga untuk memperbaiki strategi langkahmu.",
+      "ulama": "Imam Asy-Syafi'i"
+    }
+  ]
+};
 
-  /* ---- UTILITY: HARI KE BERAPA DALAM SETAHUN ---- */
-  function getDayOfYear() {
+  const THEMES = {
+    1: { // Senin
+      name: "Bahasa & Komunikasi",
+      subjects: "Bahasa Indonesia, Bahasa Inggris, Bahasa Arab",
+      key: "bahasa"
+    },
+    2: { // Selasa
+      name: "Logika & Teknologi",
+      subjects: "Matematika, Informatika",
+      key: "matematika"
+    },
+    3: { // Rabu
+      name: "Sejarah & Masyarakat",
+      subjects: "IPS, Mentoring",
+      key: "sosial"
+    },
+    4: { // Kamis
+      name: "Alam & Seni Kreatif",
+      subjects: "IPA, Seni Rupa, PJOK",
+      key: "sains_seni"
+    },
+    5: { // Jumat
+      name: "Karakter & Spiritualitas",
+      subjects: "Al-Qur'an, PAI, Bimbingan Konseling",
+      key: "agama_karakter"
+    },
+    0: { // Minggu
+      name: "Refleksi & Relaksasi Akhir Pekan",
+      subjects: "Hari Libur Kelas",
+      key: "umum"
+    },
+    6: { // Sabtu
+      name: "Refleksi & Relaksasi Akhir Pekan",
+      subjects: "Hari Libur Kelas",
+      key: "umum"
+    }
+  };
+
+  /* ---- UTILITY: MINGGU KE BERAPA DALAM SETAHUN ---- */
+  function getWeekOfYear() {
     const now = new Date();
     const start = new Date(now.getFullYear(), 0, 0);
     const diff = now - start;
-    return Math.floor(diff / (1000 * 60 * 60 * 24));
+    const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+    return Math.floor(dayOfYear / 7);
   }
 
-  /* ---- AMBIL QUOTE HARI INI ---- */
-  function getQuoteOfDay(offset = 0) {
-    const idx = (getDayOfYear() + offset) % QUOTES.length;
-    return QUOTES[idx < 0 ? QUOTES.length + idx : idx];
+  /* ---- AMBIL QUOTE UNTUK HARI INI ---- */
+  function getQuoteOfDay(offsetDays = 0) {
+    const targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() + offsetDays);
+    
+    const dayOfWeek = targetDate.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+    const theme = THEMES[dayOfWeek] || THEMES[0];
+    const pool = CATEGORIZED_QUOTES[theme.key] || CATEGORIZED_QUOTES.umum;
+    
+    // Rotasi index menggunakan nomor minggu agar setiap hari Senin yang berbeda 
+    // dalam setahun selalu menampilkan quote yang berbeda dan tidak pernah tabrakan.
+    const startOfYear = new Date(targetDate.getFullYear(), 0, 0);
+    const diff = targetDate - startOfYear;
+    const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const weekIndex = Math.floor(dayOfYear / 7);
+    
+    const idx = (weekIndex) % pool.length;
+    return {
+      quote: pool[idx],
+      themeName: theme.name,
+      subjects: theme.subjects
+    };
   }
 
   /* ---- RENDER WIDGET ---- */
   let currentOffset = 0;
 
   function renderQuote(offset) {
-    const q = getQuoteOfDay(offset);
+    const data = getQuoteOfDay(offset);
     const textEl  = document.getElementById('quoteText');
     const authorEl = document.getElementById('quoteAuthor');
     const counterEl = document.getElementById('quoteCounter');
@@ -2057,9 +2147,14 @@
     textEl.style.opacity = '0';
     authorEl.style.opacity = '0';
     setTimeout(() => {
-      textEl.textContent  = `"${q.teks}"`;
-      authorEl.textContent = `— ${q.ulama}`;
-      if (counterEl) counterEl.textContent = `${((getDayOfYear() + offset) % QUOTES.length) + 1} / ${QUOTES.length}`;
+      textEl.textContent  = `"${data.quote.teks}"`;
+      authorEl.textContent = `— ${data.quote.ulama}`;
+      
+      if (counterEl) {
+        // Tampilkan info tema mapel harian
+        counterEl.innerHTML = `<span style="color:var(--yellow-light);font-weight:700;"><i class="fa-solid fa-graduation-cap"></i> ${data.themeName}</span><br><span style="font-size:0.65rem;color:var(--text-muted);">${data.subjects}</span>`;
+      }
+      
       textEl.style.opacity = '1';
       authorEl.style.opacity = '1';
     }, 220);
@@ -2082,6 +2177,6 @@
   document.addEventListener('DOMContentLoaded', init);
 
   // Expose for external use
-  window.QuotesModule = { total: QUOTES.length };
+  window.QuotesModule = { renderQuote };
 
 })();
