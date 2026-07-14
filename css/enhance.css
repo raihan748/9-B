@@ -28,7 +28,7 @@
 }
 
 /* Pastikan semua konten di atas canvas */
-nav, .live-broadcast, main, .modal-overlay, #mobileMenu {
+nav, .live-broadcast, main, #mobileMenu {
   position: relative;
   z-index: 1;
 }
@@ -378,8 +378,11 @@ input[type="checkbox"]:checked {
    MODAL — PREMIUM BLUR OVERLAY
    ========================================================================== */
 .modal-overlay {
-  backdrop-filter: blur(8px) brightness(0.6);
-  -webkit-backdrop-filter: blur(8px) brightness(0.6);
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  backdrop-filter: blur(8px) brightness(0.6) !important;
+  -webkit-backdrop-filter: blur(8px) brightness(0.6) !important;
 }
 
 .modal-content {
