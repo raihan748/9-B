@@ -1,0 +1,495 @@
+/* ==========================================================================
+   VISUAL ENHANCEMENT LAYER — 9B WEBSITE POLISH
+   Premium micro-animations, glow effects, particles, shimmer, dan lebih banyak
+   ========================================================================== */
+
+/* === UPGRADE GOOGLE FONTS — Tambah Outfit untuk heading premium === */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+
+/* === CSS VARIABLES TAMBAHAN === */
+:root {
+  --glow-purple: 0 0 20px rgba(167, 139, 250, 0.4), 0 0 40px rgba(167, 139, 250, 0.15);
+  --glow-yellow: 0 0 20px rgba(233, 196, 106, 0.4), 0 0 40px rgba(233, 196, 106, 0.15);
+  --glow-mint:   0 0 20px rgba(78, 204, 163, 0.4), 0 0 40px rgba(78, 204, 163, 0.15);
+  --glow-pink:   0 0 20px rgba(248, 113, 113, 0.4), 0 0 40px rgba(248, 113, 113, 0.15);
+  --glow-cyan:   0 0 20px rgba(96, 165, 250, 0.4), 0 0 40px rgba(96, 165, 250, 0.15);
+}
+
+/* ==========================================================================
+   CANVAS PARTICLES BACKGROUND
+   ========================================================================== */
+#particleCanvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+/* Pastikan semua konten di atas canvas */
+nav, .live-broadcast, main, .modal-overlay, #mobileMenu {
+  position: relative;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   AMBIENT GRADIENT BLOBS (Background Atmosphere)
+   ========================================================================== */
+body::before {
+  content: '';
+  position: fixed;
+  top: -30%;
+  left: -20%;
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.06) 0%, transparent 70%);
+  animation: blob-drift-1 18s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -20%;
+  right: -20%;
+  width: 70vw;
+  height: 70vw;
+  background: radial-gradient(circle, rgba(78, 204, 163, 0.05) 0%, transparent 70%);
+  animation: blob-drift-2 22s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes blob-drift-1 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(8vw, 6vh) scale(1.12); }
+}
+
+@keyframes blob-drift-2 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-6vw, -8vh) scale(1.08); }
+}
+
+/* ==========================================================================
+   NAVIGATION BAR — GLASSMORPHISM UPGRADE
+   ========================================================================== */
+nav {
+  background: rgba(13, 15, 18, 0.82) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Nav Logo — Gradient + Glow */
+.nav-logo {
+  background: linear-gradient(135deg, var(--purple), var(--cyan)) !important;
+  box-shadow: var(--glow-purple), 3px 3px 0px var(--border-color) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-logo:hover {
+  transform: rotate(-5deg) scale(1.05);
+  box-shadow: var(--glow-cyan), 3px 3px 0px var(--border-color) !important;
+}
+
+/* Nav Active Tab — Gradient background */
+.nav-links a.active {
+  background: linear-gradient(135deg, var(--yellow-light), var(--yellow)) !important;
+  box-shadow: 3px 3px 0px var(--border-color), var(--glow-yellow) !important;
+}
+
+/* ==========================================================================
+   LIVE BROADCAST TICKER — UPGRADES
+   ========================================================================== */
+.live-dot {
+  animation: blink 1s ease-in-out infinite, glow-red 1.5s ease-in-out infinite alternate;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+}
+
+@keyframes glow-red {
+  0%   { box-shadow: 0 0 4px rgba(239, 68, 68, 0.6); }
+  100% { box-shadow: 0 0 14px rgba(239, 68, 68, 1); }
+}
+
+/* Ticker text glow effect */
+#broadcastText {
+  text-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   SECTION HEADINGS — GRADIENT TEXT + GLOW
+   ========================================================================== */
+.section-title {
+  background: linear-gradient(135deg, var(--text-light) 0%, var(--purple) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.3));
+}
+
+/* Widget headers yang ada di lobby */
+.widget-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.widget-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--purple), var(--cyan), var(--mint));
+  background-size: 200% 100%;
+  animation: gradient-slide 3s ease infinite;
+}
+
+@keyframes gradient-slide {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ==========================================================================
+   BRUT-CARD — UPGRADED GLOW ON HOVER
+   ========================================================================== */
+.brut-card {
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.brut-card:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: 7px 7px 0px var(--border-color), var(--glow-purple) !important;
+}
+
+/* ==========================================================================
+   BUTTONS — SHINE / SHIMMER EFFECT
+   ========================================================================== */
+.brut-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.brut-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -75%;
+  width: 50%;
+  height: 200%;
+  background: rgba(255, 255, 255, 0.12);
+  transform: skewX(-20deg);
+  transition: left 0.4s ease;
+}
+
+.brut-btn:hover::after {
+  left: 130%;
+}
+
+/* Button color-specific glow on hover */
+.btn-purple:hover { box-shadow: var(--shadow-hover), var(--glow-purple) !important; }
+.btn-mint:hover   { box-shadow: var(--shadow-hover), var(--glow-mint)   !important; }
+.btn-cyan:hover   { box-shadow: var(--shadow-hover), var(--glow-cyan)   !important; }
+.btn-yellow:hover { box-shadow: var(--shadow-hover), var(--glow-yellow) !important; }
+.btn-pink:hover   { box-shadow: var(--shadow-hover), var(--glow-pink)   !important; }
+
+/* Admin login button pulse when logged in */
+.admin-login-btn.logged-in {
+  animation: pulse-green 2.5s ease-in-out infinite;
+}
+
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 3px 3px 0px var(--border-color), 0 0 0 0 rgba(78, 204, 163, 0.4); }
+  50%       { box-shadow: 3px 3px 0px var(--border-color), 0 0 0 8px rgba(78, 204, 163, 0); }
+}
+
+/* ==========================================================================
+   TASK CARDS — ENHANCED
+   ========================================================================== */
+.task-card {
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s ease !important;
+}
+
+.task-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 6px 6px 0px var(--border-color), 0 8px 32px rgba(167, 139, 250, 0.15) !important;
+}
+
+/* Colored left border accent per column */
+#todoCards .task-card { border-left: 4px solid var(--cyan) !important; }
+#progressCards .task-card { border-left: 4px solid var(--yellow-light) !important; }
+#doneCards .task-card { border-left: 4px solid var(--mint) !important; }
+
+/* Column header glow badge */
+.kanban-column-header .column-count {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.kanban-column-header:hover .column-count {
+  transform: scale(1.1);
+  box-shadow: var(--glow-purple);
+}
+
+/* ==========================================================================
+   CHAT MESSAGES — PREMIUM STYLING
+   ========================================================================== */
+.message.sent .message-text {
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.25), rgba(96, 165, 250, 0.2)) !important;
+  border-left: 3px solid var(--purple);
+}
+
+.message.received .message-text {
+  background: rgba(28, 28, 33, 0.9) !important;
+  border-left: 3px solid var(--mint);
+}
+
+.message {
+  animation: msg-slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes msg-slide-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Send button pulse */
+#sendChatBtn {
+  position: relative;
+}
+
+#sendChatBtn:hover {
+  animation: btn-pulse 0.6s ease;
+}
+
+@keyframes btn-pulse {
+  0%   { transform: translate(3px, 3px) scale(1); }
+  30%  { transform: translate(2px, 2px) scale(1.04); }
+  100% { transform: translate(3px, 3px) scale(1); }
+}
+
+/* ==========================================================================
+   PAGE ENTRY ANIMATIONS (IntersectionObserver target)
+   ========================================================================== */
+.anim-fade-up {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.anim-fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger delays */
+.anim-delay-1 { transition-delay: 0.05s; }
+.anim-delay-2 { transition-delay: 0.12s; }
+.anim-delay-3 { transition-delay: 0.20s; }
+.anim-delay-4 { transition-delay: 0.28s; }
+.anim-delay-5 { transition-delay: 0.36s; }
+
+/* ==========================================================================
+   PIKET WIDGET — ENHANCED
+   ========================================================================== */
+.piket-member {
+  position: relative;
+  padding-left: 4px;
+  transition: all 0.25s ease;
+}
+
+.piket-member:hover {
+  transform: translateX(6px);
+  color: var(--mint);
+}
+
+/* ==========================================================================
+   COUNTDOWN DIGITS — NEON GLOW
+   ========================================================================== */
+.countdown-digit {
+  background: linear-gradient(135deg, var(--bg-card), #252530) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 0 20px rgba(167, 139, 250, 0.2) !important;
+  animation: digit-breathe 3s ease-in-out infinite alternate;
+}
+
+@keyframes digit-breathe {
+  0%   { box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 0 10px rgba(167, 139, 250, 0.15); }
+  100% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 0 30px rgba(167, 139, 250, 0.4); }
+}
+
+/* ==========================================================================
+   FORM INPUTS — GLOW ON FOCUS
+   ========================================================================== */
+.form-input:focus, textarea:focus, input[type="text"]:focus,
+input[type="password"]:focus, input[type="datetime-local"]:focus,
+input[type="date"]:focus, select:focus {
+  outline: none !important;
+  border-color: var(--purple) !important;
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2), 3px 3px 0px var(--border-color) !important;
+  transition: all 0.25s ease !important;
+}
+
+/* ==========================================================================
+   ADMIN DASHBOARD PANEL — SUBTLE ACCENT
+   ========================================================================== */
+#adminDashboardPanel {
+  position: relative;
+  overflow: hidden;
+}
+
+#adminDashboardPanel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--purple), var(--cyan), var(--mint), var(--yellow-light));
+  background-size: 300% 100%;
+  animation: gradient-slide 4s ease infinite;
+}
+
+/* ==========================================================================
+   STATUS SWITCH TOGGLES — GLOW ON ACTIVE
+   ========================================================================== */
+input[type="checkbox"]:checked {
+  accent-color: var(--mint);
+  box-shadow: 0 0 8px var(--mint);
+}
+
+/* ==========================================================================
+   SCROLLBAR — GRADIENT UPGRADE
+   ========================================================================== */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--purple), var(--cyan)) !important;
+  border-radius: 6px !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--cyan), var(--mint)) !important;
+}
+
+/* ==========================================================================
+   MODAL — PREMIUM BLUR OVERLAY
+   ========================================================================== */
+.modal-overlay {
+  backdrop-filter: blur(8px) brightness(0.6);
+  -webkit-backdrop-filter: blur(8px) brightness(0.6);
+}
+
+.modal-content {
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-content::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--purple), var(--cyan));
+}
+
+/* ==========================================================================
+   LOG ENTRIES — ANIMATED APPEAR
+   ========================================================================== */
+.log-entry {
+  animation: log-appear 0.3s ease forwards;
+  border-left: 3px solid transparent;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.log-entry:hover {
+  border-left-color: var(--cyan);
+  background: rgba(96, 165, 250, 0.05);
+}
+
+.log-entry.important {
+  border-left-color: var(--pink) !important;
+}
+
+@keyframes log-appear {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ==========================================================================
+   VIDEO CARDS — HOVER LIFT
+   ========================================================================== */
+.video-card {
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.video-card:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: 8px 8px 0px var(--border-color), var(--glow-cyan) !important;
+}
+
+/* ==========================================================================
+   CAPSULE MESSAGE CARDS — GLOW
+   ========================================================================== */
+.capsule-message-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.capsule-message-card:hover {
+  transform: rotate(0deg) translateY(-6px) !important;
+  box-shadow: 6px 6px 0 var(--border-color), var(--glow-yellow) !important;
+  z-index: 2;
+}
+
+/* ==========================================================================
+   PAGE LOAD ANIMATION
+   ========================================================================== */
+@keyframes page-reveal {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+main {
+  animation: page-reveal 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ==========================================================================
+   DEADLINE ALERT MODE — ENHANCED PULSE
+   ========================================================================== */
+body.deadline-alert-active .brut-card:hover {
+  box-shadow: 7px 7px 0px var(--border-color), var(--glow-pink) !important;
+}
+
+body.deadline-alert-active .live-broadcast {
+  animation: deadline-flicker 3s ease-in-out infinite;
+}
+
+@keyframes deadline-flicker {
+  0%, 100% { opacity: 1; }
+  45%       { opacity: 1; }
+  50%       { opacity: 0.85; }
+  55%       { opacity: 1; }
+}
+
+/* ==========================================================================
+   MOBILE MENU — SMOOTH SLIDE
+   ========================================================================== */
+#mobileMenu {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(13, 15, 18, 0.95) !important;
+}
+
+/* ==========================================================================
+   RESPONSIVE — POLISH ON MOBILE
+   ========================================================================== */
+@media (max-width: 768px) {
+  body::before, body::after { display: none; }
+
+  .brut-card:hover {
+    transform: none !important;
+  }
+}
