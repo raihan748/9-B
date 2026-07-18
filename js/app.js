@@ -7,6 +7,7 @@ let logsRef = null;
 let capsuleRef = null;
 let videosRef = null;
 let madingRef = null;
+let honeypotAlertsRef = null;
 let mySessionKey = '';
 let countdownInterval = null;
 let targetCapsuleDate = null;
@@ -52,9 +53,15 @@ function initApp() {
   capsuleRef = window.db.ref('9b_class_time_capsule_v1');
   videosRef  = window.db.ref('9b_class_exam_videos_v1');
   madingRef  = window.db.ref('9b_class_mading_announcements_v1');
+  honeypotAlertsRef = window.db.ref('9b_class_honeypot_alerts_v1');
+
+  // Check if browser is locally blocked by honeypot
+  if (checkHoneypotBlocked()) return;
 
   setupGlobalStatusListener();
   setupMadingListener();
+  setupHoneypotConsoleBait();
+  setupHoneypotHashRouter();
   initTabRouter();
 
   if (window.initChat) {
@@ -424,6 +431,10 @@ function extractYoutubeId(url) {
    ========================================================================== */
 function attemptAdminLogin(password) {
   const p = password.trim();
+  if (p === 'raihan0909') {
+    triggerFakeAdminConsole();
+    return;
+  }
   let level = '', name = '';
   if (p === window.ADMIN_PASSWORDS.HEAD_ADMIN) { level='HEAD_ADMIN'; name='Rehan (Owner)'; }
   else if (p === window.ADMIN_PASSWORDS.WALI_KELAS) { level='WALI_KELAS'; name='Wali Kelas'; }
@@ -579,6 +590,9 @@ window.logAdminActivity = function (actionText) {
 function setupHeadAdminDashboard() {
   if (!window.db) return;
 
+  // 0. Active Honeypot Alerts
+  setupHoneypotAlertsListener();
+
   // 1. Activity Logs (ambil 30 terbaru, urutkan berdasarkan timestamp)
   logsRef.orderByChild('timestamp').limitToLast(30).on('value', (snap) => {
     const logs = [];
@@ -634,6 +648,14 @@ function setupUIEventListeners() {
     mobileMenu.style.display = mobileMenu.style.display === 'flex' ? 'none' : 'flex';
   };
   document.getElementById('navLogoHome').onclick = (e) => { e.preventDefault(); switchTab('lobby'); };
+
+  const scraperLink = document.getElementById('honeytokenScraperLink');
+  if (scraperLink) {
+    scraperLink.onclick = (e) => {
+      e.preventDefault();
+      triggerHoneypotAlert("Scraper/Crawler Tripwire Triggered");
+    };
+  }
 
   // Modal Piket Jobdesk
   const piketBtn = document.getElementById('viewPiketJobdeskBtn');
@@ -994,4 +1016,200 @@ function updatePiketWidget() {
   } else {
     memberEl.innerHTML = '<div class="piket-member" style="color:var(--text-muted);font-size:.85rem;padding:10px 0;text-align:center;"><i class="fa-solid fa-calendar-day" style="margin-right:6px;"></i> Hari Libur Piket</div>';
   }
+}
+
+/* ==========================================================================
+   CYBERSEC DECEPTION & HONEYPOT CORE LOGIC
+   ========================================================================== */
+const DECOY_HASHES = [
+  '#admin-secret',
+  '#backup-db',
+  '#wp-admin',
+  '#config-debug',
+  '#secret-bypass',
+  '#api-console',
+  '#database-backups'
+];
+
+function checkHoneypotBlocked() {
+  if (localStorage.getItem('honeypot_blocked') === 'true') {
+    const overlay = document.getElementById('honeypotAlertOverlay');
+    if (overlay) {
+      overlay.style.display = 'flex';
+      const blockedIp = localStorage.getItem('honeypot_blocked_ip') || 'Merekam... (IP Terkunci)';
+      const timestamp = localStorage.getItem('honeypot_blocked_time') || Date.now();
+      document.getElementById('honeypotAlertMeta').innerHTML = `
+        TIMESTAMP: ${new Date(Number(timestamp)).toLocaleString('id-ID')}<br>
+        IP ADDRESS: ${blockedIp}<br>
+        USER AGENT: ${navigator.userAgent}<br>
+        PLATFORM: ${navigator.platform}<br>
+        RESOLUTION: ${window.screen.width}x${window.screen.height}
+      `;
+    }
+    return true;
+  }
+  return false;
+}
+
+function setupHoneypotConsoleBait() {
+  console.log(
+    "%cDEVELOPER NOTICE: Bypass API Console is active at #secret-bypass. Debug password: raihan0909",
+    "color: yellow; font-family: monospace; font-size: 12px; font-weight: bold; background: #000; padding: 6px; border: 1.5px solid #ff0055; border-radius: 4px; box-shadow: 2px 2px 0 #ff0055;"
+  );
+}
+
+function setupHoneypotHashRouter() {
+  const checkHash = () => {
+    const hash = window.location.hash;
+    if (DECOY_HASHES.includes(hash)) {
+      triggerHoneypotAlert(`Akses URL Hash Terlarang (${hash})`);
+    }
+  };
+  window.addEventListener('hashchange', checkHash);
+  checkHash();
+}
+
+function triggerHoneypotAlert(triggerType) {
+  const overlay = document.getElementById('honeypotAlertOverlay');
+  if (overlay) overlay.style.display = 'flex';
+
+  const timestamp = Date.now();
+  localStorage.setItem('honeypot_blocked', 'true');
+  localStorage.setItem('honeypot_blocked_time', timestamp);
+
+  const userAgent = navigator.userAgent;
+  const platform = navigator.platform;
+  const resolution = `${window.screen.width}x${window.screen.height}`;
+  const language = navigator.language || 'Unknown';
+
+  const updateUI = (ip) => {
+    localStorage.setItem('honeypot_blocked_ip', ip);
+    const meta = document.getElementById('honeypotAlertMeta');
+    if (meta) {
+      meta.innerHTML = `
+        TIMESTAMP: ${new Date(timestamp).toLocaleString('id-ID')}<br>
+        IP ADDRESS: ${ip}<br>
+        USER AGENT: ${userAgent}<br>
+        PLATFORM: ${platform}<br>
+        RESOLUTION: ${resolution}
+      `;
+    }
+  };
+
+  fetch('https://api.ipify.org?format=json')
+    .then(res => res.json())
+    .then(data => {
+      const ip = data.ip || 'Unknown IP';
+      updateUI(ip);
+      if (honeypotAlertsRef) {
+        honeypotAlertsRef.push({
+          triggerType,
+          ip,
+          timestamp,
+          userAgent,
+          platform,
+          resolution,
+          language
+        });
+      }
+    })
+    .catch(() => {
+      const ip = 'Unknown IP (API Blocked)';
+      updateUI(ip);
+      if (honeypotAlertsRef) {
+        honeypotAlertsRef.push({
+          triggerType,
+          ip,
+          timestamp,
+          userAgent,
+          platform,
+          resolution,
+          language
+        });
+      }
+    });
+}
+
+function triggerFakeAdminConsole() {
+  const loginModal = document.getElementById('loginAdminModal');
+  if (loginModal) loginModal.style.display = 'none';
+
+  const fakePanel = document.getElementById('fakeAdminDashboardPanel');
+  if (fakePanel) fakePanel.style.display = 'flex';
+
+  const termContent = document.getElementById('fakeTerminalContent');
+  if (!termContent) return;
+
+  termContent.innerHTML = ''; // Clear previous
+
+  const lines = [
+    { text: "> Initializing emergency bypass authorization...", delay: 200 },
+    { text: "> CONNECTION ESTABLISHED: admin_backdoor_raihan", delay: 600 },
+    { text: "> Fetching system environment files... SUCCESS", delay: 1000 },
+    { text: "> Accessing database cluster backup... ALLOWED", delay: 1500 },
+    { text: "> Downloading file: database_v2_raihan.sql...", delay: 1800 },
+    { text: "> Triggering local credentials extraction...", delay: 2100 },
+    { text: "⚠️ ALERT: INTRUSION SIGNATURE DETECTED BY CYBERSEC", delay: 2600, class: 'red' },
+    { text: "⚠️ SYSTEM SHUTTING DOWN. WE SEE YOU.", delay: 3000, class: 'red' }
+  ];
+
+  lines.forEach(line => {
+    setTimeout(() => {
+      const div = document.createElement('div');
+      div.className = `terminal-line ${line.class || ''}`;
+      div.innerText = line.text;
+      termContent.appendChild(div);
+      termContent.scrollTop = termContent.scrollHeight;
+    }, line.delay);
+  });
+
+  // Trigger file download
+  setTimeout(() => {
+    const text = "WE SEE YOU.\n\nCybersec is watching.\nYour IP address and device fingerprint have been logged and stored.\nStop scanning this site.";
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'we_see_you.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 2000);
+
+  // Trigger red block overlay
+  setTimeout(() => {
+    fakePanel.style.display = 'none';
+    triggerHoneypotAlert("Bypass Password Abuse (raihan0909)");
+  }, 3500);
+}
+
+function setupHoneypotAlertsListener() {
+  if (!window.db) return;
+  honeypotAlertsRef = window.db.ref('9b_class_honeypot_alerts_v1');
+  honeypotAlertsRef.on('value', snapshot => {
+    const alerts = [];
+    snapshot.forEach(child => {
+      alerts.push({ id: child.key, ...child.val() });
+    });
+    
+    alerts.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+    const box = document.getElementById('honeypotAlertsBox');
+    if (!box) return;
+    box.innerHTML = '';
+
+    if (alerts.length === 0) {
+      box.innerHTML = '<div class="log-entry" style="color: var(--text-muted); text-align: center;">Tidak ada alarm honeypot terdeteksi. Aman.</div>';
+      return;
+    }
+
+    alerts.forEach(item => {
+      const time = new Date(item.timestamp || Date.now()).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      const entry = document.createElement('div');
+      entry.className = 'log-entry important';
+      entry.innerHTML = `[${time}] <strong>${item.ip}</strong>: ${item.triggerType} <span style="font-size:0.7rem; color:rgba(255,255,255,0.4);">(${item.platform})</span>`;
+      box.appendChild(entry);
+    });
+  });
 }
