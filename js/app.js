@@ -575,11 +575,12 @@ function setupUIEventListeners() {
   const btnEditBanner = document.getElementById('btnEditAnnouncementFromBanner');
   const btnCancelBanner = document.getElementById('btnCancelAnnouncementFromBanner');
   const btnSaveBanner = document.getElementById('btnSaveAnnouncementFromBanner');
+  const btnDeleteBanner = document.getElementById('btnDeleteAnnouncementFromBanner');
   const viewMode = document.getElementById('announcementViewMode');
   const editMode = document.getElementById('announcementEditMode');
   const bannerInput = document.getElementById('announcementBannerInput');
 
-  if (btnEditBanner && btnCancelBanner && btnSaveBanner && viewMode && editMode && bannerInput) {
+  if (btnEditBanner && btnCancelBanner && btnSaveBanner && btnDeleteBanner && viewMode && editMode && bannerInput) {
     btnEditBanner.onclick = () => {
       viewMode.style.display = 'none';
       btnEditBanner.style.display = 'none';
@@ -613,6 +614,22 @@ function setupUIEventListeners() {
           btnEditBanner.style.display = isAnnouncementModerator ? 'block' : 'none';
           editMode.style.display = 'none';
         }).catch(err => alert("Gagal memperbarui: " + err.message));
+      }
+    };
+
+    btnDeleteBanner.onclick = () => {
+      if (!confirm("Hapus pengumuman sematan ini?")) return;
+      if (statusRef) {
+        statusRef.update({
+          announcement_text: null,
+          announcement_author: null,
+          announcement_timestamp: null
+        }).then(() => {
+          if (window.logAdminActivity) window.logAdminActivity("Menghapus pengumuman sematan dari banner");
+          alert("Pengumuman berhasil dihapus!");
+          viewMode.style.display = 'flex';
+          editMode.style.display = 'none';
+        }).catch(err => alert("Gagal menghapus: " + err.message));
       }
     };
   }
