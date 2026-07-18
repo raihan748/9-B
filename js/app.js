@@ -6,6 +6,7 @@ let sessionsRef = null;
 let logsRef = null;
 let capsuleRef = null;
 let videosRef = null;
+let madingRef = null;
 let mySessionKey = '';
 let countdownInterval = null;
 let targetCapsuleDate = null;
@@ -50,8 +51,10 @@ function initApp() {
   logsRef    = window.db.ref('9b_class_activity_logs_v1');
   capsuleRef = window.db.ref('9b_class_time_capsule_v1');
   videosRef  = window.db.ref('9b_class_exam_videos_v1');
+  madingRef  = window.db.ref('9b_class_mading_announcements_v1');
 
   setupGlobalStatusListener();
+  setupMadingListener();
   initTabRouter();
 
   if (window.initChat) {
@@ -164,6 +167,82 @@ function setupGlobalStatusListener() {
     }
   });
 }
+
+function setupMadingListener() {
+  if (!window.db) return;
+  madingRef = window.db.ref('9b_class_mading_announcements_v1');
+  madingRef.on('value', snapshot => {
+    const data = [];
+    snapshot.forEach(child => {
+      data.push({ id: child.key, ...child.val() });
+    });
+    
+    data.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+    if (data.length === 0) {
+      prepopulateMading();
+      return;
+    }
+
+    renderMadingList(data);
+  });
+}
+
+function prepopulateMading() {
+  if (!madingRef) return;
+  const defaults = [
+    {
+      text: "Harap persiapkan diri Anda untuk menghadapi Penilaian Akhir Semester. Tetap jaga kesehatan dan manfaatkan video persiapan ujian di menu belajar apabila diaktifkan.",
+      author: "WALI_KELAS",
+      isImportant: true,
+      timestamp: 1783946614471
+    },
+    {
+      text: "Jadwal piket kelas harap dijalankan secara disiplin demi kenyamanan belajar bersama di ruang kelas.",
+      author: "KETUA_KELAS",
+      isImportant: false,
+      timestamp: 1783860214471
+    }
+  ];
+  defaults.forEach(item => madingRef.push(item));
+}
+
+function renderMadingList(data) {
+  const container = document.getElementById('madingLobbyGrid');
+  if (!container) return;
+  const isAdmin = localStorage.getItem('admin_logged') === 'true';
+
+  container.innerHTML = data.map(item => {
+    const deleteBtn = isAdmin
+      ? `<button class="task-action-btn btn-delete" style="position: absolute; top: 12px; right: 12px; padding: 2px 6px; font-size: 0.6rem; border-width: 1px; box-shadow: none;" onclick="deleteMadingAnnouncement('${item.id}')">HAPUS</button>`
+      : '';
+    
+    const dateVal = new Date(item.timestamp || Date.now());
+    const formattedDate = dateVal.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
+    
+    let authorName = item.author || 'ADMIN';
+    if (authorName === 'WALI_KELAS') authorName = 'WALI KELAS';
+    else if (authorName === 'KETUA_KELAS') authorName = 'KETUA KELAS';
+
+    return `
+      <div class="mading-item ${item.isImportant ? 'important' : ''}" style="position: relative;">
+        ${deleteBtn}
+        <div class="mading-date">DIPOSTING OLEH ${escapeHTML(authorName)} • ${formattedDate}</div>
+        <div class="mading-content">${escapeHTML(item.text)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+window.deleteMadingAnnouncement = function(id) {
+  if (!confirm("Hapus pengumuman kelas ini?")) return;
+  if (madingRef) {
+    madingRef.child(id).remove().then(() => {
+      if (window.logAdminActivity) window.logAdminActivity("Menghapus pengumuman papan kelas");
+      alert("Pengumuman berhasil dihapus!");
+    }).catch(err => alert("Gagal menghapus: " + err.message));
+  }
+};
 
 /* ==========================================================================
    TIME CAPSULE LOGIC
@@ -419,6 +498,18 @@ function applyAdminUI(level, name) {
   const editBannerBtn = document.getElementById('btnEditAnnouncementFromBanner');
   if (editBannerBtn) editBannerBtn.style.display = isAnnouncementModerator ? 'block' : 'none';
 
+  const btnToggleMading = document.getElementById('btnToggleMadingPost');
+  if (btnToggleMading) btnToggleMading.style.display = 'block';
+
+  if (madingRef) {
+    madingRef.once('value', snapshot => {
+      const data = [];
+      snapshot.forEach(child => { data.push({ id: child.key, ...child.val() }); });
+      data.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+      renderMadingList(data);
+    });
+  }
+
   if (window.renderTasksList) window.renderTasksList();
 }
 
@@ -446,6 +537,20 @@ function handleLogout(forced = false) {
   const editMode = document.getElementById('announcementEditMode');
   if (viewMode) viewMode.style.display = 'flex';
   if (editMode) editMode.style.display = 'none';
+
+  const btnToggleMading = document.getElementById('btnToggleMadingPost');
+  if (btnToggleMading) btnToggleMading.style.display = 'none';
+  const madingBox = document.getElementById('madingPostBox');
+  if (madingBox) madingBox.style.display = 'none';
+
+  if (madingRef) {
+    madingRef.once('value', snapshot => {
+      const data = [];
+      snapshot.forEach(child => { data.push({ id: child.key, ...child.val() }); });
+      data.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+      renderMadingList(data);
+    });
+  }
 
   if (window.renderTasksList) window.renderTasksList();
   if (forced) { alert("⚠️ Sesi akses administrator Anda telah diputus secara paksa oleh Administrator Utama."); switchTab('lobby'); }
@@ -749,6 +854,43 @@ function setupUIEventListeners() {
       alert("Siaran Langsung berhasil diperbarui!");
     }
   };
+
+  // Mading Class Announcements Handlers
+  const toggleMadingBtn = document.getElementById('btnToggleMadingPost');
+  const madingPostBox = document.getElementById('madingPostBox');
+  if (toggleMadingBtn && madingPostBox) {
+    toggleMadingBtn.onclick = () => {
+      const isHidden = madingPostBox.style.display === 'none';
+      madingPostBox.style.display = isHidden ? 'flex' : 'none';
+      toggleMadingBtn.innerHTML = isHidden ? '<i class="fa-solid fa-minus"></i> TUTUP FORM' : '<i class="fa-solid fa-plus"></i> BUAT PENGUMUMAN';
+    };
+  }
+
+  const btnPostMading = document.getElementById('btnPostMading');
+  if (btnPostMading) {
+    btnPostMading.onclick = () => {
+      const text = document.getElementById('madingInput').value.trim();
+      if (!text) { alert("Isi pengumuman tidak boleh kosong!"); return; }
+      const isImportant = document.getElementById('madingImportantCheck').checked;
+      const adminName = localStorage.getItem('admin_name') || 'Admin';
+
+      if (madingRef) {
+        madingRef.push({
+          text,
+          author: adminName,
+          isImportant,
+          timestamp: Date.now()
+        }).then(() => {
+          if (window.logAdminActivity) window.logAdminActivity("Menulis pengumuman baru di papan kelas");
+          alert("Pengumuman berhasil diposting!");
+          document.getElementById('madingInput').value = '';
+          document.getElementById('madingImportantCheck').checked = false;
+          madingPostBox.style.display = 'none';
+          if (toggleMadingBtn) toggleMadingBtn.innerHTML = '<i class="fa-solid fa-plus"></i> BUAT PENGUMUMAN';
+        }).catch(err => alert("Gagal memposting: " + err.message));
+      }
+    };
+  }
 }
 
 /* ==========================================================================

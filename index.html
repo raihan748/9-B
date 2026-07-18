@@ -158,20 +158,28 @@
             </div>
           </div>
 
-          <!-- Mading Kelas -->
-          <div class="mading-lobby">
-            <h3 class="mading-title"><i class="fa-solid fa-bullhorn" style="color: var(--yellow);"></i> PAPAN PENGUMUMAN KELAS</h3>
-            <div class="mading-grid" id="madingLobbyGrid">
-              <div class="mading-item important">
-                <div class="mading-date">DIPOSTING OLEH WALI KELAS • 13 JULI 2026</div>
-                <div class="mading-content">Harap persiapkan diri Anda untuk menghadapi Penilaian Akhir Semester. Tetap jaga kesehatan dan manfaatkan video persiapan ujian di menu belajar apabila diaktifkan.</div>
-              </div>
-              <div class="mading-item">
-                <div class="mading-date">DIPOSTING OLEH KETUA KELAS • 12 JULI 2026</div>
-                <div class="mading-content">Jadwal piket kelas harap dijalankan secara disiplin demi kenyamanan belajar bersama di ruang kelas.</div>
-              </div>
-            </div>
-          </div>
+           <!-- Mading Kelas -->
+           <div class="mading-lobby">
+             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+               <h3 class="mading-title" style="margin-bottom: 0;"><i class="fa-solid fa-bullhorn" style="color: var(--yellow);"></i> PAPAN PENGUMUMAN KELAS</h3>
+               <button id="btnToggleMadingPost" class="brut-btn btn-mint" style="display: none; padding: 4px 10px; font-size: 0.7rem; font-weight: 800; box-shadow: 2px 2px 0 #000;"><i class="fa-solid fa-plus"></i> BUAT PENGUMUMAN</button>
+             </div>
+
+             <div id="madingPostBox" style="display: none; border: 3px solid var(--border-color); padding: 14px; background: rgba(255,255,255,0.02); margin-bottom: 16px; border-radius: 4px; box-shadow: 3px 3px 0 #000; flex-direction: column; gap: 8px; text-align: left;">
+               <strong style="font-size: 0.8rem; color: var(--text-light);">BUAT PENGUMUMAN BARU</strong>
+               <textarea id="madingInput" class="form-input" rows="2" placeholder="Tulis isi pengumuman kelas di sini..." style="resize: none; background: #fff; color: #000; border: 2px solid var(--border-color); font-weight: 700;" maxlength="300"></textarea>
+               <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+                 <label style="display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 800; color: var(--text-light); cursor: pointer;">
+                   <input type="checkbox" id="madingImportantCheck" style="width: 14px; height: 14px; accent-color: var(--pink);"> TANDAI PENTING (Garis Tepi Merah)
+                 </label>
+                 <button id="btnPostMading" class="brut-btn btn-mint" style="padding: 4px 12px; font-size: 0.8rem; font-weight: 800; box-shadow: 2px 2px 0 #000;">KIRIM</button>
+               </div>
+             </div>
+
+             <div class="mading-grid" id="madingLobbyGrid">
+               <!-- Pengumuman kelas akan dimuat secara dinamis dari database -->
+             </div>
+           </div>
         </div>
 
         <!-- Sidebar Column -->
