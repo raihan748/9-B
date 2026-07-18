@@ -437,7 +437,7 @@ function attemptAdminLogin(password) {
     return;
   }
   let level = '', name = '';
-  if (p === window.ADMIN_PASSWORDS.HEAD_ADMIN) { level='HEAD_ADMIN'; name='Rehan (Owner)'; }
+  if (p === window.ADMIN_PASSWORDS.HEAD_ADMIN) { level='HEAD_ADMIN'; name='Raihan (Owner)'; }
   else if (p === window.ADMIN_PASSWORDS.WALI_KELAS) { level='WALI_KELAS'; name='Wali Kelas'; }
   else if (p === window.ADMIN_PASSWORDS.SEKRETARIS) { level='SEKRETARIS'; name='Sekretaris'; }
   else if (p === window.ADMIN_PASSWORDS.TEMAN) { level='REGULAR_ADMIN'; name='Admin Teman'; }

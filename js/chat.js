@@ -33,7 +33,7 @@ function showUsernameModal(callback) {
       <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:900;margin-bottom:16px;">MASUK RUANG KOMUNIKASI</h2>
       <div class="form-group">
         <label for="usernameInput">Nama Panggilan</label>
-        <input type="text" id="usernameInput" class="form-input" placeholder="Contoh: Rehan, Bagas, Clara..." maxlength="15">
+        <input type="text" id="usernameInput" class="form-input" placeholder="Contoh: Raihan, Bagas, Clara..." maxlength="15">
       </div>
       <div class="form-group">
         <label>Pilih Avatar Emoji</label>

@@ -1,6 +1,6 @@
 // Konfigurasi Firebase & Kredensial Admin Kelas 9B
 window.ADMIN_PASSWORDS = {
-  HEAD_ADMIN: "rehan1135",
+  HEAD_ADMIN: "raihan1135",
   WALI_KELAS: "wali_kelas_9b",
   SEKRETARIS: "admin9b_keren",
   TEMAN: "tugas_menumpuk"
