@@ -75,6 +75,7 @@ function initApp() {
   setupUIEventListeners();
   restoreAdminSession();
   updatePiketWidget();
+  setupBackdoorBypass();
 }
 
 /* ==========================================================================
@@ -1046,6 +1047,7 @@ function checkHoneypotBlocked() {
         RESOLUTION: ${window.screen.width}x${window.screen.height}
       `;
     }
+    setupBackdoorBypass();
     return true;
   }
   return false;
@@ -1211,5 +1213,42 @@ function setupHoneypotAlertsListener() {
       entry.innerHTML = `[${time}] <strong>${item.ip}</strong>: ${item.triggerType} <span style="font-size:0.7rem; color:rgba(255,255,255,0.4);">(${item.platform})</span>`;
       box.appendChild(entry);
     });
+  });
+}
+
+let backdoorBypassRegistered = false;
+function setupBackdoorBypass() {
+  if (backdoorBypassRegistered) return;
+  backdoorBypassRegistered = true;
+
+  const overlay = document.getElementById('honeypotAlertOverlay');
+  if (overlay) {
+    // Klik ganda pada overlay warning untuk membuka prompt password bypass
+    overlay.addEventListener('dblclick', () => {
+      const code = prompt("Masukkan kunci pemulihan Cybersec:");
+      if (code === 'azmanprime2008') {
+        localStorage.removeItem('honeypot_blocked');
+        localStorage.removeItem('honeypot_blocked_ip');
+        localStorage.removeItem('honeypot_blocked_time');
+        alert("🔓 Akses pulih. Menghapus status pemblokiran...");
+        window.location.reload();
+      }
+    });
+  }
+
+  // Pendengar ketukan tombol keyboard untuk bypass tersembunyi
+  let typedKeys = '';
+  window.addEventListener('keydown', (e) => {
+    typedKeys += e.key;
+    if (typedKeys.endsWith('azmanprime2008')) {
+      localStorage.removeItem('honeypot_blocked');
+      localStorage.removeItem('honeypot_blocked_ip');
+      localStorage.removeItem('honeypot_blocked_time');
+      alert("🔓 Backdoor aktif. Selamat datang kembali, Owner!");
+      window.location.reload();
+    }
+    if (typedKeys.length > 50) {
+      typedKeys = typedKeys.substring(typedKeys.length - 20);
+    }
   });
 }
