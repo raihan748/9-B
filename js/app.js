@@ -883,12 +883,19 @@ function setupUIEventListeners() {
       const text = document.getElementById('madingInput').value.trim();
       if (!text) { alert("Isi pengumuman tidak boleh kosong!"); return; }
       const isImportant = document.getElementById('madingImportantCheck').checked;
-      const adminName = localStorage.getItem('admin_name') || 'Admin';
+      
+      const adminLevel = localStorage.getItem('admin_level');
+      let authorRole = localStorage.getItem('admin_name') || 'Admin';
+      if (adminLevel === 'HEAD_ADMIN') {
+        authorRole = 'KETUA_KELAS';
+      } else if (adminLevel === 'WALI_KELAS') {
+        authorRole = 'WALI_KELAS';
+      }
 
       if (madingRef) {
         madingRef.push({
           text,
-          author: adminName,
+          author: authorRole,
           isImportant,
           timestamp: Date.now()
         }).then(() => {
