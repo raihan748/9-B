@@ -180,7 +180,18 @@ function setupMadingListener() {
     data.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
     if (data.length === 0) {
-      prepopulateMading();
+      if (statusRef) {
+        statusRef.child('mading_initialized').once('value', initSnap => {
+          if (!initSnap.val()) {
+            statusRef.update({ mading_initialized: true });
+            prepopulateMading();
+          } else {
+            renderMadingList([]);
+          }
+        });
+      } else {
+        renderMadingList([]);
+      }
       return;
     }
 
