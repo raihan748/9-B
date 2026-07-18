@@ -96,7 +96,13 @@
 
       <!-- Pinned Announcement Banner (Wali Kelas) -->
       <div id="pinnedAnnouncementBanner" class="brut-card btn-yellow" style="display: none; margin-bottom: 24px; padding: 18px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); position: relative;">
-        <div style="display: flex; align-items: flex-start; gap: 14px;">
+        <!-- Tombol Edit (Tampil hanya untuk Head Admin & Wali Kelas) -->
+        <button id="btnEditAnnouncementFromBanner" class="brut-btn" style="display: none; position: absolute; top: 12px; right: 12px; padding: 4px 8px; font-size: 0.65rem; font-weight: 800; background: #fff; border: 2px solid var(--border-color); box-shadow: 2px 2px 0 #000; cursor: pointer;">
+          <i class="fa-solid fa-pen"></i> EDIT
+        </button>
+
+        <!-- View Mode -->
+        <div id="announcementViewMode" style="display: flex; align-items: flex-start; gap: 14px; padding-right: 50px;">
           <div class="announcement-icon-wrapper" style="font-size: 1.4rem; color: #000; padding: 8px 12px; background: #fff; border: 2.5px solid var(--border-color); border-radius: 4px; box-shadow: 2px 2px 0 #000; display: flex; align-items: center; justify-content: center; animation: announce-pulse 1.2s infinite alternate;">
             <i class="fa-solid fa-bullhorn"></i>
           </div>
@@ -110,6 +116,18 @@
             <div id="announcementMeta" style="font-size: 0.7rem; color: rgba(0,0,0,0.5); font-weight: 700; margin-top: 6px;">
               <!-- Loaded dynamically -->
             </div>
+          </div>
+        </div>
+
+        <!-- Edit Mode (Inline Form) -->
+        <div id="announcementEditMode" style="display: none; flex-direction: column; gap: 10px; text-align: left;">
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 0.72rem; font-weight: 900; letter-spacing: 0.05em; color: rgba(0,0,0,0.6); text-transform: uppercase;">
+            Edit Pengumuman Wali Kelas
+          </div>
+          <textarea id="announcementBannerInput" class="form-input" rows="2" style="width: 100%; resize: none; background: #fff; color: #000; border: 2px solid var(--border-color); font-weight: 700;" maxlength="200" placeholder="Ketik pengumuman baru..."></textarea>
+          <div style="display: flex; gap: 8px; justify-content: flex-end;">
+            <button id="btnCancelAnnouncementFromBanner" class="brut-btn btn-pink" style="padding: 4px 10px; font-size: 0.75rem; font-weight: 700; box-shadow: 2px 2px 0 #000;">BATAL</button>
+            <button id="btnSaveAnnouncementFromBanner" class="brut-btn btn-mint" style="padding: 4px 10px; font-size: 0.75rem; font-weight: 700; box-shadow: 2px 2px 0 #000;">SIMPAN</button>
           </div>
         </div>
       </div>

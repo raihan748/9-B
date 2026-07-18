@@ -154,9 +154,13 @@ function setupGlobalStatusListener() {
       const dateStr = annTime ? new Date(annTime).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
       document.getElementById('announcementMeta').innerText = `Disematkan oleh ${annAuthor} ${dateStr ? 'pada ' + dateStr : ''}`;
       document.getElementById('announcementEditorInput').value = annText;
+      const bannerInput = document.getElementById('announcementBannerInput');
+      if (bannerInput) bannerInput.value = annText;
     } else {
       annBanner.style.display = 'none';
       document.getElementById('announcementEditorInput').value = '';
+      const bannerInput = document.getElementById('announcementBannerInput');
+      if (bannerInput) bannerInput.value = '';
     }
   });
 }
@@ -412,6 +416,9 @@ function applyAdminUI(level, name) {
   document.getElementById('ctrlAnnouncementBox').style.display = isAnnouncementModerator ? 'block' : 'none';
   document.getElementById('ctrlEventApprovalBox').style.display = isAnnouncementModerator ? 'block' : 'none';
 
+  const editBannerBtn = document.getElementById('btnEditAnnouncementFromBanner');
+  if (editBannerBtn) editBannerBtn.style.display = isAnnouncementModerator ? 'block' : 'none';
+
   if (window.renderTasksList) window.renderTasksList();
 }
 
@@ -432,6 +439,14 @@ function handleLogout(forced = false) {
   document.getElementById('clearChatBtn').style.display = 'none';
   document.getElementById('ctrlAnnouncementBox').style.display = 'none';
   document.getElementById('ctrlEventApprovalBox').style.display = 'none';
+
+  const editBannerBtn = document.getElementById('btnEditAnnouncementFromBanner');
+  if (editBannerBtn) editBannerBtn.style.display = 'none';
+  const viewMode = document.getElementById('announcementViewMode');
+  const editMode = document.getElementById('announcementEditMode');
+  if (viewMode) viewMode.style.display = 'flex';
+  if (editMode) editMode.style.display = 'none';
+
   if (window.renderTasksList) window.renderTasksList();
   if (forced) { alert("⚠️ Sesi akses administrator Anda telah diputus secara paksa oleh Administrator Utama."); switchTab('lobby'); }
 }
@@ -555,6 +570,52 @@ function setupUIEventListeners() {
       }).catch(err => alert("Gagal menghapus: " + err.message));
     }
   };
+
+  // Lobby Banner Inline Edit Handlers
+  const btnEditBanner = document.getElementById('btnEditAnnouncementFromBanner');
+  const btnCancelBanner = document.getElementById('btnCancelAnnouncementFromBanner');
+  const btnSaveBanner = document.getElementById('btnSaveAnnouncementFromBanner');
+  const viewMode = document.getElementById('announcementViewMode');
+  const editMode = document.getElementById('announcementEditMode');
+  const bannerInput = document.getElementById('announcementBannerInput');
+
+  if (btnEditBanner && btnCancelBanner && btnSaveBanner && viewMode && editMode && bannerInput) {
+    btnEditBanner.onclick = () => {
+      viewMode.style.display = 'none';
+      btnEditBanner.style.display = 'none';
+      editMode.style.display = 'flex';
+      bannerInput.focus();
+    };
+
+    btnCancelBanner.onclick = () => {
+      viewMode.style.display = 'flex';
+      const level = localStorage.getItem('admin_level');
+      const isAnnouncementModerator = level === 'HEAD_ADMIN' || level === 'WALI_KELAS';
+      btnEditBanner.style.display = isAnnouncementModerator ? 'block' : 'none';
+      editMode.style.display = 'none';
+    };
+
+    btnSaveBanner.onclick = () => {
+      const text = bannerInput.value.trim();
+      if (!text) { alert("Isi pengumuman tidak boleh kosong!"); return; }
+      const adminName = localStorage.getItem('admin_name') || 'Admin';
+      if (statusRef) {
+        statusRef.update({
+          announcement_text: text,
+          announcement_author: adminName,
+          announcement_timestamp: Date.now()
+        }).then(() => {
+          if (window.logAdminActivity) window.logAdminActivity("Menyematkan pengumuman baru dari banner");
+          alert("Pengumuman berhasil diperbarui!");
+          viewMode.style.display = 'flex';
+          const level = localStorage.getItem('admin_level');
+          const isAnnouncementModerator = level === 'HEAD_ADMIN' || level === 'WALI_KELAS';
+          btnEditBanner.style.display = isAnnouncementModerator ? 'block' : 'none';
+          editMode.style.display = 'none';
+        }).catch(err => alert("Gagal memperbarui: " + err.message));
+      }
+    };
+  }
 
   document.getElementById('submitAddTaskBtn').onclick = () => {
     const subject = document.getElementById('taskSubjectInput').value;
