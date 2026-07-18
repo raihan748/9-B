@@ -116,8 +116,9 @@ function renderMessage(message, messageId) {
     msgDiv.innerHTML = `<div class="message-text">${message.text}</div>`;
   } else {
     msgDiv.className = `message ${isSelf ? 'sent' : 'received'}`;
-    const isHeadAdmin = localStorage.getItem('admin_level') === 'HEAD_ADMIN';
-    const deleteBtn = isHeadAdmin
+    const adminLevel = localStorage.getItem('admin_level');
+    const isModerator = adminLevel === 'HEAD_ADMIN' || adminLevel === 'WALI_KELAS';
+    const deleteBtn = isModerator
       ? `<button class="task-action-btn btn-delete" style="padding:2px 6px;font-size:0.6rem;border-width:1px;box-shadow:none;" onclick="deleteChatMessage('${messageId}')">HAPUS</button>`
       : '';
     msgDiv.innerHTML = `

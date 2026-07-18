@@ -182,6 +182,12 @@
     }).join('');
   }
 
+  /* ---- HELPER ESCAPE HTML ---- */
+  function escapeHTML(str) {
+    if (window.escapeHTML) return window.escapeHTML(str);
+    return str ? str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") : "";
+  }
+
   /* ---- FIREBASE LISTENER ---- */
   let eventsData = [];
 
@@ -195,9 +201,42 @@
           eventsData.push({ id: child.key, ...child.val() });
         });
       }
-      renderEvents(eventsData);
-      renderCalendarTab(eventsData);
+      const publicEvents = eventsData.filter(e => e.approved !== false);
+      const pendingEvents = eventsData.filter(e => e.approved === false);
+
+      renderEvents(publicEvents);
+      renderCalendarTab(publicEvents);
+      renderPendingEvents(pendingEvents);
     });
+  }
+
+  /* ---- RENDER PENDING EVENTS (ADMIN ONLY) ---- */
+  function renderPendingEvents(pendingEvents) {
+    const container = document.getElementById('pendingEventList');
+    if (!container) return;
+    if (pendingEvents.length === 0) {
+      container.innerHTML = `<div style="color:var(--text-muted); font-size:0.8rem; text-align:center; padding: 10px 0;">Tidak ada usulan event pending.</div>`;
+      return;
+    }
+    container.innerHTML = pendingEvents.map(ev => {
+      const d = new Date(ev.date + 'T00:00:00');
+      const formattedDate = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+      return `
+        <div class="admin-session-item" style="border: 2px solid var(--border-color); padding: 12px; background: rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 8px; border-radius: 4px; box-shadow: 2px 2px 0px #000; margin-bottom: 8px;">
+          <div>
+            <strong style="font-size: 0.85rem; color: var(--text-light);">${escapeHTML(ev.title)}</strong>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">
+              <i class="fa-solid fa-calendar"></i> ${formattedDate} &nbsp;·&nbsp; <i class="fa-solid fa-tag"></i> ${ev.color || 'cyan'}
+            </div>
+            ${ev.description ? `<p style="font-size: 0.78rem; color: var(--text-muted); margin: 6px 0 0 0; line-height: 1.3;">${escapeHTML(ev.description)}</p>` : ''}
+          </div>
+          <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px;">
+            <button onclick="KalenderModule.rejectEvent('${ev.id}')" class="brut-btn btn-pink" style="padding: 4px 10px; font-size: 0.72rem; font-weight: 700; box-shadow: 1.5px 1.5px 0 #000;">TOLAK</button>
+            <button onclick="KalenderModule.approveEvent('${ev.id}')" class="brut-btn btn-mint" style="padding: 4px 10px; font-size: 0.72rem; font-weight: 700; box-shadow: 1.5px 1.5px 0 #000;">SETUJUI</button>
+          </div>
+        </div>
+      `;
+    }).join('');
   }
 
   /* ---- ADD EVENT ---- */
@@ -213,8 +252,11 @@
 
     if (!window.db) { alert('Database belum siap.'); return; }
 
+    const isAdmin = localStorage.getItem('admin_logged') === 'true';
+
     window.db.ref('class_events').push({
       title, date, description: desc || '', color,
+      approved: isAdmin,
       createdAt: Date.now()
     }).then(() => {
       document.getElementById('eventTitle').value = '';
@@ -223,13 +265,46 @@
       // Close form
       const form = document.getElementById('addEventForm');
       if (form) form.style.display = 'none';
+
+      if (!isAdmin) {
+        alert('Usulan kegiatan berhasil dikirim! Kegiatan akan tampil di kalender setelah disetujui oleh Wali Kelas atau Admin.');
+      } else {
+        alert('Event berhasil ditambahkan!');
+      }
     }).catch(err => alert('Gagal tambah event: ' + err.message));
+  }
+
+  /* ---- APPROVE EVENT ---- */
+  function approveEvent(id) {
+    if (!window.db) return;
+    window.db.ref(`class_events/${id}`).update({ approved: true })
+      .then(() => {
+        if (window.logAdminActivity) window.logAdminActivity("Menyetujui usulan event kelas");
+        alert("Usulan event berhasil disetujui!");
+      })
+      .catch(err => alert("Gagal menyetujui event: " + err.message));
+  }
+
+  /* ---- REJECT EVENT ---- */
+  function rejectEvent(id) {
+    if (!window.db) return;
+    if (!confirm("Tolak/Hapus usulan event ini?")) return;
+    window.db.ref(`class_events/${id}`).remove()
+      .then(() => {
+        if (window.logAdminActivity) window.logAdminActivity("Menolak usulan event kelas");
+        alert("Usulan event berhasil ditolak!");
+      })
+      .catch(err => alert("Gagal menolak event: " + err.message));
   }
 
   /* ---- DELETE EVENT ---- */
   function deleteEvent(id) {
     if (!confirm('Hapus event ini?')) return;
-    window.db.ref(`class_events/${id}`).remove();
+    window.db.ref(`class_events/${id}`).remove()
+      .then(() => {
+        if (window.logAdminActivity) window.logAdminActivity("Menghapus event kelas");
+      })
+      .catch(err => alert("Gagal menghapus event: " + err.message));
   }
 
   /* ---- INIT ---- */

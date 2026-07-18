@@ -94,6 +94,26 @@
         </div>
       </div>
 
+      <!-- Pinned Announcement Banner (Wali Kelas) -->
+      <div id="pinnedAnnouncementBanner" class="brut-card btn-yellow" style="display: none; margin-bottom: 24px; padding: 18px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); position: relative;">
+        <div style="display: flex; align-items: flex-start; gap: 14px;">
+          <div class="announcement-icon-wrapper" style="font-size: 1.4rem; color: #000; padding: 8px 12px; background: #fff; border: 2.5px solid var(--border-color); border-radius: 4px; box-shadow: 2px 2px 0 #000; display: flex; align-items: center; justify-content: center; animation: announce-pulse 1.2s infinite alternate;">
+            <i class="fa-solid fa-bullhorn"></i>
+          </div>
+          <div style="flex: 1; text-align: left;">
+            <div style="font-family: 'Space Grotesk', sans-serif; font-size: 0.72rem; font-weight: 900; letter-spacing: 0.05em; color: rgba(0,0,0,0.6); text-transform: uppercase;">
+              Pengumuman Wali Kelas
+            </div>
+            <div id="announcementText" style="font-size: 1rem; font-weight: 700; color: #000; margin-top: 4px; line-height: 1.4; word-break: break-word;">
+              <!-- Loaded dynamically -->
+            </div>
+            <div id="announcementMeta" style="font-size: 0.7rem; color: rgba(0,0,0,0.5); font-weight: 700; margin-top: 6px;">
+              <!-- Loaded dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="lobby-layout">
         <!-- Main Column -->
         <div class="lobby-main">
@@ -170,7 +190,7 @@
           <div class="brut-card" style="padding:16px;margin-top:14px;">
             <h4 style="font-family:'Archivo Black',sans-serif;font-size:0.8rem;color:var(--yellow-light);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">
               <span><i class="fa-solid fa-calendar-days"></i> EVENT KELAS</span>
-              <span id="toggleAddEventForm" class="kalender-admin-only" style="display:none;font-size:0.65rem;cursor:pointer;color:var(--mint);text-decoration:underline;">+ Tambah</span>
+              <span id="toggleAddEventForm" style="font-size:0.65rem;cursor:pointer;color:var(--mint);text-decoration:underline;">+ Tambah</span>
             </h4>
             <!-- Form Tambah Event (admin only) -->
             <div id="addEventForm" style="display:none;margin-bottom:12px;">
@@ -429,6 +449,34 @@
               <!-- Active sessions list -->
               <div class="admin-session-item">Tidak ada admin reguler aktif</div>
             </div>
+          </div>
+        </div>
+
+        <!-- Pinned Announcement Editor (Head Admin & Wali Kelas) -->
+        <div class="panel-section" id="ctrlAnnouncementBox" style="display: none;">
+          <h4><i class="fa-solid fa-bullhorn"></i> Pengumuman Sematan Wali Kelas</h4>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
+            Sematkan pengumuman penting Wali Kelas di halaman paling atas Lobby.
+          </p>
+          <div class="form-group">
+            <label for="announcementEditorInput">Isi Pengumuman</label>
+            <textarea id="announcementEditorInput" class="form-input" rows="3" style="resize: none; background-color: var(--bg-dark);" placeholder="Ketik isi pengumuman kelas di sini..." maxlength="200"></textarea>
+          </div>
+          <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button id="btnDeleteAnnouncement" class="brut-btn btn-pink" style="flex: 1; box-shadow: 3px 3px 0px #000; padding: 10px; font-size: 0.8rem; font-weight: 700;">HAPUS BANNER</button>
+            <button id="btnSaveAnnouncement" class="brut-btn btn-yellow" style="flex: 1; box-shadow: 3px 3px 0px #000; padding: 10px; font-size: 0.8rem; font-weight: 700;">SEMATKAN BANNER</button>
+          </div>
+        </div>
+
+        <!-- Calendar Event Approval Box (Head Admin & Wali Kelas) -->
+        <div class="panel-section" id="ctrlEventApprovalBox" style="display: none;">
+          <h4><i class="fa-solid fa-calendar-check"></i> Persetujuan Event Kelas</h4>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
+            Daftar usulan kegiatan/event kelas dari siswa yang membutuhkan pengesahan.
+          </p>
+          <div class="active-admins-list" id="pendingEventList" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;">
+            <!-- Pending events will be loaded dynamically from Firebase -->
+            <div style="color:var(--text-muted); font-size:0.8rem; text-align:center; padding: 10px 0;">Tidak ada usulan event pending.</div>
           </div>
         </div>
       </div>

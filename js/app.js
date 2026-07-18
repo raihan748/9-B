@@ -141,6 +141,23 @@ function setupGlobalStatusListener() {
     const bcastText = status.broadcast_text || 'Selamat datang di website resmi Kelas 9B.';
     document.getElementById('broadcastText').innerText = bcastText;
     document.getElementById('broadcastTextEditor').value = bcastText;
+
+    // 5. Pinned Announcement
+    const annText = status.announcement_text || '';
+    const annAuthor = status.announcement_author || 'Wali Kelas';
+    const annTime = status.announcement_timestamp || 0;
+    const annBanner = document.getElementById('pinnedAnnouncementBanner');
+    
+    if (annText) {
+      annBanner.style.display = 'block';
+      document.getElementById('announcementText').innerText = annText;
+      const dateStr = annTime ? new Date(annTime).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+      document.getElementById('announcementMeta').innerText = `Disematkan oleh ${annAuthor} ${dateStr ? 'pada ' + dateStr : ''}`;
+      document.getElementById('announcementEditorInput').value = annText;
+    } else {
+      annBanner.style.display = 'none';
+      document.getElementById('announcementEditorInput').value = '';
+    }
   });
 }
 
@@ -389,6 +406,12 @@ function applyAdminUI(level, name) {
     document.getElementById('headAdminManagementBox').style.display = 'none';
     document.getElementById('clearChatBtn').style.display = 'none';
   }
+
+  // Wali Kelas & Head Admin Announcement and Event Approval Panels
+  const isAnnouncementModerator = level === 'HEAD_ADMIN' || level === 'WALI_KELAS';
+  document.getElementById('ctrlAnnouncementBox').style.display = isAnnouncementModerator ? 'block' : 'none';
+  document.getElementById('ctrlEventApprovalBox').style.display = isAnnouncementModerator ? 'block' : 'none';
+
   if (window.renderTasksList) window.renderTasksList();
 }
 
@@ -407,6 +430,8 @@ function handleLogout(forced = false) {
   document.getElementById('adminDashboardPanel').style.display = 'none';
   document.getElementById('openAddTaskModalBtn').style.display = 'none';
   document.getElementById('clearChatBtn').style.display = 'none';
+  document.getElementById('ctrlAnnouncementBox').style.display = 'none';
+  document.getElementById('ctrlEventApprovalBox').style.display = 'none';
   if (window.renderTasksList) window.renderTasksList();
   if (forced) { alert("⚠️ Sesi akses administrator Anda telah diputus secara paksa oleh Administrator Utama."); switchTab('lobby'); }
 }
@@ -499,6 +524,37 @@ function setupUIEventListeners() {
   document.getElementById('adminLogoutBtn').onclick = () => { if (confirm("Keluar dari panel administrator?")) handleLogout(); };
   document.getElementById('openAddTaskModalBtn').onclick = () => addTaskModal.style.display = 'flex';
   document.getElementById('closeAddTaskModalBtn').onclick = () => addTaskModal.style.display = 'none';
+
+  // Pinned Announcement Handlers
+  document.getElementById('btnSaveAnnouncement').onclick = () => {
+    const text = document.getElementById('announcementEditorInput').value.trim();
+    if (!text) { alert("Isi pengumuman tidak boleh kosong!"); return; }
+    const adminName = localStorage.getItem('admin_name') || 'Admin';
+    if (statusRef) {
+      statusRef.update({
+        announcement_text: text,
+        announcement_author: adminName,
+        announcement_timestamp: Date.now()
+      }).then(() => {
+        if (window.logAdminActivity) window.logAdminActivity("Menyematkan pengumuman baru");
+        alert("Pengumuman berhasil disematkan!");
+      }).catch(err => alert("Gagal menyematkan: " + err.message));
+    }
+  };
+
+  document.getElementById('btnDeleteAnnouncement').onclick = () => {
+    if (!confirm("Hapus pengumuman sematan?")) return;
+    if (statusRef) {
+      statusRef.update({
+        announcement_text: null,
+        announcement_author: null,
+        announcement_timestamp: null
+      }).then(() => {
+        if (window.logAdminActivity) window.logAdminActivity("Menghapus pengumuman sematan");
+        alert("Pengumuman berhasil dihapus!");
+      }).catch(err => alert("Gagal menghapus: " + err.message));
+    }
+  };
 
   document.getElementById('submitAddTaskBtn').onclick = () => {
     const subject = document.getElementById('taskSubjectInput').value;

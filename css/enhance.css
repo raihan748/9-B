@@ -559,3 +559,9 @@ body.deadline-alert-active .live-broadcast {
   text-transform: uppercase;
 }
 
+/* Pinned Announcement Icon Pulse */
+@keyframes announce-pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
