@@ -1,18 +1,16 @@
 /* ==========================================================================
-   VISUAL ENHANCEMENT LAYER — 9B WEBSITE POLISH
-   Premium micro-animations, glow effects, particles, shimmer, dan lebih banyak
+   VISUAL ENHANCEMENT LAYER — 9B CYBER-PREMIUM POLISH
+   Includes floating ambient orbs, button shine, card glow, particle mesh,
+   cyber animations, and full Cybersec Honeypot styles.
    ========================================================================== */
 
-/* === UPGRADE GOOGLE FONTS — Tambah Outfit untuk heading premium === */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
-
-/* === CSS VARIABLES TAMBAHAN === */
+/* === CSS VARIABLES FOR GLOWS === */
 :root {
-  --glow-purple: 0 0 20px rgba(167, 139, 250, 0.4), 0 0 40px rgba(167, 139, 250, 0.15);
-  --glow-yellow: 0 0 20px rgba(233, 196, 106, 0.4), 0 0 40px rgba(233, 196, 106, 0.15);
-  --glow-mint:   0 0 20px rgba(78, 204, 163, 0.4), 0 0 40px rgba(78, 204, 163, 0.15);
-  --glow-pink:   0 0 20px rgba(248, 113, 113, 0.4), 0 0 40px rgba(248, 113, 113, 0.15);
-  --glow-cyan:   0 0 20px rgba(96, 165, 250, 0.4), 0 0 40px rgba(96, 165, 250, 0.15);
+  --glow-cyan:   0 0 20px rgba(56, 189, 248, 0.4), 0 0 40px rgba(56, 189, 248, 0.15);
+  --glow-purple: 0 0 20px rgba(168, 85, 247, 0.4), 0 0 40px rgba(168, 85, 247, 0.15);
+  --glow-yellow: 0 0 20px rgba(245, 158, 11, 0.4), 0 0 40px rgba(245, 158, 11, 0.15);
+  --glow-mint:   0 0 20px rgba(52, 211, 153, 0.4), 0 0 40px rgba(52, 211, 153, 0.15);
+  --glow-pink:   0 0 20px rgba(244, 63, 94, 0.4), 0 0 40px rgba(244, 63, 94, 0.15);
 }
 
 /* ==========================================================================
@@ -24,27 +22,26 @@
   width: 100%; height: 100%;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.4;
+  opacity: 0.6;
 }
 
-/* Pastikan semua konten di atas canvas */
-nav, .live-broadcast, main, #mobileMenu {
+nav, .live-broadcast, main, #mobileMenu, footer {
   position: relative;
   z-index: 1;
 }
 
 /* ==========================================================================
-   AMBIENT GRADIENT BLOBS (Background Atmosphere)
+   AMBIENT FLOATING ORBS (Atmospheric Lighting)
    ========================================================================== */
 body::before {
   content: '';
   position: fixed;
-  top: -30%;
-  left: -20%;
-  width: 60vw;
-  height: 60vw;
-  background: radial-gradient(circle, rgba(167, 139, 250, 0.06) 0%, transparent 70%);
-  animation: blob-drift-1 18s ease-in-out infinite alternate;
+  top: -20%;
+  left: -15%;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, transparent 65%);
+  animation: orb-drift-1 16s ease-in-out infinite alternate;
   pointer-events: none;
   z-index: 0;
 }
@@ -53,237 +50,56 @@ body::after {
   content: '';
   position: fixed;
   bottom: -20%;
-  right: -20%;
-  width: 70vw;
-  height: 70vw;
-  background: radial-gradient(circle, rgba(78, 204, 163, 0.05) 0%, transparent 70%);
-  animation: blob-drift-2 22s ease-in-out infinite alternate;
+  right: -15%;
+  width: 55vw;
+  height: 55vw;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.07) 0%, transparent 65%);
+  animation: orb-drift-2 20s ease-in-out infinite alternate;
   pointer-events: none;
   z-index: 0;
 }
 
-@keyframes blob-drift-1 {
+@keyframes orb-drift-1 {
   0%   { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(8vw, 6vh) scale(1.12); }
+  100% { transform: translate(6vw, 5vh) scale(1.1); }
 }
 
-@keyframes blob-drift-2 {
+@keyframes orb-drift-2 {
   0%   { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(-6vw, -8vh) scale(1.08); }
+  100% { transform: translate(-5vw, -6vh) scale(1.08); }
 }
 
 /* ==========================================================================
-   NAVIGATION BAR — GLASSMORPHISM UPGRADE
+   GRADIENT TEXT & SHIMMER UTILITIES
    ========================================================================== */
-nav {
-  background: rgba(13, 15, 18, 0.82) !important;
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
-}
-
-/* Nav Logo — Gradient + Glow */
-.nav-logo {
-  background: transparent !important;
-  box-shadow: var(--glow-purple), 3px 3px 0px var(--border-color) !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-  border-radius: 8px;
-}
-
-.nav-logo:hover {
-  transform: rotate(-5deg) scale(1.05);
-  box-shadow: var(--glow-cyan), 3px 3px 0px var(--border-color) !important;
-}
-
-/* Nav Active Tab — Gradient background */
-.nav-links a.active {
-  background: linear-gradient(135deg, var(--yellow-light), var(--yellow)) !important;
-  box-shadow: 3px 3px 0px var(--border-color), var(--glow-yellow) !important;
-}
-
-/* ==========================================================================
-   LIVE BROADCAST TICKER — UPGRADES
-   ========================================================================== */
-.live-dot {
-  animation: blink 1s ease-in-out infinite, glow-red 1.5s ease-in-out infinite alternate;
-  box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
-}
-
-@keyframes glow-red {
-  0%   { box-shadow: 0 0 4px rgba(239, 68, 68, 0.6); }
-  100% { box-shadow: 0 0 14px rgba(239, 68, 68, 1); }
-}
-
-/* Ticker text glow effect */
-#broadcastText {
-  text-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
-  font-weight: 700;
-}
-
-/* ==========================================================================
-   SECTION HEADINGS — GRADIENT TEXT + GLOW
-   ========================================================================== */
-.section-title {
-  background: linear-gradient(135deg, var(--text-light) 0%, var(--purple) 100%);
+.gradient-text {
+  background: linear-gradient(135deg, #38bdf8, #a855f7, #f43f5e);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.3));
+  display: inline-block;
 }
 
-/* Widget headers yang ada di lobby */
-.widget-header {
-  position: relative;
-  overflow: hidden;
+.gradient-gold {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
 }
 
-.widget-header::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--purple), var(--cyan), var(--mint));
-  background-size: 200% 100%;
-  animation: gradient-slide 3s ease infinite;
-}
-
-@keyframes gradient-slide {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+.gradient-mint {
+  background: linear-gradient(135deg, #34d399, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
 }
 
 /* ==========================================================================
-   BRUT-CARD — UPGRADED GLOW ON HOVER
-   ========================================================================== */
-.brut-card {
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.brut-card:hover {
-  transform: translateY(-6px) !important;
-  box-shadow: 7px 7px 0px var(--border-color), var(--glow-purple) !important;
-}
-
-/* ==========================================================================
-   BUTTONS — SHINE / SHIMMER EFFECT
-   ========================================================================== */
-.brut-btn {
-  position: relative;
-  overflow: hidden;
-}
-
-.brut-btn::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -75%;
-  width: 50%;
-  height: 200%;
-  background: rgba(255, 255, 255, 0.12);
-  transform: skewX(-20deg);
-  transition: left 0.4s ease;
-}
-
-.brut-btn:hover::after {
-  left: 130%;
-}
-
-/* Button color-specific glow on hover */
-.btn-purple:hover { box-shadow: var(--shadow-hover), var(--glow-purple) !important; }
-.btn-mint:hover   { box-shadow: var(--shadow-hover), var(--glow-mint)   !important; }
-.btn-cyan:hover   { box-shadow: var(--shadow-hover), var(--glow-cyan)   !important; }
-.btn-yellow:hover { box-shadow: var(--shadow-hover), var(--glow-yellow) !important; }
-.btn-pink:hover   { box-shadow: var(--shadow-hover), var(--glow-pink)   !important; }
-
-/* Admin login button pulse when logged in */
-.admin-login-btn.logged-in {
-  animation: pulse-green 2.5s ease-in-out infinite;
-}
-
-@keyframes pulse-green {
-  0%, 100% { box-shadow: 3px 3px 0px var(--border-color), 0 0 0 0 rgba(78, 204, 163, 0.4); }
-  50%       { box-shadow: 3px 3px 0px var(--border-color), 0 0 0 8px rgba(78, 204, 163, 0); }
-}
-
-/* ==========================================================================
-   TASK CARDS — ENHANCED
-   ========================================================================== */
-.task-card {
-  position: relative;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.3s ease !important;
-}
-
-.task-card:hover {
-  transform: translateY(-4px) !important;
-  box-shadow: 6px 6px 0px var(--border-color), 0 8px 32px rgba(167, 139, 250, 0.15) !important;
-}
-
-/* Colored left border accent per column */
-#todoCards .task-card { border-left: 4px solid var(--cyan) !important; }
-#progressCards .task-card { border-left: 4px solid var(--yellow-light) !important; }
-#doneCards .task-card { border-left: 4px solid var(--mint) !important; }
-
-/* Column header glow badge */
-.kanban-column-header .column-count {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.kanban-column-header:hover .column-count {
-  transform: scale(1.1);
-  box-shadow: var(--glow-purple);
-}
-
-/* ==========================================================================
-   CHAT MESSAGES — PREMIUM STYLING
-   ========================================================================== */
-.message.sent .message-text {
-  background: linear-gradient(135deg, rgba(167, 139, 250, 0.25), rgba(96, 165, 250, 0.2)) !important;
-  border-left: 3px solid var(--purple);
-}
-
-.message.received .message-text {
-  background: rgba(28, 28, 33, 0.9) !important;
-  border-left: 3px solid var(--mint);
-}
-
-.message {
-  animation: msg-slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-@keyframes msg-slide-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Send button pulse */
-#sendChatBtn {
-  position: relative;
-}
-
-#sendChatBtn:hover {
-  animation: btn-pulse 0.6s ease;
-}
-
-@keyframes btn-pulse {
-  0%   { transform: translate(3px, 3px) scale(1); }
-  30%  { transform: translate(2px, 2px) scale(1.04); }
-  100% { transform: translate(3px, 3px) scale(1); }
-}
-
-/* ==========================================================================
-   PAGE ENTRY ANIMATIONS (IntersectionObserver target)
+   MICRO-ANIMATIONS & HOVER GLOWS
    ========================================================================== */
 .anim-fade-up {
   opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(20px);
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .anim-fade-up.visible {
@@ -291,286 +107,47 @@ nav {
   transform: translateY(0);
 }
 
-/* Stagger delays */
-.anim-delay-1 { transition-delay: 0.05s; }
-.anim-delay-2 { transition-delay: 0.12s; }
-.anim-delay-3 { transition-delay: 0.20s; }
-.anim-delay-4 { transition-delay: 0.28s; }
-.anim-delay-5 { transition-delay: 0.36s; }
+.anim-delay-1 { transition-delay: 0.08s; }
+.anim-delay-2 { transition-delay: 0.16s; }
+.anim-delay-3 { transition-delay: 0.24s; }
+.anim-delay-4 { transition-delay: 0.32s; }
 
-/* ==========================================================================
-   PIKET WIDGET — ENHANCED
-   ========================================================================== */
-.piket-member {
-  position: relative;
-  padding-left: 4px;
-  transition: all 0.25s ease;
-}
-
-.piket-member:hover {
-  transform: translateX(6px);
-  color: var(--mint);
-}
-
-/* ==========================================================================
-   COUNTDOWN DIGITS — NEON GLOW
-   ========================================================================== */
-.countdown-digit {
-  background: linear-gradient(135deg, var(--bg-card), #252530) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 0 20px rgba(167, 139, 250, 0.2) !important;
-  animation: digit-breathe 3s ease-in-out infinite alternate;
-}
-
-@keyframes digit-breathe {
-  0%   { box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 0 10px rgba(167, 139, 250, 0.15); }
-  100% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 0 30px rgba(167, 139, 250, 0.4); }
-}
-
-/* ==========================================================================
-   FORM INPUTS — GLOW ON FOCUS
-   ========================================================================== */
-.form-input:focus, textarea:focus, input[type="text"]:focus,
-input[type="password"]:focus, input[type="datetime-local"]:focus,
-input[type="date"]:focus, select:focus {
-  outline: none !important;
-  border-color: var(--purple) !important;
-  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2), 3px 3px 0px var(--border-color) !important;
-  transition: all 0.25s ease !important;
-}
-
-/* ==========================================================================
-   ADMIN DASHBOARD PANEL — SUBTLE ACCENT
-   ========================================================================== */
-#adminDashboardPanel {
-  position: relative;
-  overflow: hidden;
-}
-
-#adminDashboardPanel::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--purple), var(--cyan), var(--mint), var(--yellow-light));
-  background-size: 300% 100%;
-  animation: gradient-slide 4s ease infinite;
-}
-
-/* ==========================================================================
-   STATUS SWITCH TOGGLES — GLOW ON ACTIVE
-   ========================================================================== */
-input[type="checkbox"]:checked {
-  accent-color: var(--mint);
-  box-shadow: 0 0 8px var(--mint);
-}
-
-/* ==========================================================================
-   SCROLLBAR — GRADIENT UPGRADE
-   ========================================================================== */
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--purple), var(--cyan)) !important;
-  border-radius: 6px !important;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, var(--cyan), var(--mint)) !important;
-}
-
-/* ==========================================================================
-   MODAL — PREMIUM BLUR OVERLAY
-   ========================================================================== */
-.modal-overlay {
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 9999 !important;
-  backdrop-filter: blur(8px) brightness(0.6) !important;
-  -webkit-backdrop-filter: blur(8px) brightness(0.6) !important;
-}
-
-.modal-content {
-  position: relative;
-  overflow: hidden;
-}
-
-.modal-content::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--purple), var(--cyan));
-}
-
-/* ==========================================================================
-   LOG ENTRIES — ANIMATED APPEAR
-   ========================================================================== */
-.log-entry {
-  animation: log-appear 0.3s ease forwards;
-  border-left: 3px solid transparent;
-  transition: border-color 0.2s ease, background 0.2s ease;
-}
-
-.log-entry:hover {
-  border-left-color: var(--cyan);
-  background: rgba(96, 165, 250, 0.05);
-}
-
-.log-entry.important {
-  border-left-color: var(--pink) !important;
-}
-
-@keyframes log-appear {
-  from { opacity: 0; transform: translateX(-8px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-/* ==========================================================================
-   VIDEO CARDS — HOVER LIFT
-   ========================================================================== */
-.video-card {
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.video-card:hover {
-  transform: translateY(-6px) !important;
-  box-shadow: 8px 8px 0px var(--border-color), var(--glow-cyan) !important;
-}
-
-/* ==========================================================================
-   CAPSULE MESSAGE CARDS — GLOW
-   ========================================================================== */
-.capsule-message-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease !important;
-}
-
-.capsule-message-card:hover {
-  transform: rotate(0deg) translateY(-6px) !important;
-  box-shadow: 6px 6px 0 var(--border-color), var(--glow-yellow) !important;
-  z-index: 2;
-}
-
-/* ==========================================================================
-   PAGE LOAD ANIMATION
-   ========================================================================== */
-@keyframes page-reveal {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-main {
-  animation: page-reveal 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-/* ==========================================================================
-   DEADLINE ALERT MODE — ENHANCED PULSE
-   ========================================================================== */
-body.deadline-alert-active .brut-card:hover {
-  box-shadow: 7px 7px 0px var(--border-color), var(--glow-pink) !important;
-}
-
-body.deadline-alert-active .live-broadcast {
-  animation: deadline-flicker 3s ease-in-out infinite;
-}
-
-@keyframes deadline-flicker {
-  0%, 100% { opacity: 1; }
-  45%       { opacity: 1; }
-  50%       { opacity: 0.85; }
-  55%       { opacity: 1; }
-}
-
-/* ==========================================================================
-   MOBILE MENU — SMOOTH SLIDE
-   ========================================================================== */
-#mobileMenu {
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  background: rgba(13, 15, 18, 0.95) !important;
-}
-
-/* ==========================================================================
-   GALERI — MASONRY GRID
-   ========================================================================== */
-.galeri-masonry {
-  columns: 3;
-  column-gap: 12px;
-}
-
-.galeri-masonry .galeri-item {
-  break-inside: avoid;
-  margin-bottom: 12px;
-  display: block;
-}
-
-.galeri-masonry .galeri-item img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-@media (max-width: 768px) {
-  .galeri-masonry {
-    columns: 2;
-  }
-}
-
-@media (max-width: 480px) {
-  .galeri-masonry {
-    columns: 1;
-  }
-}
-
-/* ==========================================================================
-   MOBILE — POLISH ON MOBILE
-   ========================================================================== */
-@media (max-width: 768px) {
-  body::before, body::after { display: none; }
-
-  .brut-card:hover {
-    transform: none !important;
-  }
-}
-
-/* ==========================================================================
-   NAV TITLE SUBTITLES STYLING
-   ========================================================================== */
-.nav-title-main {
-  font-family: 'Archivo Black', sans-serif;
-  font-size: 0.95rem !important;
-  color: var(--text-light);
-  line-height: 1.1;
-}
-
-.nav-title-sub1 {
-  font-size: 0.72rem !important;
-  font-weight: 800;
-  color: var(--cyan) !important;
-  line-height: 1.1;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.nav-title-sub2 {
-  font-size: 0.6rem !important;
-  color: var(--text-muted) !important;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  line-height: 1.1;
-  text-transform: uppercase;
-}
-
-/* Pinned Announcement Icon Pulse */
+/* Pulse Glows */
 @keyframes announce-pulse {
-  from { transform: scale(1); }
-  to { transform: scale(1.08); }
+  0%   { transform: scale(1); box-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
+  100% { transform: scale(1.05); box-shadow: 0 0 25px rgba(245, 158, 11, 0.7); }
+}
+
+@keyframes pulse-cyan {
+  0%   { box-shadow: 0 0 5px rgba(56, 189, 248, 0.4); }
+  100% { box-shadow: 0 0 20px rgba(56, 189, 248, 0.8); }
+}
+
+/* Task priority tags */
+.priority-pill-high {
+  background: rgba(244, 63, 94, 0.15);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+  color: #f43f5e;
+}
+
+.priority-pill-medium {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #f59e0b;
+}
+
+.priority-pill-low {
+  background: rgba(52, 211, 153, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  color: #34d399;
 }
 
 /* ==========================================================================
-   CYBERSEC HONEYPOT STYLE
+   CYBERSEC HONEYPOT STYLE & RETRO TERMINAL
    ========================================================================== */
 @keyframes red-flash {
-  0% { background-color: rgba(255, 0, 85, 0.15); }
-  100% { background-color: rgba(255, 0, 85, 0.4); }
+  0% { background-color: rgba(244, 63, 94, 0.1); box-shadow: 0 0 30px rgba(244, 63, 94, 0.3); }
+  100% { background-color: rgba(244, 63, 94, 0.25); box-shadow: 0 0 60px rgba(244, 63, 94, 0.6); }
 }
 
 .honeypot-overlay {
@@ -579,7 +156,9 @@ body.deadline-alert-active .live-broadcast {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: #000;
+  background: rgba(5, 7, 10, 0.95);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
   z-index: 999999;
   display: flex;
   align-items: center;
@@ -591,56 +170,62 @@ body.deadline-alert-active .live-broadcast {
 .honeypot-warn-card {
   max-width: 650px;
   width: 100%;
-  border: 4px solid #ff0055;
-  background: #080808;
-  padding: 30px;
-  box-shadow: 8px 8px 0px #ff0055;
+  border: 2px solid #f43f5e;
+  border-radius: 16px;
+  background: #090b10;
+  padding: 36px;
+  box-shadow: 0 20px 60px rgba(244, 63, 94, 0.4);
   text-align: center;
-  font-family: 'Space Grotesk', 'Courier New', monospace;
-  animation: red-flash 1s infinite alternate;
+  font-family: 'Space Grotesk', monospace;
+  animation: red-flash 1.2s infinite alternate;
 }
 
 .honeypot-warn-title {
-  font-family: 'Archivo Black', sans-serif;
-  color: #ff0055;
+  font-family: 'Outfit', sans-serif;
+  color: #f43f5e;
   font-size: 1.8rem;
-  margin-bottom: 15px;
-  letter-spacing: 0.05em;
+  font-weight: 900;
+  margin-bottom: 16px;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  text-shadow: 2px 2px 0px #000;
+  text-shadow: 0 0 20px rgba(244, 63, 94, 0.6);
 }
 
 .honeypot-warn-text {
-  color: #fff;
+  color: #f1f5f9;
   font-size: 1rem;
   line-height: 1.6;
   margin-bottom: 20px;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 .honeypot-warn-meta {
-  color: #ff0055;
+  color: #f43f5e;
   font-size: 0.85rem;
-  font-family: monospace;
-  border-top: 2px dashed #ff0055;
-  padding-top: 15px;
-  margin-top: 15px;
+  font-family: 'JetBrains Mono', monospace;
+  border-top: 1px dashed rgba(244, 63, 94, 0.4);
+  padding-top: 16px;
+  margin-top: 16px;
   text-align: left;
-  line-height: 1.4;
+  line-height: 1.5;
+  background: rgba(244, 63, 94, 0.05);
+  padding: 14px;
+  border-radius: 8px;
 }
 
-/* Fake Terminal Consoles */
+/* Fake Terminal Console */
 .fake-terminal-box {
   width: 100%;
-  max-width: 700px;
-  background: #000;
-  border: 3px solid var(--border-color);
-  box-shadow: 6px 6px 0 var(--border-color);
-  font-family: monospace;
-  color: #33ff33;
-  padding: 16px;
+  max-width: 720px;
+  background: #06080c;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.2);
+  font-family: 'JetBrains Mono', monospace;
+  color: #34d399;
+  padding: 20px;
   text-align: left;
-  line-height: 1.4;
+  line-height: 1.5;
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -648,10 +233,10 @@ body.deadline-alert-active .live-broadcast {
 .terminal-line {
   margin-bottom: 6px;
   word-break: break-all;
+  font-size: 0.88rem;
 }
 
 .terminal-line.red {
-  color: #ff0055;
+  color: #f43f5e;
   font-weight: bold;
 }
-

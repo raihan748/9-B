@@ -21,7 +21,7 @@
       canvas.width = W; canvas.height = H;
     });
 
-    const COLORS = ['#A78BFA', '#60A5FA', '#4ECCA3', '#F4A261', '#F87171'];
+    const COLORS = ['#38bdf8', '#a855f7', '#34d399', '#f59e0b', '#f43f5e'];
     const particles = [];
     const COUNT = Math.min(55, Math.floor((W * H) / 20000));
 
