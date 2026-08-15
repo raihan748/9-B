@@ -1,12 +1,12 @@
 /* ==========================================================================
-   PARTICLES + AMBIENT INTERACTION + LIVE CLOCK & ANIMATIONS
-   Visual enhancement layer — 60fps performance for Desktops & Laptops
+   PARTICLES + INTERSECTION OBSERVER ANIMATIONS
+   Visual enhancement layer — murni efek, tidak menyentuh logika Firebase
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  /* ---- 1. CONSTELLATION PARTICLE CANVAS ---- */
+  /* ---- 1. PARTICLE CANVAS ---- */
   function initParticles() {
     const canvas = document.createElement('canvas');
     canvas.id = 'particleCanvas';
@@ -23,19 +23,39 @@
 
     const COLORS = ['#38bdf8', '#a855f7', '#34d399', '#f59e0b', '#f43f5e'];
     const particles = [];
-    const COUNT = Math.min(65, Math.floor((W * H) / 18000));
+    const COUNT = Math.min(55, Math.floor((W * H) / 20000));
 
     for (let i = 0; i < COUNT; i++) {
       particles.push({
         x: Math.random() * W,
         y: Math.random() * H,
-        r: Math.random() * 1.8 + 0.5,
+        r: Math.random() * 1.8 + 0.4,
         color: COLORS[Math.floor(Math.random() * COLORS.length)],
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        alpha: Math.random() * 0.55 + 0.15
+        vx: (Math.random() - 0.5) * 0.25,
+        vy: (Math.random() - 0.5) * 0.25,
+        alpha: Math.random() * 0.5 + 0.1
       });
     }
+
+    let mouse = { x: -1000, y: -1000, active: false };
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      mouse.active = true;
+    });
+    window.addEventListener('mouseleave', () => {
+      mouse.active = false;
+    });
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) {
+        mouse.x = e.touches[0].clientX;
+        mouse.y = e.touches[0].clientY;
+        mouse.active = true;
+      }
+    }, { passive: true });
+    window.addEventListener('touchend', () => {
+      mouse.active = false;
+    });
 
     function draw() {
       ctx.clearRect(0, 0, W, H);
@@ -51,18 +71,33 @@
         ctx.globalAlpha = p.alpha;
         ctx.fill();
 
-        // Connect nearby particles
+        // Interactive line to mouse/touch
+        if (mouse.active) {
+          const dxM = p.x - mouse.x, dyM = p.y - mouse.y;
+          const distM = Math.sqrt(dxM * dxM + dyM * dyM);
+          if (distM < 130) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.strokeStyle = '#38bdf8';
+            ctx.globalAlpha = (1 - distM / 130) * 0.28;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+
+        // Draw lines to nearby particles
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j];
           const dx = p.x - p2.x, dy = p.y - p2.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 120) {
+          if (dist < 110) {
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.strokeStyle = p.color;
-            ctx.globalAlpha = (1 - dist / 120) * 0.15;
-            ctx.lineWidth = 0.6;
+            ctx.globalAlpha = (1 - dist / 110) * 0.12;
+            ctx.lineWidth = 0.5;
             ctx.stroke();
           }
         }
@@ -76,7 +111,7 @@
   /* ---- 2. INTERSECTION OBSERVER — FADE-UP ANIMATION ---- */
   function initScrollAnimations() {
     const targets = document.querySelectorAll(
-      '.brut-card, .widget-header, .task-card, .piket-member, .capsule-message-card, .video-card, .stat-item, .mading-item'
+      '.brut-card, .widget-header, .task-card, .piket-member, .capsule-message-card, .video-card'
     );
 
     targets.forEach((el, idx) => {
@@ -131,6 +166,7 @@
     }, delay);
   }
 
+  // Observe counter DOM changes
   function initCounterAnimations() {
     const counters = ['todoCount', 'progressCount', 'doneCount'];
     counters.forEach(id => {
@@ -172,28 +208,9 @@
     }, { passive: true });
   }
 
-  /* ---- 7. LIVE HERO CLOCK & DATE ---- */
-  function initLiveClock() {
-    const clockEl = document.getElementById('liveClockText');
-    if (!clockEl) return;
-    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-    
-    function update() {
-      const now = new Date();
-      const day = days[now.getDay()];
-      const date = now.getDate();
-      const month = months[now.getMonth()];
-      const year = now.getFullYear();
-      const time = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      clockEl.innerHTML = `${day}, ${date} ${month} ${year} &bull; <strong>${time}</strong>`;
-    }
-    update();
-    setInterval(update, 1000);
-  }
-
   /* ---- INIT ALL ---- */
   document.addEventListener('DOMContentLoaded', () => {
+    // Particles hanya di desktop (hemat performa mobile)
     if (window.innerWidth > 768) initParticles();
 
     setTimeout(() => {
@@ -202,8 +219,7 @@
       initCounterAnimations();
       initBroadcastCursor();
       initNavScroll();
-      initLiveClock();
-    }, 250);
+    }, 300);
   });
 
 })();

@@ -137,19 +137,13 @@
         <!-- Main Column -->
         <div class="lobby-main">
           <div class="hero-brutal">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
-              <div class="hero-subtitle" style="margin-bottom: 0;"><i class="fa-solid fa-sparkles"></i> Portal Resmi Kelas 9B &bull; TA 2025/2026</div>
-              <div id="heroLiveClock" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); display: inline-flex; align-items: center; gap: 8px; padding: 5px 14px; background: rgba(255,255,255,0.04); border-radius: var(--radius-full); border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 0 10px rgba(0,0,0,0.5);">
-                <i class="fa-regular fa-clock" style="color: var(--cyan);"></i> <span id="liveClockText">Memuat waktu...</span>
-              </div>
-            </div>
+            <div class="hero-subtitle"><i class="fa-solid fa-sparkles"></i> Portal Resmi Kelas 9B &bull; TA 2025/2026</div>
             <h1 class="hero-title">Welcome to the<br><span class="accent">9B CLASSROOM</span></h1>
             <p class="hero-desc">Pusat kolaborasi & pemantauan digital Kelas 9B Imam Muslim SMPIT Al-Fityan School Gowa. Pantau tugas, berkomunikasi secara real-time, dan simpan kenangan di Kapsul Waktu.</p>
-            <div style="display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap;">
-              <a href="#" class="brut-btn btn-cyan nav-tab-btn" data-tab="tasks" style="padding: 9px 18px; font-size: 0.82rem;"><i class="fa-solid fa-list-check"></i> Papan Tugas</a>
-              <a href="#" class="brut-btn btn-purple nav-tab-btn" data-tab="chat" style="padding: 9px 18px; font-size: 0.82rem;"><i class="fa-solid fa-comments"></i> Ruang Diskusi</a>
-              <a href="#" class="brut-btn btn-yellow nav-tab-btn" data-tab="jadwal" style="padding: 9px 18px; font-size: 0.82rem;"><i class="fa-solid fa-calendar-days"></i> Jadwal Pelajaran</a>
-              <a href="#" class="brut-btn btn-mint nav-tab-btn" data-tab="galeri" style="padding: 9px 18px; font-size: 0.82rem;"><i class="fa-solid fa-images"></i> Galeri Foto</a>
+            <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+              <a href="#" class="brut-btn btn-cyan nav-tab-btn" data-tab="tasks" style="padding: 8px 16px; font-size: 0.8rem;"><i class="fa-solid fa-list-check"></i> Papan Tugas</a>
+              <a href="#" class="brut-btn btn-purple nav-tab-btn" data-tab="chat" style="padding: 8px 16px; font-size: 0.8rem;"><i class="fa-solid fa-comments"></i> Ruang Diskusi</a>
+              <a href="#" class="brut-btn btn-yellow nav-tab-btn" data-tab="jadwal" style="padding: 8px 16px; font-size: 0.8rem;"><i class="fa-solid fa-calendar-days"></i> Jadwal Pelajaran</a>
             </div>
           </div>
 
@@ -673,6 +667,34 @@
       </p>
     </div>
   </footer>
+
+  <!-- MOBILE BOTTOM FLOATING DOCK -->
+  <div class="mobile-bottom-dock">
+    <a class="dock-item nav-tab-btn active" data-tab="lobby">
+      <i class="fa-solid fa-house"></i>
+      <span>Lobby</span>
+    </a>
+    <a class="dock-item nav-tab-btn" data-tab="tasks">
+      <i class="fa-solid fa-list-check"></i>
+      <span>Tugas</span>
+    </a>
+    <a class="dock-item nav-tab-btn" data-tab="chat">
+      <i class="fa-solid fa-comments"></i>
+      <span>Chat</span>
+    </a>
+    <a class="dock-item nav-tab-btn" data-tab="jadwal">
+      <i class="fa-solid fa-calendar-days"></i>
+      <span>Jadwal</span>
+    </a>
+    <a class="dock-item nav-tab-btn" data-tab="galeri">
+      <i class="fa-solid fa-images"></i>
+      <span>Galeri</span>
+    </a>
+    <a class="dock-item nav-tab-btn" data-tab="capsule">
+      <i class="fa-solid fa-hourglass-half"></i>
+      <span>Kapsul</span>
+    </a>
+  </div>
 
   <!-- ==========================================
        POPUP MODALS (LOGIN ADMIN, TAMBAH TUGAS)
