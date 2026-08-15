@@ -1,12 +1,122 @@
 /* ==========================================================================
-   PARTICLES + INTERSECTION OBSERVER ANIMATIONS
-   Visual enhancement layer — murni efek, tidak menyentuh logika Firebase
+   CLASS 9B CYBER-PREMIUM VISUAL & AUDIO FX ENGINE — 10.000X EDITION
+   Features:
+   1. Interactive Shooting Stars & Responsive Constellation Particle Mesh
+   2. Pure Web Audio API Synthesizer (Futuristic Micro-Sounds)
+   3. 3D Perspective Tilt & Dynamic Specular Glare Reflection on Cards
+   4. Live Digital Clock & Time-of-Day Islamic Greeting Engine
+   5. Confetti Celebration Burst on Task Completion
+   6. Custom Smooth Ambient Micro-interactions
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  /* ---- 1. PARTICLE CANVAS ---- */
+  /* ==========================================================================
+     1. WEB AUDIO API SYNTHESIZER (CYBER SOUND DESIGN)
+     ========================================================================== */
+  let audioCtx = null;
+  let isSoundEnabled = localStorage.getItem('cyber_sound_enabled') !== 'false'; // Default ON
+
+  function getAudioContext() {
+    if (!audioCtx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (AudioContext) audioCtx = new AudioContext();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    return audioCtx;
+  }
+
+  window.playCyberSound = function (type) {
+    if (!isSoundEnabled) return;
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+
+      if (type === 'click') {
+        // Soft high-tech pop
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.exponentialRampToValueAtTime(320, now + 0.05);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      } else if (type === 'tab') {
+        // Smooth chord sweep
+        [523.25, 659.25, 783.99].forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + i * 0.02);
+          gain.gain.setValueAtTime(0.05, now + i * 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now + i * 0.02);
+          osc.stop(now + 0.14);
+        });
+      } else if (type === 'hover') {
+        // Subtle micro-tick
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1400, now);
+        gain.gain.setValueAtTime(0.015, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.02);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.02);
+      } else if (type === 'success') {
+        // Victory chime
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + i * 0.06);
+          gain.gain.setValueAtTime(0.08, now + i * 0.06);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.25);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now + i * 0.06);
+          osc.stop(now + i * 0.06 + 0.26);
+        });
+      }
+    } catch (e) {
+      // Audio context might be restricted before user gesture
+    }
+  };
+
+  function setupSoundToggleUI() {
+    const btn = document.getElementById('soundToggleBtn');
+    if (!btn) return;
+    const updateIcon = () => {
+      btn.innerHTML = isSoundEnabled
+        ? '<i class="fa-solid fa-volume-high" style="color:var(--mint);"></i>'
+        : '<i class="fa-solid fa-volume-xmark" style="color:var(--pink);"></i>';
+      btn.title = isSoundEnabled ? 'Suara Cyber: AKTIF' : 'Suara Cyber: MATI';
+    };
+    updateIcon();
+
+    btn.onclick = () => {
+      isSoundEnabled = !isSoundEnabled;
+      localStorage.setItem('cyber_sound_enabled', isSoundEnabled ? 'true' : 'false');
+      updateIcon();
+      if (isSoundEnabled) window.playCyberSound('click');
+    };
+  }
+
+  /* ==========================================================================
+     2. SHOOTING STARS & PARTICLE CANVAS
+     ========================================================================== */
   function initParticles() {
     const canvas = document.createElement('canvas');
     canvas.id = 'particleCanvas';
@@ -23,7 +133,7 @@
 
     const COLORS = ['#38bdf8', '#a855f7', '#34d399', '#f59e0b', '#f43f5e'];
     const particles = [];
-    const COUNT = Math.min(55, Math.floor((W * H) / 20000));
+    const COUNT = Math.min(60, Math.floor((W * H) / 18000));
 
     for (let i = 0; i < COUNT; i++) {
       particles.push({
@@ -33,8 +143,24 @@
         color: COLORS[Math.floor(Math.random() * COLORS.length)],
         vx: (Math.random() - 0.5) * 0.25,
         vy: (Math.random() - 0.5) * 0.25,
-        alpha: Math.random() * 0.5 + 0.1
+        alpha: Math.random() * 0.6 + 0.1
       });
+    }
+
+    // Shooting Stars (Meteors)
+    const meteors = [];
+    function spawnMeteor() {
+      if (Math.random() < 0.015 && meteors.length < 3) {
+        meteors.push({
+          x: Math.random() * W,
+          y: Math.random() * (H * 0.4),
+          len: Math.random() * 90 + 50,
+          speed: Math.random() * 8 + 6,
+          angle: Math.PI / 4 + (Math.random() - 0.5) * 0.2,
+          alpha: 1,
+          color: Math.random() > 0.5 ? '#38bdf8' : '#a855f7'
+        });
+      }
     }
 
     let mouse = { x: -1000, y: -1000, active: false };
@@ -43,9 +169,7 @@
       mouse.y = e.clientY;
       mouse.active = true;
     });
-    window.addEventListener('mouseleave', () => {
-      mouse.active = false;
-    });
+    window.addEventListener('mouseleave', () => { mouse.active = false; });
     window.addEventListener('touchmove', (e) => {
       if (e.touches.length > 0) {
         mouse.x = e.touches[0].clientX;
@@ -53,12 +177,40 @@
         mouse.active = true;
       }
     }, { passive: true });
-    window.addEventListener('touchend', () => {
-      mouse.active = false;
-    });
+    window.addEventListener('touchend', () => { mouse.active = false; });
 
     function draw() {
       ctx.clearRect(0, 0, W, H);
+
+      // Meteors
+      spawnMeteor();
+      for (let m = meteors.length - 1; m >= 0; m--) {
+        const meteor = meteors[m];
+        meteor.x += Math.cos(meteor.angle) * meteor.speed;
+        meteor.y += Math.sin(meteor.angle) * meteor.speed;
+        meteor.alpha -= 0.012;
+
+        const tailX = meteor.x - Math.cos(meteor.angle) * meteor.len;
+        const tailY = meteor.y - Math.sin(meteor.angle) * meteor.len;
+
+        const grad = ctx.createLinearGradient(tailX, tailY, meteor.x, meteor.y);
+        grad.addColorStop(0, 'rgba(0,0,0,0)');
+        grad.addColorStop(1, meteor.color);
+
+        ctx.beginPath();
+        ctx.moveTo(tailX, tailY);
+        ctx.lineTo(meteor.x, meteor.y);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.5;
+        ctx.globalAlpha = Math.max(0, meteor.alpha);
+        ctx.stroke();
+
+        if (meteor.alpha <= 0 || meteor.x > W || meteor.y > H) {
+          meteors.splice(m, 1);
+        }
+      }
+
+      // Constellation Particles
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         p.x += p.vx; p.y += p.vy;
@@ -71,22 +223,22 @@
         ctx.globalAlpha = p.alpha;
         ctx.fill();
 
-        // Interactive line to mouse/touch
+        // Cursor attraction beam
         if (mouse.active) {
           const dxM = p.x - mouse.x, dyM = p.y - mouse.y;
           const distM = Math.sqrt(dxM * dxM + dyM * dyM);
-          if (distM < 130) {
+          if (distM < 140) {
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(mouse.x, mouse.y);
             ctx.strokeStyle = '#38bdf8';
-            ctx.globalAlpha = (1 - distM / 130) * 0.28;
+            ctx.globalAlpha = (1 - distM / 140) * 0.3;
             ctx.lineWidth = 0.8;
             ctx.stroke();
           }
         }
 
-        // Draw lines to nearby particles
+        // Particle bonds
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j];
           const dx = p.x - p2.x, dy = p.y - p2.y;
@@ -108,7 +260,174 @@
     draw();
   }
 
-  /* ---- 2. INTERSECTION OBSERVER — FADE-UP ANIMATION ---- */
+  /* ==========================================================================
+     3. 3D CARD PERSPECTIVE TILT & SPECULAR GLARE REFLECTION
+     ========================================================================== */
+  function init3DCardTilt() {
+    if (window.innerWidth <= 960) return; // Desktop only for optimal frame rates
+
+    const cards = document.querySelectorAll('.brut-card, .stat-item, .task-card, .mading-item, .hero-brutal');
+    cards.forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -4;
+        const rotateY = ((x - centerX) / centerX) * 4;
+
+        card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-4px)`;
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+      });
+    });
+  }
+
+  /* ==========================================================================
+     4. LIVE DIGITAL CLOCK & DYNAMIC ISLAMIC GREETING
+     ========================================================================== */
+  function initLiveGreetingAndClock() {
+    const greetingEl = document.getElementById('heroLiveGreeting');
+    const clockEl = document.getElementById('heroLiveClock');
+    if (!greetingEl && !clockEl) return;
+
+    function update() {
+      const now = new Date();
+      const hours = now.getHours();
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      const secs = String(now.getSeconds()).padStart(2, '0');
+
+      let greeting = 'Selamat Belajar di Kelas 9B!';
+      let icon = '✨';
+
+      if (hours >= 4 && hours < 11) {
+        greeting = 'Selamat Pagi, Semangat Berprestasi 9B!';
+        icon = '🌅';
+      } else if (hours >= 11 && hours < 15) {
+        greeting = 'Selamat Siang, Jangan Lupa Istirahat & Sholat Dzuhur!';
+        icon = '☀️';
+      } else if (hours >= 15 && hours < 18) {
+        greeting = 'Selamat Sore, Waktunya Mengulang Materi!';
+        icon = '🌇';
+      } else {
+        greeting = 'Selamat Malam, Istirahat Cukup untuk Esok Hari!';
+        icon = '🌙';
+      }
+
+      if (greetingEl) {
+        greetingEl.innerHTML = `<span style="margin-right:6px;">${icon}</span> ${greeting}`;
+      }
+      if (clockEl) {
+        clockEl.innerText = `${String(hours).padStart(2, '0')}:${mins}:${secs} WITA`;
+      }
+    }
+
+    update();
+    setInterval(update, 1000);
+  }
+
+  /* ==========================================================================
+     5. CELEBRATION CONFETTI BURST (FOR TASK COMPLETION)
+     ========================================================================== */
+  window.triggerConfetti = function () {
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;pointer-events:none;';
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const confettis = [];
+    const colors = ['#38bdf8', '#a855f7', '#34d399', '#fbbf24', '#f43f5e'];
+
+    for (let i = 0; i < 70; i++) {
+      confettis.push({
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        w: Math.random() * 8 + 4,
+        h: Math.random() * 6 + 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vx: (Math.random() - 0.5) * 14,
+        vy: (Math.random() - 0.5) * 14 - 3,
+        rot: Math.random() * 360,
+        vRot: (Math.random() - 0.5) * 10,
+        alpha: 1
+      });
+    }
+
+    if (window.playCyberSound) window.playCyberSound('success');
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      confettis.forEach(c => {
+        c.x += c.vx;
+        c.y += c.vy;
+        c.vy += 0.35; // gravity
+        c.rot += c.vRot;
+        c.alpha -= 0.015;
+
+        if (c.alpha > 0) {
+          alive = true;
+          ctx.save();
+          ctx.translate(c.x, c.y);
+          ctx.rotate((c.rot * Math.PI) / 180);
+          ctx.fillStyle = c.color;
+          ctx.globalAlpha = c.alpha;
+          ctx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+          ctx.restore();
+        }
+      });
+
+      if (alive) {
+        requestAnimationFrame(animate);
+      } else {
+        canvas.remove();
+      }
+    }
+    animate();
+  };
+
+  /* ==========================================================================
+     6. TAB SWITCH SOUND & ANIMATIONS
+     ========================================================================== */
+  function observeTabSwitches() {
+    const navBtns = document.querySelectorAll('.nav-tab-btn');
+    navBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (window.playCyberSound) window.playCyberSound('tab');
+        setTimeout(() => {
+          const activeTab = document.querySelector('.tab-content.active');
+          if (!activeTab) return;
+          const cards = activeTab.querySelectorAll('.anim-fade-up');
+          cards.forEach(c => {
+            c.classList.remove('visible');
+            void c.offsetWidth;
+            c.classList.add('visible');
+          });
+          init3DCardTilt();
+        }, 50);
+      });
+
+      btn.addEventListener('mouseenter', () => {
+        if (window.playCyberSound) window.playCyberSound('hover');
+      });
+    });
+
+    // General button sounds
+    document.querySelectorAll('.brut-btn, .admin-login-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (window.playCyberSound) window.playCyberSound('click');
+      });
+    });
+  }
+
+  /* ==========================================================================
+     7. INTERSECTION OBSERVER ANIMATIONS
+     ========================================================================== */
   function initScrollAnimations() {
     const targets = document.querySelectorAll(
       '.brut-card, .widget-header, .task-card, .piket-member, .capsule-message-card, .video-card'
@@ -132,26 +451,9 @@
     targets.forEach(el => observer.observe(el));
   }
 
-  /* ---- 3. TAB SWITCH — RE-TRIGGER ANIMATIONS ---- */
-  function observeTabSwitches() {
-    const navBtns = document.querySelectorAll('.nav-tab-btn');
-    navBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        setTimeout(() => {
-          const activeTab = document.querySelector('.tab-content.active');
-          if (!activeTab) return;
-          const cards = activeTab.querySelectorAll('.anim-fade-up');
-          cards.forEach(c => {
-            c.classList.remove('visible');
-            void c.offsetWidth;
-            c.classList.add('visible');
-          });
-        }, 50);
-      });
-    });
-  }
-
-  /* ---- 4. SMOOTH COUNTER ANIMATION FOR KANBAN COUNTS ---- */
+  /* ==========================================================================
+     8. COUNTER ANIMATIONS
+     ========================================================================== */
   function animateCounter(el, target) {
     const current = parseInt(el.innerText) || 0;
     if (current === target) return;
@@ -166,7 +468,6 @@
     }, delay);
   }
 
-  // Observe counter DOM changes
   function initCounterAnimations() {
     const counters = ['todoCount', 'progressCount', 'doneCount'];
     counters.forEach(id => {
@@ -176,6 +477,9 @@
       new MutationObserver(() => {
         const newVal = parseInt(el.innerText) || 0;
         if (newVal !== lastVal) {
+          if (id === 'doneCount' && newVal > lastVal) {
+            window.triggerConfetti();
+          }
           lastVal = newVal;
           animateCounter(el, newVal);
         }
@@ -183,42 +487,19 @@
     });
   }
 
-  /* ---- 5. TYPING CURSOR ON BROADCAST TEXT ---- */
-  function initBroadcastCursor() {
-    const broadcastEl = document.getElementById('broadcastText');
-    if (!broadcastEl) return;
-    const cursor = document.createElement('span');
-    cursor.style.cssText = 'display:inline-block;width:2px;height:1em;background:currentColor;margin-left:3px;animation:blink-cursor 1s step-end infinite;vertical-align:middle;';
-    const style = document.createElement('style');
-    style.textContent = '@keyframes blink-cursor{0%,100%{opacity:1}50%{opacity:0}}';
-    document.head.appendChild(style);
-    broadcastEl.parentNode.insertBefore(cursor, broadcastEl.nextSibling);
-  }
-
-  /* ---- 6. NAV SCROLL EFFECT ---- */
-  function initNavScroll() {
-    const nav = document.querySelector('nav');
-    if (!nav) return;
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 20) {
-        nav.style.boxShadow = '0 8px 32px rgba(0,0,0,0.6)';
-      } else {
-        nav.style.boxShadow = '0 4px 30px rgba(0,0,0,0.4)';
-      }
-    }, { passive: true });
-  }
-
-  /* ---- INIT ALL ---- */
+  /* ==========================================================================
+     INIT ALL ENGINES
+     ========================================================================== */
   document.addEventListener('DOMContentLoaded', () => {
-    // Particles hanya di desktop (hemat performa mobile)
-    if (window.innerWidth > 768) initParticles();
+    initParticles();
+    setupSoundToggleUI();
+    initLiveGreetingAndClock();
 
     setTimeout(() => {
       initScrollAnimations();
       observeTabSwitches();
       initCounterAnimations();
-      initBroadcastCursor();
-      initNavScroll();
+      init3DCardTilt();
     }, 300);
   });
 
